@@ -1,0 +1,29 @@
+// src/styles/modalStyle.ts
+
+import { StyleSheet } from 'react-native';
+
+export const modalStyles = StyleSheet.create({
+  overlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.3)',
+  },
+  container: {
+    width: 320, // Tailwind 기준 w-80
+    backgroundColor: 'white',
+    borderRadius: 16, // rounded-2xl
+    padding: 24, // p-6
+    gap: 12, // space-y-6
+  },
+  title: {
+    fontSize: 18, // text-lg
+    fontWeight: 'bold',
+    color: 'black',
+  },
+  description: {
+    fontSize: 16, // text-base
+    color: '#767676',
+    marginTop: 8,
+  },
+});
