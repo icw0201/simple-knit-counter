@@ -1,8 +1,8 @@
 ---
 name: feature_issue_template
 about: Suggest an idea for this project
-title: "[Feat]"
-labels: "\U0001F529 Feature"
+title: "feat: "
+labels: "\U00002728 Feature"
 assignees: ''
 
 ---
