@@ -1,8 +1,8 @@
 ---
 name: refactor_issue_template
 about: Describe this issue template's purpose here.
-title: "[Refactor]"
-labels: ''
+title: "refactor: "
+labels: "\U0001F528 Refactor"
 assignees: ''
 
 ---

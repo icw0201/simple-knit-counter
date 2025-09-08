@@ -1,8 +1,8 @@
 ---
 name: bug_issue_template
 about: Create a report to help us improve
-title: "[Bug]"
-labels: "\U0001F528 Fix"
+title: "bug: "
+labels: "\U0001F41E BugFix"
 assignees: ''
 
 ---
