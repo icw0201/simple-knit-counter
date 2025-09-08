@@ -1,0 +1,47 @@
+[
+{
+    "name": "⚙ Setting",
+    "color": "FFB366",
+    "description": "개발 환경 세팅"
+},
+{
+    "name": "✨ Feature",
+    "color": "87CEEB",
+    "description": "기능 개발"
+},
+{
+    "name": "🐞 BugFix",
+    "color": "FFB6C1",
+    "description": "Something isn't working"
+},
+{
+    "name": "🔨 Refactor",
+    "color": "DDA0DD",
+    "description": "코드 리팩토링"
+},
+{
+    "name": "🎨 Style",
+    "color": "FFE4B5",
+    "description": "마크업 & 스타일링"
+},
+{
+    "name": "📃 Docs",
+    "color": "FFE4B5",
+    "description": "문서"
+},
+{
+    "name": "🌏 Deploy",
+    "color": "98FB98",
+    "description": "배포 관련"
+},
+{
+    "name": "🙋‍♂️ Question",
+    "color": "87CEEB",
+    "description": "Further information is requested"
+},
+{
+    "name": "chore",
+    "color": "D9D9D9",
+    "description": "잡다한 일"
+}
+]
