@@ -2,8 +2,8 @@
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import clsx from 'clsx';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { colorStyles, ColorStyleKey } from '@styles/colorStyles';
+import { getLucideIcon } from '@utils/iconUtils';
 
 /**
  * RoundedBox 컴포넌트의 Props 인터페이스
@@ -13,7 +13,7 @@ import { colorStyles, ColorStyleKey } from '@styles/colorStyles';
  * @param title - 박스에 표시될 주요 텍스트
  * @param subtitle - title 아래에 표시될 부제목 (선택사항)
  * @param number - 숫자 값 (선택사항)
- * @param iconName - 표시할 Material Icons 아이콘 이름 (기본값: 'star')
+ * @param iconName - 표시할 Lucide 아이콘 이름 (기본값: 'star')
  * @param rounded - 모서리 둥글기 스타일 (기본값: 'xl')
  * @param colorStyle - 색상 테마 스타일 키 (기본값: 'A')
  * @param layoutStyle - 레이아웃 스타일 ('A' | 'B' | 'C' | 'D' | 'F')
@@ -72,12 +72,17 @@ const renderLayoutC = (title: string, subtitle: string | undefined, number: numb
 /**
  * 레이아웃 스타일 F: 제목과 아이콘을 좌우로 배치
  */
-const renderLayoutF = (title: string, iconName: string, textColor: string, iconColor: string) => (
-  <View className="flex-row items-center justify-between py-3">
-    <Text className={clsx('text-base font-semibold', textColor)}>{title}</Text>
-    <MaterialIcons name={iconName} size={20} color={iconColor} />
-  </View>
-);
+const renderLayoutF = (title: string, iconName: string, textColor: string, iconColor: string) => {
+    // 아이콘 이름을 PascalCase로 변환하고 Lucide 아이콘으로 렌더링
+    const IconComponent = getLucideIcon(iconName);
+
+  return (
+    <View className="flex-row items-center justify-between py-3">
+      <Text className={clsx('text-base font-semibold', textColor)}>{title}</Text>
+      <IconComponent size={20} color={iconColor} />
+    </View>
+  );
+};
 
 /**
  * 기본 레이아웃: 중앙 정렬된 제목 표시

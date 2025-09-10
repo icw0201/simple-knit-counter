@@ -1,7 +1,7 @@
 // src/components/RadioButtonGroup.tsx
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import { Check } from 'lucide-react-native';
 import clsx from 'clsx';
 import { colorStyles } from '@styles/colorStyles';
 
@@ -68,7 +68,7 @@ const renderRadioButton = (option: Option, isSelected: boolean, onSelect: (value
     >
       {/* 선택된 상태일 때만 체크 아이콘 표시 */}
       {isSelected && (
-        <MaterialIcons name="check" size={14} color="#fff" />
+        <Check size={14} color="white" />
       )}
     </View>
     {/* 옵션 라벨 텍스트 */}

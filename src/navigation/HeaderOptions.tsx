@@ -1,12 +1,11 @@
 // src/navigation/HeaderOptions.tsx
 
 import React from 'react';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import { ChevronLeft, Settings, Trash2, Info } from 'lucide-react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from './AppNavigator';
-import { View } from 'react-native';
 
-import { Image, TouchableOpacity } from 'react-native';
+import { View, Image, TouchableOpacity } from 'react-native';
 import { activateIcons } from '@assets/images';
 import { ActivateMode } from '@storage/types';
 
@@ -15,12 +14,9 @@ export const getDefaultHeaderLeft = (
 ) => ({
   headerLeft: () => (
     <View className="mr-2 items-center">
-      <MaterialIcons
-        name="chevron-left"
-        size={28}
-        color="black"
-        onPress={() => navigation.goBack()}
-      />
+      <TouchableOpacity onPress={() => navigation.goBack()}>
+        <ChevronLeft size={28} color="black" />
+      </TouchableOpacity>
     </View>
   ),
 });
@@ -30,12 +26,9 @@ export const getDefaultHeaderRight = (
   navigation: NativeStackNavigationProp<RootStackParamList>
 ) => ({
   headerRight: () => (
-    <MaterialIcons
-      name="settings"
-      size={24}
-      color="black"
-      onPress={() => navigation.navigate('Setting')}
-    />
+    <TouchableOpacity onPress={() => navigation.navigate('Setting')}>
+      <Settings size={24} color="black" />
+    </TouchableOpacity>
   ),
 });
 
@@ -46,19 +39,12 @@ export const getHeaderRightWithEditAndSettings = (
 ): React.JSX.Element => {
   return (
     <View className="flex-row">
-      <MaterialIcons
-        name="delete-sweep"
-        size={24}
-        color="black"
-        style={{ marginRight: 12 }}
-        onPress={onEditPress}
-      />
-      <MaterialIcons
-        name="settings"
-        size={24}
-        color="black"
-        onPress={() => navigation.navigate('Setting')}
-      />
+      <TouchableOpacity onPress={onEditPress} style={{ marginRight: 12 }}>
+        <Trash2 size={24} color="black" />
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => navigation.navigate('Setting')}>
+        <Settings size={24} color="black" />
+      </TouchableOpacity>
     </View>
   );
 };
@@ -71,26 +57,15 @@ export const getHeaderRightWithInfoEditAndSettings = (
 ): React.JSX.Element => {
   return (
     <View className="flex-row">
-      <MaterialIcons
-        name="info-outline"
-        size={26}
-        color="black"
-        style={{ marginRight: 16 }}
-        onPress={onInfoPress}
-      />
-      <MaterialIcons
-        name="delete-sweep"
-        size={24}
-        color="black"
-        style={{ marginRight: 12 }}
-        onPress={onEditPress}
-      />
-      <MaterialIcons
-        name="settings"
-        size={24}
-        color="black"
-        onPress={() => navigation.navigate('Setting')}
-      />
+      <TouchableOpacity onPress={onInfoPress} style={{ marginRight: 16 }}>
+        <Info size={26} color="black" />
+      </TouchableOpacity>
+      <TouchableOpacity onPress={onEditPress} style={{ marginRight: 12 }}>
+        <Trash2 size={24} color="black" />
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => navigation.navigate('Setting')}>
+        <Settings size={24} color="black" />
+      </TouchableOpacity>
     </View>
   );
 };
@@ -115,22 +90,15 @@ export const getHeaderRightWithActivateInfoSettings = (
 
       {/* Info 버튼 (선택적) */}
       {onInfoPress && (
-        <MaterialIcons
-          name="info-outline"
-          size={26}
-          color="black"
-          style={{ marginRight: 12 }}
-          onPress={onInfoPress}
-        />
+        <TouchableOpacity onPress={onInfoPress} style={{ marginRight: 12 }}>
+          <Info size={26} color="black" />
+        </TouchableOpacity>
       )}
 
       {/* 설정 */}
-      <MaterialIcons
-        name="settings"
-        size={24}
-        color="black"
-        onPress={() => navigation.navigate('Setting')}
-      />
+      <TouchableOpacity onPress={() => navigation.navigate('Setting')}>
+        <Settings size={24} color="black" />
+      </TouchableOpacity>
     </View>
   );
 };
