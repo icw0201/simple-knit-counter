@@ -13,18 +13,9 @@ interface SlideModalProps {
   onClose?: () => void; // 닫기 콜백 (선택사항)
 }
 
-interface DragState {
-  isDragging: boolean;
-  startY: number;
-  currentY: number;
-  translateY: number;
-}
 
 // ===== 상수 =====
 const { width: screenWidth } = Dimensions.get('window');
-const DRAG_THRESHOLD = 20; // 드래그 감지 임계값 (px)
-const OPEN_THRESHOLD = 50; // 모달 열기 임계값 (px)
-const CLOSE_THRESHOLD = 30; // 모달 닫기 임계값 (px)
 
 // ===== 메인 컴포넌트 =====
 export const SlideModal: React.FC<SlideModalProps> = ({
@@ -38,122 +29,28 @@ export const SlideModal: React.FC<SlideModalProps> = ({
   // ===== 상태 관리 =====
   const modalWidth = screenWidth * 0.9; // 화면의 90%
   const [isOpen, setIsOpen] = useState(false);
-  const [dragState, setDragState] = useState<DragState>({
-    isDragging: false,
-    startY: 0,
-    currentY: 0,
-    translateY: -handleWidth, // 초기값: 핸들만 보이도록
-  });
+  const [translateY, setTranslateY] = useState(-handleWidth); // 초기값: 핸들만 보이도록
 
   const modalRef = useRef<View>(null);
 
-  // ===== 터치 이벤트 핸들러 =====
-
-  // 터치 시작 이벤트 처리
-  const handleTouchStart = (e: any) => {
-    const touch = e.nativeEvent.touches[0];
-    setDragState((prev) => ({
-      ...prev,
-      startY: touch.pageX,
-      currentY: touch.pageX,
-      isDragging: false, // 처음에는 드래그 상태가 아님
-    }));
+  // ===== 핸들러 함수들 =====
+  
+  // 모달 열기
+  const handleOpen = () => {
+    setTranslateY(-modalWidth);
+    setIsOpen(true);
   };
 
-  // 터치 이동 이벤트 처리 (드래그)
-  const handleTouchMove = (e: any) => {
-    const touch = e.nativeEvent.touches[0];
-    const deltaX = touch.pageX - dragState.startY;
-
-    // 드래그 상태로 전환
-    if (Math.abs(deltaX) > DRAG_THRESHOLD && !dragState.isDragging) {
-      setDragState((prev) => ({ ...prev, isDragging: true }));
-    }
-
-    if (dragState.isDragging) {
-      if (isOpen) {
-        // 열려있을 때: 오른쪽으로만 드래그 가능
-        if (deltaX >= 0) {
-          setDragState((prev) => ({
-            ...prev,
-            translateY: -modalWidth + deltaX,
-            currentY: touch.pageX,
-          }));
-        }
-      } else {
-        // 닫혀있을 때: 왼쪽으로만 드래그 가능
-        if (deltaX <= 0) {
-          setDragState((prev) => ({
-            ...prev,
-            translateY: -handleWidth + deltaX,
-            currentY: touch.pageX,
-          }));
-        }
-      }
-    }
+  // 모달 닫기
+  const handleClose = () => {
+    setTranslateY(-handleWidth);
+    setIsOpen(false);
+    onClose?.();
   };
 
-  // 터치 종료 이벤트 처리 (드래그 완료)
-  const handleTouchEnd = () => {
-    if (!dragState.isDragging) {
-      return;
-    }
-
-    setDragState((prev) => ({ ...prev, isDragging: false }));
-    const deltaX = dragState.currentY - dragState.startY;
-
-    if (isOpen) {
-      // 열려있을 때: 오른쪽으로 충분히 드래그하면 닫힘
-      if (deltaX > CLOSE_THRESHOLD) {
-        setDragState((prev) => ({ ...prev, translateY: -handleWidth }));
-        setIsOpen(false);
-        onClose?.();
-      } else {
-        // 원래 열린 위치로 복귀
-        setDragState((prev) => ({ ...prev, translateY: -modalWidth }));
-      }
-    } else {
-      // 닫혀있을 때: 왼쪽으로 충분히 드래그하면 열림
-      if (deltaX < -OPEN_THRESHOLD) {
-        setDragState((prev) => ({ ...prev, translateY: -modalWidth }));
-        setIsOpen(true);
-      } else {
-        // 원래 닫힌 위치로 복귀
-        setDragState((prev) => ({ ...prev, translateY: -handleWidth }));
-      }
-    }
-  };
-
-  // 단순 터치 이벤트 처리 (드래그가 아닌 경우)
-  const handlePress = () => {
-    const deltaX = Math.abs(dragState.currentY - dragState.startY);
-    if (deltaX > DRAG_THRESHOLD) {
-      return; // 드래그로 간주
-    }
-
-    if (isOpen) {
-      // 열려있을 때: 터치하면 닫기
-      setDragState((prev) => ({ ...prev, translateY: -handleWidth }));
-      setIsOpen(false);
-      onClose?.();
-    } else {
-      // 닫혀있을 때: 터치하면 열기
-      setDragState((prev) => ({ ...prev, translateY: -modalWidth }));
-      setIsOpen(true);
-    }
-  };
-
-  // 터치 종료 시 드래그/터치 구분 처리
-  const handleTouchEndWithCheck = () => {
-    const deltaX = Math.abs(dragState.currentY - dragState.startY);
-
-    if (deltaX <= DRAG_THRESHOLD) {
-      // 드래그가 아닌 단순 터치
-      handlePress();
-    } else {
-      // 드래그
-      handleTouchEnd();
-    }
+  // 드래그 위치 업데이트
+  const handleDragUpdate = (newTranslateY: number) => {
+    setTranslateY(newTranslateY);
   };
 
 
@@ -180,7 +77,7 @@ export const SlideModal: React.FC<SlideModalProps> = ({
           // Android용 그림자
           elevation: 3,
           transform: [
-            { translateX: dragState.translateY },
+            { translateX: translateY },
             { translateY: -height / 2 },
           ],
         }}
@@ -206,10 +103,11 @@ export const SlideModal: React.FC<SlideModalProps> = ({
         isOpen={isOpen}
         height={height}
         handleWidth={handleWidth}
-        translateY={dragState.translateY}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEndWithCheck}
+        modalWidth={modalWidth}
+        translateY={translateY}
+        onOpen={handleOpen}
+        onClose={handleClose}
+        onDragUpdate={handleDragUpdate}
       />
     </View>
   );
