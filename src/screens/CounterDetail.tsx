@@ -19,7 +19,7 @@ import { Counter } from '@storage/types';
 import { getSoundSetting, getVibrationSetting, getScreenAwakeSetting } from '@storage/settings';
 
 import CircleIcon from '@components/common/CircleIcon';
-import CustomModal from '@components/common/modals/CustomModal';
+import { ConfirmModal, CounterEditModal } from '@components/common/modals';
 import { Images } from '@assets/images';
 
 // Android New Architecture에서 레이아웃 애니메이션 활성화
@@ -405,12 +405,12 @@ const CounterDetail = () => {
   /**
    * 편집 모달에서 확인 시 카운트 업데이트
    */
-  const handleEditConfirm = () => {
+  const handleEditConfirm = (value: string) => {
     if (!counter) {
       return;
     }
 
-    const newValue = parseInt(currentCount, 10);
+    const newValue = parseInt(value, 10);
     if (isNaN(newValue)) {
       return;
     }
@@ -514,50 +514,48 @@ const CounterDetail = () => {
       </View>
 
       {/* 초기화 확인 모달 */}
-      <CustomModal
+      <ConfirmModal
         visible={activeModal === 'reset'}
         onClose={handleClose}
         title="숫자 초기화"
         description="숫자를 0으로 초기화하시겠습니까?"
-        buttonType="confirmCancel"
         onConfirm={handleResetConfirm}
-        onCancel={handleClose}
+        confirmText="초기화"
+        cancelText="취소"
+        confirmButtonStyle="danger"
       />
 
       {/* 카운트 편집 모달 */}
-      <CustomModal
+      <CounterEditModal
         visible={activeModal === 'edit'}
         onClose={handleClose}
-        title="카운트 편집"
-        inputVisible
-        inputPlaceholder="숫자를 입력해 주세요"
-        inputValue={currentCount}
-        inputType="number"
-        onInputChange={setCurrentCount}
-        buttonType="confirmCancel"
         onConfirm={handleEditConfirm}
-        onCancel={handleClose}
+        initialValue={currentCount}
+        title="카운트 편집"
       />
 
       {/* 범위 초과 경고 모달 */}
-      <CustomModal
+      <ConfirmModal
         visible={activeModal === 'limit'}
         onClose={handleClose}
         title="범위 초과 안내"
         description="카운터에는 0에서 9999 사이의 값만 입력할 수 있습니다."
-        buttonType="confirm"
         onConfirm={handleClose}
-        onCancel={handleClose}
+        confirmText="확인"
+        cancelText=""
+        confirmButtonStyle="primary"
       />
 
       {/* 에러 모달 */}
-      <CustomModal
+      <ConfirmModal
         visible={errorModalVisible}
         onClose={() => setErrorModalVisible(false)}
         title="오류"
         description={errorMessage}
-        buttonType="confirm"
         onConfirm={() => setErrorModalVisible(false)}
+        confirmText="확인"
+        cancelText=""
+        confirmButtonStyle="primary"
       />
     </View>
   );

@@ -1,7 +1,6 @@
 // src/components/common/modals/ConfirmModal/ConfirmModal.tsx
 import React from 'react';
-import { View, Text } from 'react-native';
-import { BaseModal } from '../BaseModal';
+import { Modal, View, Text, Pressable } from 'react-native';
 import RoundedBox from '@components/common/RoundedBox';
 import { modalStyles } from '@styles/modalStyle';
 
@@ -46,45 +45,55 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
   };
 
   return (
-    <BaseModal
+    <Modal
       visible={visible}
-      onClose={onClose}
-      title={title}
+      transparent
+      animationType="fade"
+      onRequestClose={() => {}} // 뒤로가기 버튼 비활성화
     >
-      {/* 모달 설명 - 줄바꿈 지원 */}
-      <Text style={modalStyles.description}>
-        {description.split('\n').map((line, index) => (
-          <Text key={index}>
-            {line}
-            {'\n'}
-          </Text>
-        ))}
-      </Text>
+      {/* 모달 배경 오버레이 - 클릭 비활성화 */}
+      <Pressable style={[modalStyles.overlay, { zIndex: 1000 }]}>
+        {/* 모달 컨테이너 - 배경 클릭 이벤트 전파 방지 */}
+        <Pressable style={modalStyles.container} onPress={(e) => e.stopPropagation()}>
+          {/* 모달 제목 */}
+          <Text style={modalStyles.title}>{title}</Text>
 
-      {/* 버튼 섹션 - 버튼 타입에 따라 다른 버튼 조합 표시 */}
-      <View className="flex-row justify-evenly">
-        {/* 취소 버튼 */}
-        {cancelText && (
-          <RoundedBox
-            title={cancelText}
-            onPress={onClose}
-            isButton
-            colorStyle="C"
-            rounded="full"
-            containerClassName="mx-1 py-3 px-8"
-          />
-        )}
-        {/* 확인 버튼 */}
-        <RoundedBox
-          title={confirmText}
-          onPress={handleConfirm}
-          isButton
-          colorStyle="E"
-          rounded="full"
-          containerClassName="mx-1 py-3 px-8"
-        />
-      </View>
-    </BaseModal>
+          {/* 모달 설명 - 줄바꿈 지원 */}
+          <Text style={modalStyles.description}>
+            {description.split('\n').map((line, index) => (
+              <Text key={index}>
+                {line}
+                {'\n'}
+              </Text>
+            ))}
+          </Text>
+
+          {/* 버튼 섹션 - 버튼 타입에 따라 다른 버튼 조합 표시 */}
+          <View className="flex-row justify-evenly">
+            {/* 취소 버튼 */}
+            {cancelText && (
+              <RoundedBox
+                title={cancelText}
+                onPress={onClose}
+                isButton
+                colorStyle="C"
+                rounded="full"
+                containerClassName="mx-1 py-3 px-8"
+              />
+            )}
+            {/* 확인 버튼 */}
+            <RoundedBox
+              title={confirmText}
+              onPress={handleConfirm}
+              isButton
+              colorStyle="E"
+              rounded="full"
+              containerClassName="mx-1 py-3 px-8"
+            />
+          </View>
+        </Pressable>
+      </Pressable>
+    </Modal>
   );
 };
 

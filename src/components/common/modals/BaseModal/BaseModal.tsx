@@ -12,7 +12,7 @@ import { modalStyles } from '@styles/modalStyle';
  */
 interface BaseModalProps {
   visible: boolean;
-  onClose: () => void;
+  onClose?: () => void;
   title: string;
   children: React.ReactNode;
 }
@@ -35,7 +35,7 @@ const BaseModal: React.FC<BaseModalProps> = ({
       onRequestClose={onClose}
     >
       {/* 모달 배경 오버레이 - 클릭 시 모달 닫기 */}
-      <Pressable style={modalStyles.overlay} onPress={onClose}>
+      <Pressable style={[modalStyles.overlay, { zIndex: 100 }]} onPress={onClose}>
         {/* 모달 컨테이너 - 배경 클릭 이벤트 전파 방지 */}
         <Pressable style={modalStyles.container} onPress={(e) => e.stopPropagation()}>
           {/* 모달 제목 */}

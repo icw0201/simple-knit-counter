@@ -8,25 +8,13 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import RoundedBox from '@components/common/RoundedBox';
 import CircleIcon from '@components/common/CircleIcon';
-import CustomModal from '@components/common/modals/CustomModal';
+import { ProjectCreateModal, ConfirmModal } from '@components/common/modals';
 import { getHeaderRightWithEditAndSettings } from '@navigation/HeaderOptions';
 
 import { Item } from '@storage/types';
 import { getStoredItems, addItem, removeItem, getAllProjects, getIndependentCounters } from '@storage/storage';
 
-// 상수 정의
-const RADIO_OPTIONS = [
-  {
-    value: 'project',
-    label: '프로젝트',
-    tooltip: '프로젝트는 하위에 여러 카운터를 생성할 수 있습니다.',
-  },
-  {
-    value: 'counter',
-    label: '카운터',
-    tooltip: '단일 카운터를 생성합니다.',
-  },
-];
+// 상수 정의 (ProjectCreateModal에서 사용)
 
 const Main = () => {
   // 네비게이션 객체
@@ -37,10 +25,8 @@ const Main = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<Item | null>(null);
-  const [textValue, setTextValue] = useState('');
   const [items, setItems] = useState<Item[]>([]);
   const [isEditMode, setIsEditMode] = useState(false);
-  const [selectedType, setSelectedType] = useState<string | null>(null);
   const [duplicateModalVisible, setDuplicateModalVisible] = useState(false);
   const [pendingItem, setPendingItem] = useState<Item | null>(null);
 
@@ -103,8 +89,6 @@ const Main = () => {
    */
   const resetModalState = () => {
     setModalVisible(false);
-    setTextValue('');
-    setSelectedType('counter');
   };
 
   /**
@@ -191,10 +175,8 @@ const Main = () => {
   /**
    * 모달에서 확인 시 아이템 생성 및 중복 체크
    */
-  const handleModalConfirm = () => {
-    if (!selectedType || !textValue.trim()) return;
-
-    const newItem = createNewItem(selectedType, textValue);
+  const handleModalConfirm = (name: string, type: 'project' | 'counter') => {
+    const newItem = createNewItem(type, name);
 
     if (checkDuplicateName(newItem)) {
       setPendingItem(newItem);
@@ -294,8 +276,6 @@ const Main = () => {
         colorStyle="C"
         isButton
         onPress={() => {
-          setTextValue('');
-          setSelectedType('counter');
           setModalVisible(true);
         }}
       />
@@ -313,48 +293,42 @@ const Main = () => {
       {renderFloatingAddButton()}
 
       {/* 새 프로젝트/카운터 생성 모달 */}
-      <CustomModal
+      <ProjectCreateModal
         visible={modalVisible}
         onClose={resetModalState}
-        title="새 프로젝트 생성하기"
-        radioOptions={RADIO_OPTIONS}
-        radioValue={selectedType ?? ''}
-        onRadioChange={setSelectedType}
-        inputVisible
-        inputValue={textValue}
-        onInputChange={setTextValue}
-        inputPlaceholder="이름을 입력해 주세요"
-        inputType="text"
-        buttonType="create"
         onConfirm={handleModalConfirm}
-        onCancel={resetModalState}
       />
 
       {/* 삭제 확인 모달 */}
-      <CustomModal
+      <ConfirmModal
         visible={deleteModalVisible}
         onClose={resetDeleteModalState}
         title="삭제"
         description={getDeleteDescription()}
-        buttonType="confirmCancel"
         onConfirm={handleDeleteConfirm}
-        onCancel={resetDeleteModalState}
+        confirmText="삭제"
+        cancelText="취소"
+        confirmButtonStyle="danger"
       />
 
       {/* 중복 이름 확인 모달 */}
-      <CustomModal
+      <ConfirmModal
         visible={duplicateModalVisible}
-        onClose={resetDuplicateModalState}
+        onClose={() => {
+          resetDuplicateModalState();
+          // 중복 모달이 닫힐 때 원래 프로젝트 생성 모달은 유지 (modalVisible은 true로 유지)
+        }}
         title="중복 이름"
         description={`같은 이름을 가진 ${pendingItem?.type === 'project' ? '프로젝트' : '카운터'}가 이미 존재합니다. 생성하시겠습니까?`}
-        buttonType="confirmCancel"
         onConfirm={() => {
           if (pendingItem) {
             proceedAddItem(pendingItem);
           }
-          resetDuplicateModalState();
+          // resetDuplicateModalState는 ConfirmModal의 onClose에서 자동으로 호출됨
         }}
-        onCancel={resetDuplicateModalState}
+        confirmText="생성"
+        cancelText="취소"
+        confirmButtonStyle="primary"
       />
     </SafeAreaView>
   );
