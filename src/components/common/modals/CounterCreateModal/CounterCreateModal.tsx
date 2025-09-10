@@ -53,7 +53,7 @@ const CounterCreateModal: React.FC<CounterCreateModalProps> = ({
     >
       {/* 입력 필드 섹션 */}
       <TextInputBox
-        label="이름"
+        label=""
         value={textValue}
         onChangeText={setTextValue}
         placeholder="카운터 이름을 입력하세요"

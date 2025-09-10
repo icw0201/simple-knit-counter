@@ -78,7 +78,7 @@ const ProjectCreateModal: React.FC<ProjectCreateModalProps> = ({
 
       {/* 입력 필드 섹션 */}
       <TextInputBox
-        label="이름"
+        label=""
         value={textValue}
         onChangeText={setTextValue}
         placeholder="프로젝트 이름을 입력하세요"

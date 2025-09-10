@@ -61,7 +61,7 @@ const CounterEditModal: React.FC<CounterEditModalProps> = ({
     >
       {/* 입력 필드 섹션 */}
       <TextInputBox
-        label="카운트"
+        label=""
         value={textValue}
         onChangeText={setTextValue}
         placeholder="카운트 값을 입력하세요"
