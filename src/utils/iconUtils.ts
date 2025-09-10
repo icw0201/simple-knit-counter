@@ -7,11 +7,11 @@ import * as LucideIcons from 'lucide-react-native';
  * @returns Lucide 아이콘 컴포넌트 또는 기본 Star 아이콘
  */
 export const getLucideIcon = (iconName: string) => {
-  // 아이콘 이름을 PascalCase로 변환
+  // 아이콘 이름을 PascalCase로 변환 (숫자와 문자 모두 처리)
   const pascalCaseName = iconName
-    .replace(/-([a-z])/g, (match, letter) => letter.toUpperCase())
+    .replace(/-([a-z0-9])/g, (match, letter) => letter.toUpperCase())
     .replace(/^[a-z]/, (letter) => letter.toUpperCase());
-  
+
   // Lucide 아이콘 컴포넌트 반환 (없으면 Star 아이콘을 기본값으로)
   return LucideIcons[pascalCaseName] || LucideIcons.Star;
 };

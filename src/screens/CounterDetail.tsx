@@ -500,7 +500,7 @@ const CounterDetail = () => {
             {/* 편집 버튼 */}
             <CircleIcon
               size={iconSize}
-              iconName="edit-3"
+              iconName="pencil"
               colorStyle="D"
               isButton
               containerClassName="mx-2"
