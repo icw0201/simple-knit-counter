@@ -13,5 +13,5 @@ export const getLucideIcon = (iconName: string) => {
     .replace(/^[a-z]/, (letter) => letter.toUpperCase());
 
   // Lucide 아이콘 컴포넌트 반환 (없으면 Star 아이콘을 기본값으로)
-  return LucideIcons[pascalCaseName] || LucideIcons.Star;
+  return (LucideIcons as any)[pascalCaseName] || LucideIcons.Star;
 };
