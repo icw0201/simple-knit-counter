@@ -48,7 +48,7 @@ const CheckBox: React.FC<CheckBoxProps> = ({ label, checked, onToggle, disabled 
       <View className={checkboxClass}>
         {/* 체크된 상태일 때만 체크 아이콘 표시 */}
         {checked && (
-          <Check size={16} color="#fff" />
+          <Check size={16} color="white" />
         )}
       </View>
     </TouchableOpacity>

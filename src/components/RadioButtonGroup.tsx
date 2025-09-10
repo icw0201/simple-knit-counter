@@ -68,7 +68,7 @@ const renderRadioButton = (option: Option, isSelected: boolean, onSelect: (value
     >
       {/* 선택된 상태일 때만 체크 아이콘 표시 */}
       {isSelected && (
-        <Check size={14} color="#fff" />
+        <Check size={14} color="white" />
       )}
     </View>
     {/* 옵션 라벨 텍스트 */}
