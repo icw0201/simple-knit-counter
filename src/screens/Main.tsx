@@ -6,9 +6,9 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '@navigation/AppNavigator';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import RoundedBox from '@components/RoundedBox';
-import CircleIcon from '@components/CircleIcon';
-import CustomModal from '@components/CustomModal';
+import RoundedBox from '@components/common/RoundedBox';
+import CircleIcon from '@components/common/CircleIcon';
+import CustomModal from '@components/common/modals/CustomModal';
 import { getHeaderRightWithEditAndSettings } from '@navigation/HeaderOptions';
 
 import { Item } from '@storage/types';

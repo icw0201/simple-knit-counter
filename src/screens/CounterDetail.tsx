@@ -18,8 +18,8 @@ import { ActivateMode, Way } from '@storage/types';
 import { Counter } from '@storage/types';
 import { getSoundSetting, getVibrationSetting, getScreenAwakeSetting } from '@storage/settings';
 
-import CircleIcon from '@components/CircleIcon';
-import CustomModal from '@components/CustomModal';
+import CircleIcon from '@components/common/CircleIcon';
+import CustomModal from '@components/common/modals/CustomModal';
 import { Images } from '@assets/images';
 
 // Android New Architecture에서 레이아웃 애니메이션 활성화

@@ -7,8 +7,8 @@ import { useRoute, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '@navigation/AppNavigator';
 
-import TextInputBox from '@components/TextInputBox';
-import RoundedBox from '@components/RoundedBox';
+import TextInputBox from '@components/common/TextInputBox';
+import RoundedBox from '@components/common/RoundedBox';
 
 import { getStoredItems, updateItem } from '@storage/storage';
 import clsx from 'clsx';

@@ -3,10 +3,10 @@ import React from 'react';
 import { Modal, View, Text, Pressable } from 'react-native';
 import { modalStyles } from '@styles/modalStyle';
 
-import TextInputBox from '@components/TextInputBox';
-import RoundedBox from '@components/RoundedBox';
-import CheckBox from '@components/CheckBox';
-import RadioButtonGroup from '@components/RadioButtonGroup';
+import TextInputBox from '@components/common/TextInputBox';
+import RoundedBox from '@components/common/RoundedBox';
+import CheckBox from '@components/common/CheckBox';
+import RadioButtonGroup from '@components/common/RadioButtonGroup';
 
 import clsx from 'clsx';
 

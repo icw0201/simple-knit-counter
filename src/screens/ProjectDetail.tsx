@@ -7,9 +7,9 @@ import { RootStackParamList } from '@navigation/AppNavigator';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import RoundedBox from '@components/RoundedBox';
-import CircleIcon from '@components/CircleIcon';
-import CustomModal from '@components/CustomModal';
+import RoundedBox from '@components/common/RoundedBox';
+import CircleIcon from '@components/common/CircleIcon';
+import CustomModal from '@components/common/modals/CustomModal';
 import { getHeaderRightWithInfoEditAndSettings } from '@navigation/HeaderOptions';
 
 import { Item, Counter, Project } from '@storage/types';

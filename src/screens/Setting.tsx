@@ -4,9 +4,9 @@ import { View, Text, Linking, ScrollView } from 'react-native';
 import { CommonActions, useNavigation } from '@react-navigation/native';
 import { activateKeepAwake, deactivateKeepAwake } from '@sayem314/react-native-keep-awake';
 
-import RoundedBox from '@components/RoundedBox';
-import CheckBox from '@components/CheckBox';
-import CustomModal from '@components/CustomModal';
+import RoundedBox from '@components/common/RoundedBox';
+import CheckBox from '@components/common/CheckBox';
+import CustomModal from '@components/common/modals/CustomModal';
 
 import { clearAllProjectData } from '@storage/storage';
 import {
