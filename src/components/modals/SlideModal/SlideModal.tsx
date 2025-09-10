@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { View, Dimensions, StyleSheet } from 'react-native';
+import { View, Dimensions } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { ModalHandle } from './ModalHandle';
 
@@ -95,7 +95,9 @@ export const SlideModal: React.FC<SlideModalProps> = ({
 
   // 터치 종료 이벤트 처리 (드래그 완료)
   const handleTouchEnd = () => {
-    if (!dragState.isDragging) return;
+    if (!dragState.isDragging) {
+      return;
+    }
 
     setDragState((prev) => ({ ...prev, isDragging: false }));
     const deltaX = dragState.currentY - dragState.startY;
@@ -125,7 +127,9 @@ export const SlideModal: React.FC<SlideModalProps> = ({
   // 단순 터치 이벤트 처리 (드래그가 아닌 경우)
   const handlePress = () => {
     const deltaX = Math.abs(dragState.currentY - dragState.startY);
-    if (deltaX > DRAG_THRESHOLD) return; // 드래그로 간주
+    if (deltaX > DRAG_THRESHOLD) {
+      return; // 드래그로 간주
+    }
 
     if (isOpen) {
       // 열려있을 때: 터치하면 닫기
@@ -152,55 +156,42 @@ export const SlideModal: React.FC<SlideModalProps> = ({
     }
   };
 
-  // ===== 스타일 정의 =====
-  const modalStyle = StyleSheet.create({
-    container: {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      zIndex: 50,
-    },
-    modal: {
-      position: 'absolute',
-      top: '50%',
-      right: -modalWidth,
-      width: modalWidth,
-      height: height,
-      backgroundColor,
-      borderTopLeftRadius: 16,
-      borderBottomLeftRadius: 16,
-      borderLeftWidth: 2,
-      borderTopWidth: 2,
-      borderLeftColor: '#ffffff',
-      borderTopColor: '#ffffff',
-      // iOS용 그림자 (위쪽 그림자 제거)
-      shadowColor: '#000',
-      shadowOffset: { width: -2, height: 2 },
-      shadowOpacity: 0.25,
-      shadowRadius: 3.84,
-      // Android용 그림자
-      elevation: 3,
-      transform: [
-        { translateX: dragState.translateY },
-        { translateY: -height / 2 },
-      ],
-    },
-  });
 
   // ===== 렌더링 =====
   return (
-    <View style={modalStyle.container}>
+    <View className="absolute top-0 left-0 right-0 bottom-0" style={{ zIndex: 50 }}>
       {/* 모달 내용 - 항상 보임, 드래그에 따라 위치 변경 */}
-      <View ref={modalRef} style={modalStyle.modal}>
+      <View
+        ref={modalRef}
+        className="absolute border-t-2 border-l-2 border-white"
+        style={{
+          top: '50%',
+          right: -modalWidth,
+          width: modalWidth,
+          height: height,
+          backgroundColor,
+          borderTopLeftRadius: 16,
+          borderBottomLeftRadius: 16,
+          // iOS용 그림자 (위쪽 그림자 제거)
+          shadowColor: '#000',
+          shadowOffset: { width: -2, height: 2 },
+          shadowOpacity: 0.25,
+          shadowRadius: 3.84,
+          // Android용 그림자
+          elevation: 3,
+          transform: [
+            { translateX: dragState.translateY },
+            { translateY: -height / 2 },
+          ],
+        }}
+      >
         <LinearGradient
           colors={['#ffc7c6', '#ffe1e0', '#ffffff']} // red-orange-200, red-orange-100, white
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
           locations={[0, 0.2, 0.6]} // 그라데이션 비율
-          style={{
-            flex: 1,
+          className="flex-1"
+          style={{ 
             padding: padding,
             borderTopLeftRadius: 16,
             borderBottomLeftRadius: 16,

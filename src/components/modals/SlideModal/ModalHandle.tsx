@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 
 // ===== 타입 정의 =====
@@ -25,18 +25,19 @@ export const ModalHandle: React.FC<ModalHandleProps> = ({
 }) => {
   return (
     <View
-      style={[
-        styles.handle,
-        {
-          right: -handleWidth,
-          width: handleWidth,
-          height: height,
-          transform: [
-            { translateX: translateY },
-            { translateY: -height / 2 },
-          ],
-        },
-      ]}
+      className="absolute top-1/2 bg-transparent"
+      style={{
+        right: -handleWidth,
+        width: handleWidth,
+        height: height,
+        zIndex: 2,
+        borderTopLeftRadius: 16,
+        borderBottomLeftRadius: 16,
+        transform: [
+          { translateX: translateY },
+          { translateY: -height / 2 },
+        ],
+      }}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
@@ -52,22 +53,17 @@ export const ModalHandle: React.FC<ModalHandleProps> = ({
       ) : (
         // 닫혀있을 때: 그라데이션 핸들만 (바 없음)
         <View
+          className="flex-1 border-t-2 border-l-2 border-white overflow-hidden"
           style={{
-            flex: 1,
             borderTopLeftRadius: 16,
             borderBottomLeftRadius: 16,
-            borderLeftWidth: 2,
-            borderTopWidth: 2,
-            borderLeftColor: '#ffffff',
-            borderTopColor: '#ffffff',
-            overflow: 'hidden', // 그라데이션이 둥근 모서리를 따라가도록
           }}
         >
           <LinearGradient
             colors={['#ff6b67', '#ffc7c6']} // 400, 200
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
-            style={{ flex: 1 }}
+            className="flex-1"
           />
         </View>
       )}
@@ -75,14 +71,3 @@ export const ModalHandle: React.FC<ModalHandleProps> = ({
   );
 };
 
-// ===== 스타일 =====
-const styles = StyleSheet.create({
-  handle: {
-    position: 'absolute',
-    top: '50%',
-    backgroundColor: 'transparent',
-    borderTopLeftRadius: 16,
-    borderBottomLeftRadius: 16,
-    zIndex: 2,
-  },
-});
