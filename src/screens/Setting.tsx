@@ -191,7 +191,7 @@ const Settings = () => {
             title="문의하기"
             layoutStyle="F"
             colorStyle="C"
-            iconName="email"
+            iconName="mail"
             isButton
             rounded="2xl"
             containerClassName="mb-4"

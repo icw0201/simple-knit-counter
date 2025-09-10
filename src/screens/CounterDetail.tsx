@@ -490,7 +490,7 @@ const CounterDetail = () => {
             {/* 초기화 버튼 */}
             <CircleIcon
               size={iconSize}
-              iconName="restart-alt"
+              iconName="rotate-ccw"
               colorStyle="D"
               isButton
               containerClassName="mx-2"
@@ -500,7 +500,7 @@ const CounterDetail = () => {
             {/* 편집 버튼 */}
             <CircleIcon
               size={iconSize}
-              iconName="create"
+              iconName="edit-3"
               colorStyle="D"
               isButton
               containerClassName="mx-2"

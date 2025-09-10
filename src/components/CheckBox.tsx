@@ -1,7 +1,7 @@
 // src/components/CheckBox.tsx
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import { Check } from 'lucide-react-native';
 import { colorStyles } from '@styles/colorStyles';
 import clsx from 'clsx';
 
@@ -48,7 +48,7 @@ const CheckBox: React.FC<CheckBoxProps> = ({ label, checked, onToggle, disabled 
       <View className={checkboxClass}>
         {/* 체크된 상태일 때만 체크 아이콘 표시 */}
         {checked && (
-          <MaterialIcons name="check" size={16} color="#fff" />
+          <Check size={16} color="#fff" />
         )}
       </View>
     </TouchableOpacity>

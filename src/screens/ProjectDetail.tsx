@@ -266,7 +266,7 @@ const ProjectDetail = () => {
         <View className="ml-2">
           <CircleIcon
             size={48}
-            iconName="delete"
+            iconName="trash-2"
             colorStyle="D"
             isButton
             onPress={() => {
@@ -289,7 +289,7 @@ const ProjectDetail = () => {
     >
       <CircleIcon
         size={64}
-        iconName="add"
+        iconName="plus"
         colorStyle="C"
         isButton
         onPress={() => {
