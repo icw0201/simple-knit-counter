@@ -9,7 +9,7 @@ interface SlideModalProps {
   height?: number; // 모달의 세로 길이 (기본값: 300)
   handleWidth?: number; // 핸들의 가로 길이 (기본값: 40)
   backgroundColor?: string; // 배경색 (기본값: white)
-  handleColor?: string; // 핸들 색상 (기본값: transparent)
+  padding?: number; // 모달 내부 패딩 (기본값: 20)
   onClose?: () => void; // 닫기 콜백 (선택사항)
 }
 
@@ -32,6 +32,7 @@ export const SlideModal: React.FC<SlideModalProps> = ({
   height = 300,
   handleWidth = 40,
   backgroundColor = 'white',
+  padding = 20,
   onClose,
 }) => {
   // ===== 상태 관리 =====
@@ -200,7 +201,7 @@ export const SlideModal: React.FC<SlideModalProps> = ({
           locations={[0, 0.2, 0.6]} // 그라데이션 비율
           style={{
             flex: 1,
-            padding: 20,
+            padding: padding,
             borderTopLeftRadius: 16,
             borderBottomLeftRadius: 16,
           }}
