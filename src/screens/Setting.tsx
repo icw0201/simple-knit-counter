@@ -4,9 +4,9 @@ import { View, Text, Linking, ScrollView } from 'react-native';
 import { CommonActions, useNavigation } from '@react-navigation/native';
 import { activateKeepAwake, deactivateKeepAwake } from '@sayem314/react-native-keep-awake';
 
-import RoundedBox from '@components/RoundedBox';
-import CheckBox from '@components/CheckBox';
-import CustomModal from '@components/CustomModal';
+import RoundedBox from '@components/common/RoundedBox';
+import CheckBox from '@components/common/CheckBox';
+import { ConfirmModal } from '@components/common/modals';
 
 import { clearAllProjectData } from '@storage/storage';
 import {
@@ -206,24 +206,27 @@ const Settings = () => {
       </ScrollView>
 
       {/* 초기화 확인 모달 */}
-      <CustomModal
+      <ConfirmModal
         visible={resetModalVisible}
         onClose={handleResetModalClose}
         title="초기화"
         description="정말 프로젝트 정보를 모두 삭제하시겠습니까?"
-        buttonType="confirmCancel"
         onConfirm={handleResetConfirm}
-        onCancel={handleResetModalClose}
+        confirmText="삭제"
+        cancelText="취소"
+        confirmButtonStyle="danger"
       />
 
       {/* 에러 알림 모달 */}
-      <CustomModal
+      <ConfirmModal
         visible={errorModalVisible}
         onClose={() => setErrorModalVisible(false)}
         title="오류"
         description={errorMessage}
-        buttonType="confirm"
         onConfirm={() => setErrorModalVisible(false)}
+        confirmText="확인"
+        cancelText=""
+        confirmButtonStyle="primary"
       />
     </View>
   );

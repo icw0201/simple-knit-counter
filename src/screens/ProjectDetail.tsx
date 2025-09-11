@@ -7,9 +7,9 @@ import { RootStackParamList } from '@navigation/AppNavigator';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import RoundedBox from '@components/RoundedBox';
-import CircleIcon from '@components/CircleIcon';
-import CustomModal from '@components/CustomModal';
+import RoundedBox from '@components/common/RoundedBox';
+import CircleIcon from '@components/common/CircleIcon';
+import { CounterCreateModal, ConfirmModal } from '@components/common/modals';
 import { getHeaderRightWithInfoEditAndSettings } from '@navigation/HeaderOptions';
 
 import { Item, Counter, Project } from '@storage/types';
@@ -181,12 +181,13 @@ const ProjectDetail = () => {
   /**
    * 모달에서 확인 시 카운터 생성 및 중복 체크
    */
-  const handleModalConfirm = () => {
-    if (!textValue.trim()) {
+  const handleModalConfirm = (name?: string) => {
+    const counterName = name || textValue;
+    if (!counterName.trim()) {
       return;
     }
 
-    const newCounter = createNewCounter(textValue);
+    const newCounter = createNewCounter(counterName);
 
     if (checkDuplicateName(newCounter)) {
       setPendingCounter(newCounter);
@@ -311,45 +312,45 @@ const ProjectDetail = () => {
       {renderFloatingAddButton()}
 
       {/* 새 카운터 생성 모달 */}
-      <CustomModal
+      <CounterCreateModal
         visible={modalVisible}
         onClose={resetModalState}
         title="새 카운터 생성하기"
-        inputVisible
-        inputValue={textValue}
-        onInputChange={setTextValue}
-        inputPlaceholder="이름을 입력해 주세요"
-        inputType="text"
-        buttonType="create"
-        onConfirm={handleModalConfirm}
-        onCancel={resetModalState}
+        onConfirm={(name) => {
+          handleModalConfirm(name);
+        }}
       />
 
       {/* 삭제 확인 모달 */}
-      <CustomModal
+      <ConfirmModal
         visible={deleteModalVisible}
         onClose={resetDeleteModalState}
         title="삭제"
         description={`"${itemToDelete?.title}" 카운터를 삭제하시겠습니까?`}
-        buttonType="confirmCancel"
         onConfirm={handleDeleteConfirm}
-        onCancel={resetDeleteModalState}
+        confirmText="삭제"
+        cancelText="취소"
+        confirmButtonStyle="danger"
       />
 
       {/* 중복 이름 확인 모달 */}
-      <CustomModal
+      <ConfirmModal
         visible={duplicateModalVisible}
-        onClose={resetDuplicateModalState}
+        onClose={() => {
+          resetDuplicateModalState();
+          // 중복 모달이 닫힐 때 원래 카운터 생성 모달은 유지 (modalVisible은 true로 유지)
+        }}
         title="중복 이름"
         description="같은 이름의 카운터가 이미 존재합니다. 생성하시겠습니까?"
-        buttonType="confirmCancel"
         onConfirm={() => {
           if (pendingCounter) {
             proceedAddCounter(pendingCounter);
           }
-          resetDuplicateModalState();
+          // resetDuplicateModalState는 ConfirmModal의 onClose에서 자동으로 호출됨
         }}
-        onCancel={resetDuplicateModalState}
+        confirmText="생성"
+        cancelText="취소"
+        confirmButtonStyle="primary"
       />
     </SafeAreaView>
   );
