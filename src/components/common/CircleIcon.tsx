@@ -2,7 +2,7 @@
 import React from 'react';
 import { View, TouchableOpacity } from 'react-native';
 import clsx from 'clsx';
-import { colorStyles, ColorStyleKey } from '../../styles/colorStyles';
+import { colorStyles, ColorStyleKey } from '@styles/colorStyles';
 import { getLucideIcon } from '@utils/iconUtils';
 
 /**
