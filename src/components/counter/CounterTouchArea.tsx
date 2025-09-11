@@ -20,9 +20,10 @@ const CounterTouchArea: React.FC<CounterTouchAreaProps> = ({
 
   return (
     <View className="absolute top-0 left-0 right-0 bottom-0 flex-row">
-      {/* 왼쪽 터치 영역 (감소) */}
+      {/* 왼쪽 터치 영역 (감소) - 37% */}
       <Pressable
-        className={`flex-1 items-start justify-center ${leftPressed ? 'bg-gray-100' : 'bg-white'}`}
+        className={`items-start justify-center ${leftPressed ? 'bg-gray-100' : 'bg-white'}`}
+        style={{ width: '37%' }}
         onPress={() => {
           setLeftPressed(true);
           onSubtract();
@@ -32,9 +33,10 @@ const CounterTouchArea: React.FC<CounterTouchAreaProps> = ({
         <Text className="text-6xl text-red-500 ml-6">-</Text>
       </Pressable>
 
-      {/* 오른쪽 터치 영역 (증가) */}
+      {/* 오른쪽 터치 영역 (증가) - 63% */}
       <Pressable
-        className={`flex-1 items-end justify-center ${rightPressed ? 'bg-red-200' : 'bg-red-100'}`}
+        className={`items-end justify-center ${rightPressed ? 'bg-red-200' : 'bg-red-100'}`}
+        style={{ width: '63%' }}
         onPress={() => {
           setRightPressed(true);
           onAdd();
