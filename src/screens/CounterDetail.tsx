@@ -187,6 +187,22 @@ const CounterDetail = () => {
         />
       </View>
 
+
+      {/* 서브 카운터 모달 */}
+      <SubCounterModal
+        isOpen={subModalIsOpen}
+        onToggle={handleSubModalToggle}
+        onClose={handleSlideModalClose}
+        onAdd={handleSubAdd}
+        onSubtract={handleSubSubtract}
+        onReset={handleSubReset}
+        onEdit={handleSubEdit}
+        onRule={handleSubRule}
+        subCount={subCount}
+        subRule={subRule}
+        subRuleIsActive={subRuleIsActive}
+      />
+
       {/* 모달들 */}
       <CounterModals
         activeModal={activeModal}
@@ -203,21 +219,6 @@ const CounterDetail = () => {
         onSubEditConfirm={handleSubEditConfirm}
         onSubResetConfirm={handleSubResetConfirm}
         onSubRuleConfirm={handleSubRuleConfirm}
-      />
-
-      {/* 서브 카운터 모달 */}
-      <SubCounterModal
-        isOpen={subModalIsOpen}
-        onToggle={handleSubModalToggle}
-        onClose={handleSlideModalClose}
-        onAdd={handleSubAdd}
-        onSubtract={handleSubSubtract}
-        onReset={handleSubReset}
-        onEdit={handleSubEdit}
-        onRule={handleSubRule}
-        subCount={subCount}
-        subRule={subRule}
-        subRuleIsActive={subRuleIsActive}
       />
       </View>
     </SafeAreaView>
