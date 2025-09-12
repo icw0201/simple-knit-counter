@@ -23,9 +23,12 @@ const SubCounterTouchArea: React.FC<SubCounterTouchAreaProps> = ({
 
   return (
     <View className="absolute top-0 left-0 right-0 bottom-0 flex-row" style={{ paddingLeft: handleWidth }}>
-      {/* 왼쪽 영역 (감소) - 흰색 */}
+      {/* 왼쪽 영역 (감소) - 투명 배경 */}
       <Pressable
-        className={`flex-1 items-start justify-center ${leftPressed ? 'bg-gray-100' : 'bg-white'}`}
+        className={`flex-1 items-start justify-center ${leftPressed ? 'bg-gray-100' : 'bg-transparent'}`}
+        style={{
+          mixBlendMode: leftPressed ? 'multiply' : 'normal',
+        }}
         onPress={() => {
           setLeftPressed(true);
           onSubtract?.();
@@ -40,9 +43,12 @@ const SubCounterTouchArea: React.FC<SubCounterTouchAreaProps> = ({
         />
       </Pressable>
 
-      {/* 오른쪽 영역 (증가) - 붉은색 */}
+      {/* 오른쪽 영역 (증가) - 투명 배경 */}
       <Pressable
-        className={`flex-1 items-end justify-center ${rightPressed ? 'bg-red-600' : 'bg-red-500'}`}
+        className={`flex-1 items-end justify-center ${rightPressed ? 'bg-gray-100' : 'bg-transparent'}`}
+        style={{
+          mixBlendMode: rightPressed ? 'multiply' : 'normal',
+        }}
         onPress={() => {
           setRightPressed(true);
           onAdd?.();
@@ -51,7 +57,7 @@ const SubCounterTouchArea: React.FC<SubCounterTouchAreaProps> = ({
       >
         <Plus
           size={24}
-          color="white"
+          color="#fc3e39"
           strokeWidth={2}
           className="mr-3"
         />
