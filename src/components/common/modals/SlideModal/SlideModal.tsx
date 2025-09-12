@@ -34,7 +34,7 @@ export const SlideModal: React.FC<SlideModalProps> = ({
   const modalRef = useRef<View>(null);
 
   // ===== 핸들러 함수들 =====
-  
+
   // 모달 열기
   const handleOpen = () => {
     setTranslateY(-modalWidth);
@@ -56,7 +56,11 @@ export const SlideModal: React.FC<SlideModalProps> = ({
 
   // ===== 렌더링 =====
   return (
-    <View className="absolute top-0 left-0 right-0 bottom-0" style={{ zIndex: 50 }}>
+    <View
+      className="absolute top-0 left-0 right-0 bottom-0"
+      style={{ zIndex: 50 }}
+      pointerEvents={isOpen ? 'auto' : 'box-none'}
+    >
       {/* 모달 내용 - 항상 보임, 드래그에 따라 위치 변경 */}
       <View
         ref={modalRef}
@@ -88,7 +92,7 @@ export const SlideModal: React.FC<SlideModalProps> = ({
           end={{ x: 1, y: 0 }}
           locations={[0, 0.2, 0.6]} // 그라데이션 비율
           className="flex-1"
-          style={{ 
+          style={{
             padding: padding,
             borderTopLeftRadius: 16,
             borderBottomLeftRadius: 16,

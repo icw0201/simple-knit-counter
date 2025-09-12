@@ -81,10 +81,20 @@ import ProjectCreateModal from '@components/common/modals/ProjectCreateModal';
 import { SlideModal } from '@components/common/modals/SlideModal';
 
 <SlideModal
-  visible={true}
+  height={300}
+  handleWidth={40}
+  backgroundColor="white"
+  padding={20}
   onClose={() => {}}
-  title="설정"
 >
   <Text>모달 내용</Text>
 </SlideModal>
 ```
+
+**Props:**
+- `children`: 모달 내용 (필수)
+- `height?`: 모달의 세로 길이 (기본값: 300)
+- `handleWidth?`: 핸들의 가로 길이 (기본값: 40)
+- `backgroundColor?`: 배경색 (기본값: white)
+- `padding?`: 모달 내부 패딩 (기본값: 20)
+- `onClose?`: 닫기 콜백 (선택사항)
