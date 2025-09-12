@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { View, Dimensions } from 'react-native';
+import { View, Dimensions, DimensionValue } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { ModalHandle } from './ModalHandle';
 
@@ -10,6 +10,7 @@ interface SlideModalProps {
   handleWidth?: number; // 핸들의 가로 길이 (기본값: 40)
   backgroundColor?: string; // 배경색 (기본값: white)
   padding?: number; // 모달 내부 패딩 (기본값: 20)
+  top?: DimensionValue; // 모달의 상단 위치 (기본값: '50%')
   onClose?: () => void; // 닫기 콜백 (선택사항)
 }
 
@@ -24,6 +25,7 @@ export const SlideModal: React.FC<SlideModalProps> = ({
   handleWidth = 40,
   backgroundColor = 'white',
   padding = 20,
+  top = '50%',
   onClose,
 }) => {
   // ===== 상태 관리 =====
@@ -66,7 +68,7 @@ export const SlideModal: React.FC<SlideModalProps> = ({
         ref={modalRef}
         className="absolute border-t-2 border-l-2 border-white"
         style={{
-          top: '50%',
+          top: top,
           right: -modalWidth,
           width: modalWidth,
           height: height,
@@ -109,6 +111,7 @@ export const SlideModal: React.FC<SlideModalProps> = ({
         handleWidth={handleWidth}
         modalWidth={modalWidth}
         translateY={translateY}
+        top={top}
         onOpen={handleOpen}
         onClose={handleClose}
         onDragUpdate={handleDragUpdate}

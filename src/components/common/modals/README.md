@@ -97,4 +97,5 @@ import { SlideModal } from '@components/common/modals/SlideModal';
 - `handleWidth?`: 핸들의 가로 길이 (기본값: 40)
 - `backgroundColor?`: 배경색 (기본값: white)
 - `padding?`: 모달 내부 패딩 (기본값: 20)
+- `top?`: 모달의 상단 위치 (기본값: '50%')
 - `onClose?`: 닫기 콜백 (선택사항)
