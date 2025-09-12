@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import { SlideModal } from '../common/modals/SlideModal/SlideModal';
 import SubCounterAction from './SubCounterAction';
+import SubCounterTouchArea from './SubCounterTouchArea';
 import { getScreenSize, getSubIconSize } from '@constants/screenSizeConfig';
 import { useWindowDimensions } from 'react-native';
 
@@ -11,6 +12,8 @@ interface SubCounterModalProps {
   onReset?: () => void;
   onEdit?: () => void;
   onRule?: () => void;
+  onAdd?: () => void;
+  onSubtract?: () => void;
   handleWidth?: number;
 }
 
@@ -20,6 +23,8 @@ export const SubCounterModal: React.FC<SubCounterModalProps> = ({
   onReset,
   onEdit,
   onRule,
+  onAdd,
+  onSubtract,
   handleWidth = 30,
 }) => {
   // 화면 크기 정보
@@ -35,6 +40,14 @@ export const SubCounterModal: React.FC<SubCounterModalProps> = ({
       top="80%"
       onClose={onClose}
     >
+      {/* 터치 영역 - 배경 100% 차지 */}
+      <SubCounterTouchArea
+        handleWidth={handleWidth}
+        onAdd={onAdd}
+        onSubtract={onSubtract}
+      />
+
+      {/* 콘텐츠 영역 */}
       <View className="flex-1 items-center justify-center" style={{ paddingLeft: handleWidth }}>
 
         <Text className="text-4xl font-bold text-black mt-5 mb-10">

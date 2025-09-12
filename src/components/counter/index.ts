@@ -5,3 +5,4 @@ export { default as CounterActions } from './CounterActions';
 export { default as CounterModals } from './CounterModals';
 export { default as SubCounterModal } from './SubCounterModal';
 export { default as SubCounterAction } from './SubCounterAction';
+export { default as SubCounterTouchArea } from './SubCounterTouchArea';
