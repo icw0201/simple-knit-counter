@@ -7,7 +7,7 @@ import clsx from 'clsx';
 const INPUT_LIMITS = {
   number: 4,
   text: 15,
-  longText: 70,
+  longText: 500,
 } as const;
 
 const DATE_MAX_LENGTH = 8;
@@ -17,7 +17,7 @@ const DATE_MAX_LENGTH = 8;
  * - number: 숫자만 입력 가능 (최대 4자리)
  * - text: 일반 텍스트 입력 (최대 15자리)
  * - date: 날짜 형식 입력 (YYYY.MM.DD)
- * - longText: 긴 텍스트 입력 (최대 70자리, 여러 줄 지원)
+ * - longText: 긴 텍스트 입력 (최대 500자리, 여러 줄 지원)
  */
 type TextInputType = 'number' | 'text' | 'date' | 'longText';
 
