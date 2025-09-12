@@ -64,6 +64,9 @@ export const useProjectDetail = () => {
       title,
       count: 0,
       parentProjectId: project?.id ?? '',
+      subCount: 0,
+      subRule: 0,
+      subRuleIsActive: false,
     };
   }, [project?.id]);
 

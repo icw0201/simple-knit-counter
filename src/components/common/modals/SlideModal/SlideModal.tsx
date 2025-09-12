@@ -61,7 +61,7 @@ export const SlideModal: React.FC<SlideModalProps> = ({
     <View
       className="absolute top-0 left-0 right-0 bottom-0"
       style={{ zIndex: 50 }}
-      pointerEvents={isOpen ? 'auto' : 'box-none'}
+      pointerEvents="box-none"
     >
       {/* 모달 내용 - 항상 보임, 드래그에 따라 위치 변경 */}
       <View

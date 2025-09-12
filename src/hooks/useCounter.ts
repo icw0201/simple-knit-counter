@@ -19,9 +19,14 @@ interface UseCounterReturn {
   activateMode: ActivateMode;
   way: Way;
   currentCount: string;
-  activeModal: 'reset' | 'edit' | 'limit' | null;
+  activeModal: 'reset' | 'edit' | 'limit' | 'rule' | 'subReset' | 'subEdit' | 'subLimit' | null;
   errorModalVisible: boolean;
   errorMessage: string;
+
+  // 서브 카운터 상태
+  subCount: number;
+  subRule: number;
+  subRuleIsActive: boolean;
 
   // 액션 함수들
   handleAdd: () => void;
@@ -34,7 +39,16 @@ interface UseCounterReturn {
   toggleWay: () => void;
   showErrorModal: (message: string) => void;
   setErrorModalVisible: (visible: boolean) => void;
-  setActiveModal: (modal: 'reset' | 'edit' | 'limit' | null) => void;
+  setActiveModal: (modal: 'reset' | 'edit' | 'limit' | 'rule' | 'subReset' | 'subEdit' | 'subLimit' | null) => void;
+
+  // 서브 카운터 액션 함수들
+  handleSubAdd: () => void;
+  handleSubSubtract: () => void;
+  handleSubReset: () => void;
+  handleSubEdit: () => void;
+  handleSubRule: () => void;
+  handleSubResetConfirm: () => void;
+  handleSubEditConfirm: (value: string) => void;
 }
 
 /**
@@ -42,6 +56,7 @@ interface UseCounterReturn {
  *
  * 주요 기능:
  * - 카운터 값 증가/감소
+ * - 서브 카운터 값 증가/감소
  * - 활성화 모드 전환
  * - 방향 전환
  * - 사운드 및 진동 피드백
@@ -53,7 +68,7 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
   const [counter, setCounter] = useState<Counter | null>(null);
 
   // 모달 상태 관리
-  const [activeModal, setActiveModal] = useState<'reset' | 'edit' | 'limit' | null>(null);
+  const [activeModal, setActiveModal] = useState<'reset' | 'edit' | 'limit' | 'rule' | 'subReset' | 'subEdit' | 'subLimit' | null>(null);
   const [currentCount, setCurrentCount] = useState('');
   const [errorModalVisible, setErrorModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -328,6 +343,123 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     handleClose();
   }, [counter, updateCountAndMaybeWay, handleClose]);
 
+  // 서브 카운터 액션 함수들
+  const handleSubAdd = useCallback(async () => {
+    if (!counter) {
+      return;
+    }
+
+    // 범위 체크: 9999 초과 시 경고 모달 표시
+    if (counter.subCount >= 9999) {
+      setActiveModal('subLimit');
+      return;
+    }
+
+    try {
+      playSound();
+      triggerHaptics();
+
+      const updatedCounter = {
+        ...counter,
+        subCount: counter.subCount + 1,
+      };
+
+      await updateItem(counter.id, updatedCounter);
+      setCounter(updatedCounter);
+    } catch (error) {
+      console.error('서브 카운터 증가 실패:', error);
+      showErrorModal('카운터 업데이트에 실패했습니다.');
+    }
+  }, [counter, playSound, triggerHaptics, showErrorModal]);
+
+  const handleSubSubtract = useCallback(async () => {
+    if (!counter) {
+      return;
+    }
+
+    // 범위 체크: 0 미만 시 경고 모달 표시
+    if (counter.subCount <= 0) {
+      setActiveModal('subLimit');
+      return;
+    }
+
+    try {
+      playSound();
+      triggerHaptics();
+
+      const updatedCounter = {
+        ...counter,
+        subCount: counter.subCount - 1,
+      };
+
+      await updateItem(counter.id, updatedCounter);
+      setCounter(updatedCounter);
+    } catch (error) {
+      console.error('서브 카운터 감소 실패:', error);
+      showErrorModal('카운터 업데이트에 실패했습니다.');
+    }
+  }, [counter, playSound, triggerHaptics, showErrorModal]);
+
+  const handleSubReset = useCallback(() => {
+    setActiveModal('subReset');
+  }, []);
+
+  const handleSubEdit = useCallback(() => {
+    setActiveModal('subEdit');
+  }, []);
+
+  const handleSubRule = useCallback(() => {
+    setActiveModal('rule');
+  }, []);
+
+  // 서브 카운터 초기화 확인
+  const handleSubResetConfirm = useCallback(() => {
+    if (!counter) {
+      return;
+    }
+
+    try {
+      const updatedCounter = {
+        ...counter,
+        subCount: 0,
+      };
+
+      updateItem(counter.id, updatedCounter);
+      setCounter(updatedCounter);
+      handleClose();
+    } catch (error) {
+      console.error('서브 카운터 초기화 실패:', error);
+      showErrorModal('서브 카운터 초기화에 실패했습니다.');
+    }
+  }, [counter, handleClose, showErrorModal]);
+
+  // 서브 카운터 편집 확인
+  const handleSubEditConfirm = useCallback((value: string) => {
+    if (!counter) {
+      return;
+    }
+
+    const newValue = parseInt(value, 10);
+    if (isNaN(newValue) || newValue < 0 || newValue > 9999) {
+      showErrorModal('서브 카운터에는 0에서 9999 사이의 값만 입력할 수 있습니다.');
+      return;
+    }
+
+    try {
+      const updatedCounter = {
+        ...counter,
+        subCount: newValue,
+      };
+
+      updateItem(counter.id, updatedCounter);
+      setCounter(updatedCounter);
+      handleClose();
+    } catch (error) {
+      console.error('서브 카운터 편집 실패:', error);
+      showErrorModal('서브 카운터 편집에 실패했습니다.');
+    }
+  }, [counter, handleClose, showErrorModal]);
+
   return {
     // 상태
     counter,
@@ -337,6 +469,11 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     activeModal,
     errorModalVisible,
     errorMessage,
+
+    // 서브 카운터 상태
+    subCount: counter?.subCount ?? 0,
+    subRule: counter?.subRule ?? 0,
+    subRuleIsActive: counter?.subRuleIsActive ?? false,
 
     // 액션 함수들
     handleAdd,
@@ -350,5 +487,14 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     showErrorModal,
     setErrorModalVisible,
     setActiveModal,
+
+    // 서브 카운터 액션 함수들
+    handleSubAdd,
+    handleSubSubtract,
+    handleSubReset,
+    handleSubEdit,
+    handleSubRule,
+    handleSubResetConfirm,
+    handleSubEditConfirm,
   };
 };

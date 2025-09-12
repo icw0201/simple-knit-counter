@@ -15,6 +15,9 @@ interface SubCounterModalProps {
   onAdd?: () => void;
   onSubtract?: () => void;
   handleWidth?: number;
+  subCount?: number;
+  subRule?: number;
+  subRuleIsActive?: boolean;
 }
 
 // ===== 메인 컴포넌트 =====
@@ -26,6 +29,7 @@ export const SubCounterModal: React.FC<SubCounterModalProps> = ({
   onAdd,
   onSubtract,
   handleWidth = 30,
+  subCount = 0,
 }) => {
   // 화면 크기 정보
   const { height, width } = useWindowDimensions();
@@ -50,9 +54,11 @@ export const SubCounterModal: React.FC<SubCounterModalProps> = ({
       {/* 콘텐츠 영역 */}
       <View className="flex-1 items-center justify-center" style={{ paddingLeft: handleWidth }}>
 
+      <View pointerEvents="none">
         <Text className="text-4xl font-bold text-black mt-5 mb-10">
-          NUM
+          {subCount}
         </Text>
+      </View>
 
         {/* 액션 버튼들 */}
         <SubCounterAction
