@@ -1,6 +1,6 @@
 // src/components/counter/CounterModals.tsx
 import React from 'react';
-import { ConfirmModal, CounterEditModal } from '@components/common/modals';
+import { ConfirmModal, CounterEditModal, SubCounterRuleModal } from '@components/common/modals';
 
 interface CounterModalsProps {
   activeModal: 'reset' | 'edit' | 'limit' | 'rule' | 'subReset' | 'subEdit' | 'subLimit' | null;
@@ -8,12 +8,15 @@ interface CounterModalsProps {
   errorMessage: string;
   currentCount: string;
   subCount: number;
+  subRule: number;
+  subRuleIsActive: boolean;
   onClose: () => void;
   onEditConfirm: (value: string) => void;
   onResetConfirm: () => void;
   onErrorModalClose: () => void;
   onSubEditConfirm: (value: string) => void;
   onSubResetConfirm: () => void;
+  onSubRuleConfirm: (rule: number, isActive: boolean) => void;
 }
 
 /**
@@ -26,12 +29,15 @@ const CounterModals: React.FC<CounterModalsProps> = ({
   errorMessage,
   currentCount,
   subCount,
+  subRule,
+  subRuleIsActive,
   onClose,
   onEditConfirm,
   onResetConfirm,
   onErrorModalClose,
   onSubEditConfirm,
   onSubResetConfirm,
+  onSubRuleConfirm,
 }) => {
   return (
     <>
@@ -101,16 +107,13 @@ const CounterModals: React.FC<CounterModalsProps> = ({
         confirmButtonStyle="primary"
       />
 
-      {/* 서브 카운터 규칙 모달 (임시) */}
-      <ConfirmModal
+      {/* 서브 카운터 규칙 모달 */}
+      <SubCounterRuleModal
         visible={activeModal === 'rule'}
         onClose={onClose}
-        title="서브 카운터 규칙"
-        description="서브 카운터 규칙 편집 기능은 준비 중입니다."
-        onConfirm={onClose}
-        confirmText="확인"
-        cancelText=""
-        confirmButtonStyle="primary"
+        onConfirm={onSubRuleConfirm}
+        initialRule={subRule}
+        initialIsRuleActive={subRuleIsActive}
       />
 
       {/* 에러 모달 */}

@@ -49,6 +49,7 @@ interface UseCounterReturn {
   handleSubRule: () => void;
   handleSubResetConfirm: () => void;
   handleSubEditConfirm: (value: string) => void;
+  handleSubRuleConfirm: (rule: number, isRuleActive: boolean) => void;
 }
 
 /**
@@ -355,22 +356,27 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
       return;
     }
 
-    try {
-      playSound();
-      triggerHaptics();
+    playSound();
+    triggerHaptics();
 
-      const updatedCounter = {
-        ...counter,
-        subCount: counter.subCount + 1,
-      };
+    let newSubCount = counter.subCount + 1;
+    let newMainCount = counter.count;
 
-      await updateItem(counter.id, updatedCounter);
-      setCounter(updatedCounter);
-    } catch (error) {
-      console.error('서브 카운터 증가 실패:', error);
-      showErrorModal('카운터 업데이트에 실패했습니다.');
+    // 규칙이 활성화되어 있고 규칙 값 이상이 되면 자동 리셋
+    if (counter.subRuleIsActive && newSubCount >= counter.subRule) {
+      newSubCount = 0;
+      newMainCount = counter.count + 1;
     }
-  }, [counter, playSound, triggerHaptics, showErrorModal]);
+
+    const updatedCounter = {
+      ...counter,
+      subCount: newSubCount,
+      count: newMainCount,
+    };
+
+    await updateItem(counter.id, updatedCounter);
+    setCounter(updatedCounter);
+  }, [counter, playSound, triggerHaptics]);
 
   const handleSubSubtract = useCallback(async () => {
     if (!counter) {
@@ -383,22 +389,27 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
       return;
     }
 
-    try {
-      playSound();
-      triggerHaptics();
+    playSound();
+    triggerHaptics();
 
-      const updatedCounter = {
-        ...counter,
-        subCount: counter.subCount - 1,
-      };
+    let newSubCount = counter.subCount - 1;
+    let newMainCount = counter.count;
 
-      await updateItem(counter.id, updatedCounter);
-      setCounter(updatedCounter);
-    } catch (error) {
-      console.error('서브 카운터 감소 실패:', error);
-      showErrorModal('카운터 업데이트에 실패했습니다.');
+    // 규칙이 활성화되어 있고 규칙 값 이상이 되면 자동 리셋
+    if (counter.subRuleIsActive && newSubCount >= counter.subRule) {
+      newSubCount = 0;
+      newMainCount = counter.count + 1;
     }
-  }, [counter, playSound, triggerHaptics, showErrorModal]);
+
+    const updatedCounter = {
+      ...counter,
+      subCount: newSubCount,
+      count: newMainCount,
+    };
+
+    await updateItem(counter.id, updatedCounter);
+    setCounter(updatedCounter);
+  }, [counter, playSound, triggerHaptics]);
 
   const handleSubReset = useCallback(() => {
     setActiveModal('subReset');
@@ -441,24 +452,57 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
 
     const newValue = parseInt(value, 10);
     if (isNaN(newValue) || newValue < 0 || newValue > 9999) {
-      showErrorModal('서브 카운터에는 0에서 9999 사이의 값만 입력할 수 있습니다.');
+      setActiveModal('subLimit');
       return;
     }
 
-    try {
-      const updatedCounter = {
-        ...counter,
-        subCount: newValue,
-      };
+    let newSubCount = newValue;
+    let newMainCount = counter.count;
 
-      updateItem(counter.id, updatedCounter);
-      setCounter(updatedCounter);
-      handleClose();
-    } catch (error) {
-      console.error('서브 카운터 편집 실패:', error);
-      showErrorModal('서브 카운터 편집에 실패했습니다.');
+    // 규칙이 활성화되어 있고 규칙 값 이상이 되면 자동 리셋
+    if (counter.subRuleIsActive && newSubCount >= counter.subRule) {
+      newSubCount = 0;
+      newMainCount = counter.count + 1;
     }
-  }, [counter, handleClose, showErrorModal]);
+
+    const updatedCounter = {
+      ...counter,
+      subCount: newSubCount,
+      count: newMainCount,
+    };
+
+    updateItem(counter.id, updatedCounter);
+    setCounter(updatedCounter);
+    handleClose();
+  }, [counter, handleClose]);
+
+  // 서브 카운터 규칙 확인
+  const handleSubRuleConfirm = useCallback((rule: number, isRuleActive: boolean) => {
+    if (!counter) {
+      return;
+    }
+
+    let newSubCount = counter.subCount;
+    let newMainCount = counter.count;
+
+    // 규칙을 활성화할 때 기존 보조 카운터 값이 규칙 값 이상이면 자동 리셋
+    if (isRuleActive && counter.subCount >= rule) {
+      newSubCount = 0;
+      newMainCount = counter.count + 1;
+    }
+
+    const updatedCounter = {
+      ...counter,
+      subRule: rule,
+      subRuleIsActive: isRuleActive,
+      subCount: newSubCount,
+      count: newMainCount,
+    };
+
+    updateItem(counter.id, updatedCounter);
+    setCounter(updatedCounter);
+    handleClose();
+  }, [counter, handleClose]);
 
   return {
     // 상태
@@ -496,5 +540,6 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     handleSubRule,
     handleSubResetConfirm,
     handleSubEditConfirm,
+    handleSubRuleConfirm,
   };
 };

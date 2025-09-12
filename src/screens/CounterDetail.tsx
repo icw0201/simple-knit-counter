@@ -83,6 +83,7 @@ const CounterDetail = () => {
     handleSubRule,
     handleSubResetConfirm,
     handleSubEditConfirm,
+    handleSubRuleConfirm,
   } = useCounter({ counterId });
 
   // 화면 크기 및 설정값 계산
@@ -191,12 +192,15 @@ const CounterDetail = () => {
         errorMessage={errorMessage}
         currentCount={currentCount}
         subCount={subCount}
+        subRule={subRule}
+        subRuleIsActive={subRuleIsActive}
         onClose={handleClose}
         onEditConfirm={handleEditConfirm}
         onResetConfirm={handleResetConfirm}
         onErrorModalClose={() => setErrorModalVisible(false)}
         onSubEditConfirm={handleSubEditConfirm}
         onSubResetConfirm={handleSubResetConfirm}
+        onSubRuleConfirm={handleSubRuleConfirm}
       />
 
       {/* 서브 카운터 모달 */}

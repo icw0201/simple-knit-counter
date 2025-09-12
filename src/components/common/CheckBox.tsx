@@ -7,13 +7,13 @@ import clsx from 'clsx';
 
 /**
  * CheckBox 컴포넌트의 Props 인터페이스
- * @param label - 체크박스 옆에 표시될 텍스트 라벨
+ * @param label - 체크박스 옆에 표시될 텍스트 라벨 (선택사항)
  * @param checked - 체크박스의 체크 상태 (true: 체크됨, false: 체크 안됨)
  * @param onToggle - 체크박스 클릭 시 실행될 콜백 함수
  * @param disabled - 체크박스 비활성화 여부 (기본값: false)
  */
 interface CheckBoxProps {
-  label: string;
+  label?: string;
   checked: boolean;
   onToggle: () => void;
   disabled?: boolean;
@@ -39,10 +39,12 @@ const CheckBox: React.FC<CheckBoxProps> = ({ label, checked, onToggle, disabled 
     <TouchableOpacity
       onPress={disabled ? undefined : onToggle} // 비활성화 상태일 때는 onPress 이벤트를 무시
       activeOpacity={0.7} // 터치 시 투명도 효과
-      className="flex-row items-center justify-between px-4 py-3"
+      className={label ? "flex-row items-center justify-between px-4 py-3" : ""}
     >
-      {/* 체크박스 라벨 텍스트 */}
-      <Text className="text-base text-black">{label}</Text>
+      {/* 체크박스 라벨 텍스트 - label이 있을 때만 표시 */}
+      {label && (
+        <Text className="text-base text-black">{label}</Text>
+      )}
 
       {/* 체크박스 아이콘 컨테이너 */}
       <View className={checkboxClass}>
