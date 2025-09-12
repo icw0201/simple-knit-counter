@@ -27,6 +27,7 @@ interface UseCounterReturn {
   subCount: number;
   subRule: number;
   subRuleIsActive: boolean;
+  subModalIsOpen: boolean;
 
   // 액션 함수들
   handleAdd: () => void;
@@ -50,6 +51,7 @@ interface UseCounterReturn {
   handleSubResetConfirm: () => void;
   handleSubEditConfirm: (value: string) => void;
   handleSubRuleConfirm: (rule: number, isRuleActive: boolean) => void;
+  handleSubModalToggle: () => void;
 }
 
 /**
@@ -482,6 +484,12 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
       return;
     }
 
+    // 규칙이 활성화되려고 하는데 값이 0이면 에러
+    if (isRuleActive && rule <= 0) {
+      showErrorModal('규칙 값은 1 이상이어야 합니다.');
+      return;
+    }
+
     let newSubCount = counter.subCount;
     let newMainCount = counter.count;
 
@@ -502,7 +510,22 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     updateItem(counter.id, updatedCounter);
     setCounter(updatedCounter);
     handleClose();
-  }, [counter, handleClose]);
+  }, [counter, handleClose, showErrorModal]);
+
+  // 서브 카운터 모달 토글
+  const handleSubModalToggle = useCallback(async () => {
+    if (!counter) {
+      return;
+    }
+
+    const updatedCounter = {
+      ...counter,
+      subModalIsOpen: !counter.subModalIsOpen,
+    };
+
+    await updateItem(counter.id, updatedCounter);
+    setCounter(updatedCounter);
+  }, [counter]);
 
   return {
     // 상태
@@ -518,6 +541,7 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     subCount: counter?.subCount ?? 0,
     subRule: counter?.subRule ?? 0,
     subRuleIsActive: counter?.subRuleIsActive ?? false,
+    subModalIsOpen: counter?.subModalIsOpen ?? false,
 
     // 액션 함수들
     handleAdd,
@@ -541,5 +565,6 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     handleSubResetConfirm,
     handleSubEditConfirm,
     handleSubRuleConfirm,
+    handleSubModalToggle,
   };
 };

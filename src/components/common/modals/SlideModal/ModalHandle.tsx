@@ -12,6 +12,7 @@ interface ModalHandleProps {
   top: DimensionValue;
   onOpen: () => void;
   onClose: () => void;
+  onToggle?: () => void;
   onDragUpdate: (translateY: number) => void;
 }
 
@@ -36,6 +37,7 @@ export const ModalHandle: React.FC<ModalHandleProps> = ({
   top,
   onOpen,
   onClose,
+  onToggle,
   onDragUpdate,
 }) => {
   // ===== 드래그 상태 관리 =====
@@ -89,6 +91,10 @@ export const ModalHandle: React.FC<ModalHandleProps> = ({
   // 터치 종료 이벤트 처리 (드래그 완료)
   const handleTouchEnd = () => {
     if (!dragState.isDragging) {
+      // 드래그가 아닌 단순 클릭일 때 토글
+      if (onToggle) {
+        onToggle();
+      }
       return;
     }
 

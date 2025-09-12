@@ -69,6 +69,7 @@ export const useMain = () => {
       subCount: 0,
       subRule: 0,
       subRuleIsActive: false,
+      subModalIsOpen: false,
     };
   }, []);
 

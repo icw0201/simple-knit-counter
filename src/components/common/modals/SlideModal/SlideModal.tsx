@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { View, Dimensions, DimensionValue } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { ModalHandle } from './ModalHandle';
@@ -6,6 +6,8 @@ import { ModalHandle } from './ModalHandle';
 // ===== 타입 정의 =====
 interface SlideModalProps {
   children: React.ReactNode;
+  isOpen?: boolean; // 모달 열림 상태 (기본값: false)
+  onToggle?: () => void; // 토글 콜백 (선택사항)
   height?: number; // 모달의 세로 길이 (기본값: 300)
   handleWidth?: number; // 핸들의 가로 길이 (기본값: 40)
   backgroundColor?: string; // 배경색 (기본값: white)
@@ -21,6 +23,8 @@ const { width: screenWidth } = Dimensions.get('window');
 // ===== 메인 컴포넌트 =====
 export const SlideModal: React.FC<SlideModalProps> = ({
   children,
+  isOpen = false,
+  onToggle,
   height = 300,
   handleWidth = 40,
   backgroundColor = 'white',
@@ -30,23 +34,27 @@ export const SlideModal: React.FC<SlideModalProps> = ({
 }) => {
   // ===== 상태 관리 =====
   const modalWidth = screenWidth * 0.9; // 화면의 90%
-  const [isOpen, setIsOpen] = useState(false);
-  const [translateY, setTranslateY] = useState(-handleWidth); // 초기값: 핸들만 보이도록
+  const [translateY, setTranslateY] = useState(isOpen ? -modalWidth : -handleWidth);
 
   const modalRef = useRef<View>(null);
+
+  // isOpen props가 변경될 때 translateY 업데이트
+  useEffect(() => {
+    setTranslateY(isOpen ? -modalWidth : -handleWidth);
+  }, [isOpen, modalWidth, handleWidth]);
 
   // ===== 핸들러 함수들 =====
 
   // 모달 열기
   const handleOpen = () => {
     setTranslateY(-modalWidth);
-    setIsOpen(true);
+    onToggle?.();
   };
 
   // 모달 닫기
   const handleClose = () => {
     setTranslateY(-handleWidth);
-    setIsOpen(false);
+    onToggle?.();
     onClose?.();
   };
 
@@ -114,6 +122,7 @@ export const SlideModal: React.FC<SlideModalProps> = ({
         top={top}
         onOpen={handleOpen}
         onClose={handleClose}
+        onToggle={onToggle}
         onDragUpdate={handleDragUpdate}
       />
     </View>

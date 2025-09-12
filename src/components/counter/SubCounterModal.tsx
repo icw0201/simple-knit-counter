@@ -8,6 +8,8 @@ import { useWindowDimensions } from 'react-native';
 
 // ===== 타입 정의 =====
 interface SubCounterModalProps {
+  isOpen: boolean;
+  onToggle: () => void;
   onClose: () => void;
   onReset?: () => void;
   onEdit?: () => void;
@@ -22,6 +24,8 @@ interface SubCounterModalProps {
 
 // ===== 메인 컴포넌트 =====
 export const SubCounterModal: React.FC<SubCounterModalProps> = ({
+  isOpen,
+  onToggle,
   onClose,
   onReset,
   onEdit,
@@ -30,6 +34,8 @@ export const SubCounterModal: React.FC<SubCounterModalProps> = ({
   onSubtract,
   handleWidth = 30,
   subCount = 0,
+  subRule: _subRule = 0,
+  subRuleIsActive: _subRuleIsActive = false,
 }) => {
   // 화면 크기 정보
   const { height, width } = useWindowDimensions();
@@ -37,6 +43,8 @@ export const SubCounterModal: React.FC<SubCounterModalProps> = ({
   const iconSize = getSubIconSize(screenSize);
   return (
     <SlideModal
+      isOpen={isOpen}
+      onToggle={onToggle}
       height={230}
       handleWidth={handleWidth}
       backgroundColor="white"

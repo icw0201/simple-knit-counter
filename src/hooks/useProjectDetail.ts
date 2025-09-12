@@ -67,6 +67,7 @@ export const useProjectDetail = () => {
       subCount: 0,
       subRule: 0,
       subRuleIsActive: false,
+      subModalIsOpen: false,
     };
   }, [project?.id]);
 

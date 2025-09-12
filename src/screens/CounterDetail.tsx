@@ -76,6 +76,7 @@ const CounterDetail = () => {
     subCount,
     subRule,
     subRuleIsActive,
+    subModalIsOpen,
     handleSubAdd,
     handleSubSubtract,
     handleSubReset,
@@ -84,6 +85,7 @@ const CounterDetail = () => {
     handleSubResetConfirm,
     handleSubEditConfirm,
     handleSubRuleConfirm,
+    handleSubModalToggle,
   } = useCounter({ counterId });
 
   // 화면 크기 및 설정값 계산
@@ -205,6 +207,8 @@ const CounterDetail = () => {
 
       {/* 서브 카운터 모달 */}
       <SubCounterModal
+        isOpen={subModalIsOpen}
+        onToggle={handleSubModalToggle}
         onClose={handleSlideModalClose}
         onAdd={handleSubAdd}
         onSubtract={handleSubSubtract}

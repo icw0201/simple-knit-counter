@@ -42,6 +42,7 @@ export type Counter = {
   subCount: number;              // 서브 카운터의 현재 카운트 수
   subRule: number;               // 서브 카운터의 규칙 번호
   subRuleIsActive: boolean;      // 서브 카운터의 규칙 활성화 여부
+  subModalIsOpen: boolean;       // 서브 카운터 모달 열림 여부
 };
 
 /**
