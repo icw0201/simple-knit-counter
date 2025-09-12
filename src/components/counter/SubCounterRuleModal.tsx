@@ -1,7 +1,7 @@
 // src/components/common/modals/SubCounterRuleModal/SubCounterRuleModal.tsx
 import React, { useState, useEffect } from 'react';
 import { View, Text } from 'react-native';
-import BaseModal from '../BaseModal/BaseModal';
+import BaseModal from '../common/modals/BaseModal/BaseModal';
 import RoundedBox from '@components/common/RoundedBox';
 import TextInputBox from '@components/common/TextInputBox';
 import CheckBox from '@components/common/CheckBox';
