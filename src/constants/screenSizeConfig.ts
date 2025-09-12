@@ -20,6 +20,15 @@ export const iconSizeConfig = {
 };
 
 /**
+ * 화면 크기별 서브 아이콘 크기 설정 (서브모달용, 더 작은 크기)
+ */
+export const subIconSizeConfig = {
+  [ScreenSize.COMPACT]: 32,   // 컴팩트: 매우 작은 아이콘
+  [ScreenSize.SMALL]: 36,     // 작음: 작은 아이콘
+  [ScreenSize.LARGE]: 44,     // 큼: 중간 아이콘
+};
+
+/**
  * 화면 크기별 아이콘 마진 설정
  */
 export const iconMarginConfig = {
@@ -60,6 +69,15 @@ export const getScreenSize = (height: number, width: number): ScreenSize => {
  */
 export const getIconSize = (screenSize: ScreenSize): number => {
   return iconSizeConfig[screenSize];
+};
+
+/**
+ * 화면 크기에 따른 서브 아이콘 크기를 반환합니다.
+ * @param screenSize - 화면 크기
+ * @returns 서브 아이콘 크기
+ */
+export const getSubIconSize = (screenSize: ScreenSize): number => {
+  return subIconSizeConfig[screenSize];
 };
 
 /**
