@@ -147,10 +147,14 @@ const CounterDetail = () => {
           onToggleWay={toggleWay}
         />
 
-        {/* 현재 카운트 표시 */}
-        <Text className={`${textClass} font-bold text-black`}>
-          {counter.count}
-        </Text>
+        현재 카운트 표시
+        <View pointerEvents="none">
+          <Text
+            className={`${textClass} font-bold text-black`}
+          >
+            {counter.count}
+          </Text>
+        </View>
 
         {/* 액션 버튼들 */}
         <CounterActions

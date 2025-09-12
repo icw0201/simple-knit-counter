@@ -20,10 +20,10 @@ export type Way = 'front' | 'back';
 export type Info = {
   startDate?: string; // 시작일 (8자리 yyyyMMdd 형식)
   endDate?: string;   // 종료일 (8자리 yyyyMMdd 형식)
-  gauge?: string;     // 게이지 정보 (최대 70자)
-  yarn?: string;      // 실 정보 (최대 70자)
-  needle?: string;    // 바늘 정보 (최대 70자)
-  notes?: string;     // 메모 (최대 70자)
+  gauge?: string;     // 게이지 정보 (최대 500자)
+  yarn?: string;      // 실 정보 (최대 500자)
+  needle?: string;    // 바늘 정보 (최대 500자)
+  notes?: string;     // 메모 (최대 500자)
   way?: Way;          // 진행 방향
 };
 
