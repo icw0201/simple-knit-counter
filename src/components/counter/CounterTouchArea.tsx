@@ -1,6 +1,7 @@
 // src/components/counter/CounterTouchArea.tsx
 import React, { useState } from 'react';
-import { View, Text, Pressable } from 'react-native';
+import { View, Pressable } from 'react-native';
+import { Minus, Plus } from 'lucide-react-native';
 
 interface CounterTouchAreaProps {
   onAdd: () => void;
@@ -30,7 +31,12 @@ const CounterTouchArea: React.FC<CounterTouchAreaProps> = ({
           setTimeout(() => setLeftPressed(false), 100);
         }}
       >
-        <Text className="text-6xl text-red-500 ml-6">-</Text>
+        <Minus
+          size={60}
+          color="#fc3e39"
+          strokeWidth={2}
+          className="ml-3"
+        />
       </Pressable>
 
       {/* 오른쪽 터치 영역 (증가) - 63% */}
@@ -43,7 +49,12 @@ const CounterTouchArea: React.FC<CounterTouchAreaProps> = ({
           setTimeout(() => setRightPressed(false), 100);
         }}
       >
-        <Text className="text-6xl text-red-500 mr-6">+</Text>
+        <Plus
+          size={60}
+          color="#fc3e39"
+          strokeWidth={2}
+          className="mr-3"
+        />
       </Pressable>
     </View>
   );
