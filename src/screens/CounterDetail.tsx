@@ -2,6 +2,7 @@
 
 import React, { useLayoutEffect, useCallback } from 'react';
 import { View, Text, UIManager, Platform, useWindowDimensions } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '@navigation/AppNavigator';
@@ -10,7 +11,7 @@ import { activateKeepAwake, deactivateKeepAwake } from '@sayem314/react-native-k
 import { getHeaderRightWithActivateInfoSettings } from '@navigation/HeaderOptions';
 import { getScreenAwakeSetting } from '@storage/settings';
 
-import { CounterTouchArea, CounterDirection, CounterActions, CounterModals } from '@components/counter';
+import { CounterTouchArea, CounterDirection, CounterActions, CounterModals, SubCounterModal } from '@components/counter';
 import { getScreenSize, getIconSize, getIconMargin, getTextClass, ScreenSize } from '@constants/screenSizeConfig';
 import { useCounter } from '@hooks/useCounter';
 
@@ -46,6 +47,11 @@ const CounterDetail = () => {
 
   // 화면 크기 정보
   const { height, width } = useWindowDimensions();
+
+  // 슬라이드 모달 핸들러
+  const handleSlideModalClose = useCallback(() => {
+    // 모달 닫기 로직 (필요시 추가)
+  }, []);
 
   // 카운터 비즈니스 로직 훅
   const {
@@ -132,7 +138,8 @@ const CounterDetail = () => {
   }
 
   return (
-    <View className="flex-1 bg-white">
+    <SafeAreaView style={{ flex: 1 }} edges={['left', 'right', 'bottom']}>
+      <View className="flex-1 bg-white">
       {/* 좌우 터치 레이어 */}
       <CounterTouchArea onAdd={handleAdd} onSubtract={handleSubtract} />
 
@@ -147,7 +154,7 @@ const CounterDetail = () => {
           onToggleWay={toggleWay}
         />
 
-        현재 카운트 표시
+        {/* 현재 카운트 표시 */}
         <View pointerEvents="none">
           <Text
             className={`${textClass} font-bold text-black`}
@@ -177,7 +184,13 @@ const CounterDetail = () => {
         onResetConfirm={handleResetConfirm}
         onErrorModalClose={() => setErrorModalVisible(false)}
       />
-    </View>
+
+      {/* 서브 카운터 모달 */}
+      <SubCounterModal
+        onClose={handleSlideModalClose}
+      />
+      </View>
+    </SafeAreaView>
   );
 };
 
