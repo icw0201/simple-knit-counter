@@ -163,12 +163,10 @@ export const useItemList = ({ projectId, headerSetup }: UseItemListProps): UseIt
     fetchData();
   }, [fetchData]));
 
-  // 헤더 설정 (ProjectDetail에서만 사용)
+  // 헤더 설정
   useEffect(() => {
-    if (projectId) {
-      headerSetup();
-    }
-  }, [projectId, headerSetup]);
+    headerSetup();
+  }, [headerSetup]);
 
   // 뒤로가기 버튼 핸들링 (편집 모드일 때는 편집 모드 해제)
   useEffect(() => {

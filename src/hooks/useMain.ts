@@ -14,16 +14,6 @@ import { useItemList } from './useItemList';
 export const useMain = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-  // 헤더 설정
-  const setupHeader = useCallback(() => {
-    navigation.setOptions({
-      headerRight: () =>
-        getHeaderRightWithEditAndSettings(navigation, () =>
-          setIsEditMode((prev) => !prev)
-        ),
-    });
-  }, [navigation, setIsEditMode]);
-
   // useItemList 훅 사용
   const {
     items,
@@ -44,7 +34,16 @@ export const useMain = () => {
     resetModalState,
     resetDeleteModalState,
     resetDuplicateModalState,
-  } = useItemList({ headerSetup: setupHeader });
+  } = useItemList({
+    headerSetup: () => {
+      navigation.setOptions({
+        headerRight: () =>
+          getHeaderRightWithEditAndSettings(navigation, () =>
+            setIsEditMode((prev) => !prev)
+          ),
+      });
+    },
+  });
 
   /**
    * 아이템 생성 함수
