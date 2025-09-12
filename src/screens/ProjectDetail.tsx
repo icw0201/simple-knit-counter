@@ -22,12 +22,12 @@ const ProjectDetail = () => {
     handlePress,
     handleLongPress,
     handleDelete,
-    handleModalConfirm,
+    handleCreateCounterConfirm,
     handleDeleteConfirm,
     resetModalState,
     resetDeleteModalState,
     resetDuplicateModalState,
-    proceedAddCounter,
+    completeCounterCreation,
   } = useProjectDetail();
 
 
@@ -56,9 +56,9 @@ const ProjectDetail = () => {
       {/* 모든 모달들 */}
       <ItemModals
         modalType="project"
-        projectModalVisible={modalVisible}
-        onProjectModalClose={resetModalState}
-        onProjectModalConfirm={(name) => handleModalConfirm(name)}
+        createCounterModalVisible={modalVisible}
+        onCreateCounterModalClose={resetModalState}
+        onCreateCounterModalConfirm={(name) => handleCreateCounterConfirm(name)}
         deleteModalVisible={deleteModalVisible}
         onDeleteModalClose={resetDeleteModalState}
         onDeleteConfirm={handleDeleteConfirm}
@@ -69,7 +69,7 @@ const ProjectDetail = () => {
         }}
         onDuplicateConfirm={() => {
           if (pendingItem) {
-            proceedAddCounter(pendingItem as Counter);
+            completeCounterCreation(pendingItem as Counter);
           }
         }}
         duplicateDescription="같은 이름의 카운터가 이미 존재합니다. 생성하시겠습니까?"

@@ -3,14 +3,14 @@ import { ProjectCreateModal, CounterCreateModal, ConfirmModal } from '@component
 
 interface ItemModalsProps {
   // Main 화면용 props
-  mainModalVisible?: boolean;
-  onMainModalClose?: () => void;
-  onMainModalConfirm?: (name: string, type: 'project' | 'counter') => void;
+  createItemModalVisible?: boolean;
+  onCreateItemModalClose?: () => void;
+  onCreateItemModalConfirm?: (name: string, type: 'project' | 'counter') => void;
 
   // ProjectDetail 화면용 props
-  projectModalVisible?: boolean;
-  onProjectModalClose?: () => void;
-  onProjectModalConfirm?: (name?: string) => void;
+  createCounterModalVisible?: boolean;
+  onCreateCounterModalClose?: () => void;
+  onCreateCounterModalConfirm?: (name?: string) => void;
 
   // 공통 props
   deleteModalVisible: boolean;
@@ -34,14 +34,14 @@ interface ItemModalsProps {
  */
 const ItemModals: React.FC<ItemModalsProps> = ({
   // Main 화면용 props
-  mainModalVisible = false,
-  onMainModalClose,
-  onMainModalConfirm,
+  createItemModalVisible = false,
+  onCreateItemModalClose,
+  onCreateItemModalConfirm,
 
   // ProjectDetail 화면용 props
-  projectModalVisible = false,
-  onProjectModalClose,
-  onProjectModalConfirm,
+  createCounterModalVisible = false,
+  onCreateCounterModalClose,
+  onCreateCounterModalConfirm,
 
   // 공통 props
   deleteModalVisible,
@@ -61,19 +61,19 @@ const ItemModals: React.FC<ItemModalsProps> = ({
       {/* Main 화면용 프로젝트/카운터 생성 모달 */}
       {modalType === 'main' && (
         <ProjectCreateModal
-          visible={mainModalVisible}
-          onClose={onMainModalClose || (() => {})}
-          onConfirm={onMainModalConfirm || (() => {})}
+          visible={createItemModalVisible}
+          onClose={onCreateItemModalClose || (() => {})}
+          onConfirm={onCreateItemModalConfirm || (() => {})}
         />
       )}
 
       {/* ProjectDetail 화면용 카운터 생성 모달 */}
       {modalType === 'project' && (
         <CounterCreateModal
-          visible={projectModalVisible}
-          onClose={onProjectModalClose || (() => {})}
+          visible={createCounterModalVisible}
+          onClose={onCreateCounterModalClose || (() => {})}
           title="새 카운터 생성하기"
-          onConfirm={onProjectModalConfirm || (() => {})}
+          onConfirm={onCreateCounterModalConfirm || (() => {})}
         />
       )}
 

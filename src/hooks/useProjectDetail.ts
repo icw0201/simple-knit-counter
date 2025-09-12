@@ -38,8 +38,8 @@ export const useProjectDetail = () => {
     resetModalState,
     resetDeleteModalState,
     resetDuplicateModalState,
-  } = useItemList({ 
-    projectId, 
+  } = useItemList({
+    projectId,
     headerSetup: () => {
       navigation.setOptions({
         title: project?.title ?? '',
@@ -50,7 +50,7 @@ export const useProjectDetail = () => {
             () => setIsEditMode((prev) => !prev)
           ),
       });
-    }
+    },
   });
 
   /**
@@ -84,9 +84,9 @@ export const useProjectDetail = () => {
   }, [project?.id]);
 
   /**
-   * 카운터 추가 처리 (실제 저장 및 상태 업데이트)
+   * 카운터 생성 완료 처리 (실제 저장 및 상태 업데이트)
    */
-  const proceedAddCounter = useCallback((newCounter: Counter) => {
+  const completeCounterCreation = useCallback((newCounter: Counter) => {
     addItem(newCounter);
 
     const updatedProject: Partial<Project> = {
@@ -102,9 +102,9 @@ export const useProjectDetail = () => {
   }, [project, setItems, resetModalState]);
 
   /**
-   * 모달에서 확인 시 카운터 생성 및 중복 체크
+   * 카운터 생성 모달에서 확인 시 카운터 생성 및 중복 체크
    */
-  const handleModalConfirm = useCallback((name?: string) => {
+  const handleCreateCounterConfirm = useCallback((name?: string) => {
     if (!name?.trim()) {
       return;
     }
@@ -117,8 +117,8 @@ export const useProjectDetail = () => {
       return;
     }
 
-    proceedAddCounter(newCounter);
-  }, [createNewCounter, checkDuplicateName, proceedAddCounter, setPendingItem, setDuplicateModalVisible]);
+    completeCounterCreation(newCounter);
+  }, [createNewCounter, checkDuplicateName, completeCounterCreation, setPendingItem, setDuplicateModalVisible]);
 
   /**
    * 삭제 확인 시 실제 삭제 처리
@@ -154,11 +154,11 @@ export const useProjectDetail = () => {
     handlePress,
     handleLongPress,
     handleDelete,
-    handleModalConfirm,
+    handleCreateCounterConfirm,
     handleDeleteConfirm,
     resetModalState,
     resetDeleteModalState,
     resetDuplicateModalState,
-    proceedAddCounter,
+    completeCounterCreation,
   };
 };

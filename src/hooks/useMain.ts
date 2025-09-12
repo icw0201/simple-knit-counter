@@ -85,18 +85,18 @@ export const useMain = () => {
   }, []);
 
   /**
-   * 아이템 추가 처리 (실제 저장 및 상태 초기화)
+   * 아이템 생성 완료 처리 (실제 저장 및 상태 초기화)
    */
-  const proceedAddItem = useCallback((item: Item) => {
+  const completeItemCreation = useCallback((item: Item) => {
     addItem(item);
     resetModalState();
     setItems(prev => [item, ...prev]);
   }, [resetModalState, setItems]);
 
   /**
-   * 모달에서 확인 시 아이템 생성 및 중복 체크
+   * 프로젝트/카운터 생성 모달에서 확인 시 아이템 생성 및 중복 체크
    */
-  const handleModalConfirm = useCallback((name: string, type: 'project' | 'counter') => {
+  const handleCreateItemConfirm = useCallback((name: string, type: 'project' | 'counter') => {
     const newItem = createNewItem(type, name);
 
     if (checkDuplicateName(newItem)) {
@@ -105,8 +105,8 @@ export const useMain = () => {
       return;
     }
 
-    proceedAddItem(newItem);
-  }, [createNewItem, checkDuplicateName, proceedAddItem, setPendingItem, setDuplicateModalVisible]);
+    completeItemCreation(newItem);
+  }, [createNewItem, checkDuplicateName, completeItemCreation, setPendingItem, setDuplicateModalVisible]);
 
   /**
    * 삭제 모달 설명 텍스트 생성
@@ -152,20 +152,20 @@ export const useMain = () => {
     itemToDelete,
     duplicateModalVisible,
     pendingItem,
-    
+
     // 상태 설정 함수들
     setModalVisible,
-    
+
     // 액션 함수들
     handlePress,
     handleLongPress,
     handleDelete,
-    handleModalConfirm,
+    handleCreateItemConfirm,
     handleDeleteConfirm,
     resetModalState,
     resetDeleteModalState,
     resetDuplicateModalState,
-    proceedAddItem,
+    completeItemCreation,
     getDeleteDescription,
   };
 };

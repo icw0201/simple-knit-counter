@@ -20,12 +20,12 @@ const Main = () => {
     handlePress,
     handleLongPress,
     handleDelete,
-    handleModalConfirm,
+    handleCreateItemConfirm,
     handleDeleteConfirm,
     resetModalState,
     resetDeleteModalState,
     resetDuplicateModalState,
-    proceedAddItem,
+    completeItemCreation,
     getDeleteDescription,
   } = useMain();
 
@@ -55,9 +55,9 @@ const Main = () => {
       {/* 모든 모달들 */}
       <ItemModals
         modalType="main"
-        mainModalVisible={modalVisible}
-        onMainModalClose={resetModalState}
-        onMainModalConfirm={handleModalConfirm}
+        createItemModalVisible={modalVisible}
+        onCreateItemModalClose={resetModalState}
+        onCreateItemModalConfirm={handleCreateItemConfirm}
         deleteModalVisible={deleteModalVisible}
         onDeleteModalClose={resetDeleteModalState}
         onDeleteConfirm={handleDeleteConfirm}
@@ -68,7 +68,7 @@ const Main = () => {
         }}
         onDuplicateConfirm={() => {
           if (pendingItem) {
-            proceedAddItem(pendingItem);
+            completeItemCreation(pendingItem);
           }
         }}
         duplicateDescription={`같은 이름을 가진 ${pendingItem?.type === 'project' ? '프로젝트' : '카운터'}가 이미 존재합니다. 생성하시겠습니까?`}
