@@ -61,7 +61,6 @@ export const getStoredItems = (): Item[] => {
   const json = storage.getString(STORAGE_KEY);
   const items = json ? JSON.parse(json) : [];
 
-  // console.log('📱 [Storage] getStoredItems:', items.length, 'items loaded');
   return items;
 };
 
@@ -71,7 +70,6 @@ export const getStoredItems = (): Item[] => {
  */
 const setStoredItems = (items: Item[]) => {
   storage.set(STORAGE_KEY, JSON.stringify(items));
-  // console.log('💾 [Storage] setStoredItems:', items.length, 'items saved');
 };
 
 /**
@@ -79,12 +77,6 @@ const setStoredItems = (items: Item[]) => {
  * @param newItem 추가할 새로운 Item
  */
 export const addItem = (newItem: Item) => {
-  // console.log('➕ [Storage] addItem:', {
-  //   id: newItem.id,
-  //   type: newItem.type,
-  //   title: newItem.title,
-  //   ...(newItem.type === 'counter' && { parentProjectId: newItem.parentProjectId }),
-  // });
 
   const existing = getStoredItems();
   setStoredItems([...existing, newItem]);
@@ -95,7 +87,6 @@ export const addItem = (newItem: Item) => {
  * @param id 삭제할 항목의 ID
  */
 export const removeItem = (id: string) => {
-  // console.log('🗑️ [Storage] removeItem:', id);
   const items = getStoredItems();
   const filteredItems = items.filter((item) => item.id !== id);
   setStoredItems(filteredItems);
@@ -107,7 +98,6 @@ export const removeItem = (id: string) => {
  * @param updatedFields 업데이트할 필드들
  */
 export const updateItem = (id: string, updatedFields: Record<string, any>) => {
-  // console.log('✏️ [Storage] updateItem:', id, 'with fields:', updatedFields);
   const items = getStoredItems();
   const updatedItems = items.map((item) =>
     item.id === id ? { ...item, ...updatedFields } : item
@@ -121,7 +111,6 @@ export const updateItem = (id: string, updatedFields: Record<string, any>) => {
  * @param counterId 제거할 카운터 ID
  */
 export const removeCounterFromProject = (projectId: string, counterId: string) => {
-  // console.log('🔗 [Storage] removeCounterFromProject:', { projectId, counterId });
   const allItems = getStoredItems();
 
   // 프로젝트 찾기
@@ -130,7 +119,6 @@ export const removeCounterFromProject = (projectId: string, counterId: string) =
   );
 
   if (!project) {
-    // console.warn('⚠️ [Storage] Project not found:', projectId);
     return;
   }
 
@@ -139,17 +127,6 @@ export const removeCounterFromProject = (projectId: string, counterId: string) =
     ...project,
     counterIds: project.counterIds.filter((id) => id !== counterId),
   };
-
-  // console.log('📊 [Storage] Project before:', {
-  //   id: project.id,
-  //   title: project.title,
-  //   counterIds: project.counterIds,
-  // });
-  // console.log('📊 [Storage] Project after:', {
-  //   id: updatedProject.id,
-  //   title: updatedProject.title,
-  //   counterIds: updatedProject.counterIds,
-  // });
 
   // 카운터와 프로젝트를 제거하고 업데이트된 프로젝트 추가
   const updatedItems = allItems
@@ -166,7 +143,6 @@ export const removeCounterFromProject = (projectId: string, counterId: string) =
 export const getAllProjects = (): Project[] => {
   const items = getStoredItems();
   const projects = items.filter((item): item is Project => item.type === 'project');
-  // console.log('📁 [Storage] getAllProjects:', projects.length, 'projects');
   return projects;
 };
 
@@ -178,7 +154,6 @@ export const getIndependentCounters = (): Counter[] => {
   const items = getStoredItems();
   const counters = items.filter((item): item is Counter => item.type === 'counter');
   const independentCounters = counters.filter((counter) => !counter.parentProjectId);
-  // console.log('🆓 [Storage] getIndependentCounters:', independentCounters.length, 'counters');
   return independentCounters;
 };
 
@@ -186,6 +161,5 @@ export const getIndependentCounters = (): Counter[] => {
  * 모든 프로젝트 데이터를 삭제합니다.
  */
 export const clearAllProjectData = () => {
-  // console.log('🗑️ [Storage] clearAllProjectData: Clearing all data');
   storage.delete(STORAGE_KEY);
 };
