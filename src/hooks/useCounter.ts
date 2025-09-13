@@ -25,7 +25,7 @@ interface UseCounterReturn {
   errorModalVisible: boolean;
   errorMessage: string;
 
-  // 서브 카운터 상태
+  // 보조 카운터 상태
   subCount: number;
   subRule: number;
   subRuleIsActive: boolean;
@@ -44,7 +44,7 @@ interface UseCounterReturn {
   setErrorModalVisible: (visible: boolean) => void;
   setActiveModal: (modal: 'reset' | 'edit' | 'limit' | 'rule' | 'subReset' | 'subEdit' | 'subLimit' | null) => void;
 
-  // 서브 카운터 액션 함수들
+  // 보조 카운터 액션 함수들
   handleSubAdd: () => void;
   handleSubSubtract: () => void;
   handleSubReset: () => void;
@@ -53,7 +53,7 @@ interface UseCounterReturn {
 
   // 패딩 탑 애니메이션
   paddingTopAnim: Animated.Value;
-  updatePaddingTopAnimation: (height: number, subModalIsOpen: boolean) => void;
+  updatePaddingTopAnimation: (height: number, subModalIsOpen: boolean, options?: { animate?: boolean }) => void;
   handleSubResetConfirm: () => void;
   handleSubEditConfirm: (value: string) => void;
   handleSubRuleConfirm: (rule: number, isRuleActive: boolean) => void;
@@ -65,7 +65,7 @@ interface UseCounterReturn {
  *
  * 주요 기능:
  * - 카운터 값 증가/감소
- * - 서브 카운터 값 증가/감소
+ * - 보조 카운터 값 증가/감소
  * - 활성화 모드 전환
  * - 방향 전환
  * - 사운드 및 진동 피드백
@@ -103,7 +103,7 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
   // 패딩 탑 애니메이션 상태
   const paddingTopAnim = useRef(new Animated.Value(0)).current;
   const isInitialized = useRef(false);
-  const prevSubModalIsOpen = useRef(false);
+  const prevSubModalIsOpen = useRef<boolean | null>(null); // null로 초기화하여 첫 실행과 구분
 
   // 카운터 동작 상태
   const [activateMode, setActivateMode] = useState<ActivateMode>('inactive');
@@ -174,22 +174,28 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
   /**
    * 패딩 탑 애니메이션 관리
    */
-  const updatePaddingTopAnimation = useCallback((height: number, subModalIsOpen: boolean) => {
+  const updatePaddingTopAnimation = useCallback((height: number, subModalIsOpen: boolean, options?: { animate?: boolean }) => {
+    const shouldAnimate = options?.animate ?? true;
     const targetPaddingTop = subModalIsOpen
       ? PADDING_TOP_MULTIPLIER * height  // 열려있으면 0.085 * height
       : PADDING_TOP_MULTIPLIER * PADDING_TOP_RATIO * height; // 닫혀있으면 0.17 * height
 
-    if (!isInitialized.current) {
+    // 첫 실행이거나 초기화되지 않은 경우
+    if (prevSubModalIsOpen.current === null) {
       // 초기 설정 시에는 애니메이션 없이 즉시 설정
       paddingTopAnim.setValue(targetPaddingTop);
       isInitialized.current = true;
     } else if (prevSubModalIsOpen.current !== subModalIsOpen) {
       // subModalIsOpen이 변경된 경우에만 애니메이션 적용
-      Animated.timing(paddingTopAnim, {
-        toValue: targetPaddingTop,
-        duration: 300,
-        useNativeDriver: false,
-      }).start();
+      if (shouldAnimate) {
+        Animated.timing(paddingTopAnim, {
+          toValue: targetPaddingTop,
+          duration: 300,
+          useNativeDriver: false,
+        }).start();
+      } else {
+        paddingTopAnim.setValue(targetPaddingTop);
+      }
     } else {
       // height만 변경된 경우에는 즉시 설정 (애니메이션 없음)
       paddingTopAnim.setValue(targetPaddingTop);
@@ -406,7 +412,7 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     handleClose();
   }, [counter, updateCountAndMaybeWay, handleClose]);
 
-  // 서브 카운터 액션 함수들
+  // 보조 카운터 액션 함수들
   const handleSubAdd = useCallback(async () => {
     if (!counter) {
       return;
@@ -485,7 +491,7 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     setActiveModal('rule');
   }, []);
 
-  // 서브 카운터 초기화 확인
+  // 보조 카운터 초기화 확인
   const handleSubResetConfirm = useCallback(() => {
     if (!counter) {
       return;
@@ -501,12 +507,12 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
       setCounter(updatedCounter);
       handleClose();
     } catch (error) {
-      console.error('서브 카운터 초기화 실패:', error);
-      showErrorModal('서브 카운터 초기화에 실패했습니다.');
+      console.error('보조 카운터 초기화 실패:', error);
+      showErrorModal('보조 카운터 초기화에 실패했습니다.');
     }
   }, [counter, handleClose, showErrorModal]);
 
-  // 서브 카운터 편집 확인
+  // 보조 카운터 편집 확인
   const handleSubEditConfirm = useCallback((value: string) => {
     if (!counter) {
       return;
@@ -538,7 +544,7 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     handleClose();
   }, [counter, handleClose]);
 
-  // 서브 카운터 규칙 확인
+  // 보조 카운터 규칙 확인
   const handleSubRuleConfirm = useCallback((rule: number, isRuleActive: boolean) => {
     if (!counter) {
       return;
@@ -572,7 +578,7 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     handleClose();
   }, [counter, handleClose, showErrorModal]);
 
-  // 서브 카운터 모달 토글
+  // 보조 카운터 모달 토글
   const handleSubModalToggle = useCallback(async () => {
     if (!counter) {
       return;
@@ -597,7 +603,7 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     errorModalVisible,
     errorMessage,
 
-    // 서브 카운터 상태
+    // 보조 카운터 상태
     subCount: counter?.subCount ?? 0,
     subRule: counter?.subRule ?? 0,
     subRuleIsActive: counter?.subRuleIsActive ?? false,
@@ -616,7 +622,7 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     setErrorModalVisible,
     setActiveModal,
 
-    // 서브 카운터 액션 함수들
+    // 보조 카운터 액션 함수들
     handleSubAdd,
     handleSubSubtract,
     handleSubReset,
