@@ -1,13 +1,15 @@
 // src/hooks/useCounter.ts
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Platform, Vibration } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import { Platform, Vibration, Animated, UIManager } from 'react-native';
 import HapticFeedback from 'react-native-haptic-feedback';
 import Sound from 'react-native-sound';
 
 import { getStoredItems, updateItem } from '@storage/storage';
 import { ActivateMode, Way, Counter } from '@storage/types';
 import { getSoundSetting, getVibrationSetting } from '@storage/settings';
+import { PADDING_TOP_MULTIPLIER, PADDING_TOP_RATIO } from '@constants/screenSizeConfig';
 
 interface UseCounterProps {
   counterId: string;
@@ -19,9 +21,15 @@ interface UseCounterReturn {
   activateMode: ActivateMode;
   way: Way;
   currentCount: string;
-  activeModal: 'reset' | 'edit' | 'limit' | null;
+  activeModal: 'reset' | 'edit' | 'limit' | 'rule' | 'subReset' | 'subEdit' | 'subLimit' | null;
   errorModalVisible: boolean;
   errorMessage: string;
+
+  // 보조 카운터 상태
+  subCount: number;
+  subRule: number;
+  subRuleIsActive: boolean;
+  subModalIsOpen: boolean;
 
   // 액션 함수들
   handleAdd: () => void;
@@ -34,7 +42,22 @@ interface UseCounterReturn {
   toggleWay: () => void;
   showErrorModal: (message: string) => void;
   setErrorModalVisible: (visible: boolean) => void;
-  setActiveModal: (modal: 'reset' | 'edit' | 'limit' | null) => void;
+  setActiveModal: (modal: 'reset' | 'edit' | 'limit' | 'rule' | 'subReset' | 'subEdit' | 'subLimit' | null) => void;
+
+  // 보조 카운터 액션 함수들
+  handleSubAdd: () => void;
+  handleSubSubtract: () => void;
+  handleSubReset: () => void;
+  handleSubEdit: () => void;
+  handleSubRule: () => void;
+  handleSubResetConfirm: () => void;
+  handleSubEditConfirm: (value: string) => void;
+  handleSubRuleConfirm: (rule: number, isRuleActive: boolean) => void;
+  handleSubModalToggle: () => void;
+
+  // 패딩 탑 애니메이션
+  paddingTopAnim: Animated.Value;
+  updatePaddingTopAnimation: (height: number, subModalIsOpen: boolean, options?: { animate?: boolean }) => void;
 }
 
 /**
@@ -42,6 +65,7 @@ interface UseCounterReturn {
  *
  * 주요 기능:
  * - 카운터 값 증가/감소
+ * - 보조 카운터 값 증가/감소
  * - 활성화 모드 전환
  * - 방향 전환
  * - 사운드 및 진동 피드백
@@ -49,11 +73,22 @@ interface UseCounterReturn {
  * - 에러 처리
  */
 export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => {
+  // Android New Architecture에서 레이아웃 애니메이션 활성화
+  useEffect(() => {
+    if (
+      Platform.OS === 'android' &&
+      !(globalThis as any)._REACT_NATIVE_NEW_ARCH_ENABLED && // New Architecture에서 무시
+      UIManager.setLayoutAnimationEnabledExperimental
+    ) {
+      UIManager.setLayoutAnimationEnabledExperimental(true);
+    }
+  }, []);
+
   // 카운터 데이터 상태
   const [counter, setCounter] = useState<Counter | null>(null);
 
   // 모달 상태 관리
-  const [activeModal, setActiveModal] = useState<'reset' | 'edit' | 'limit' | null>(null);
+  const [activeModal, setActiveModal] = useState<'reset' | 'edit' | 'limit' | 'rule' | 'subReset' | 'subEdit' | 'subLimit' | null>(null);
   const [currentCount, setCurrentCount] = useState('');
   const [errorModalVisible, setErrorModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -64,6 +99,11 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
   // 설정 상태
   const [soundSetting, setSoundSettingState] = useState(true);
   const [vibrationSetting, setVibrationSettingState] = useState(true);
+
+  // 패딩 탑 애니메이션 상태
+  const paddingTopAnim = useRef(new Animated.Value(0)).current;
+  const isInitialized = useRef(false);
+  const prevSubModalIsOpen = useRef<boolean | null>(null); // null로 초기화하여 첫 실행과 구분
 
   // 카운터 동작 상태
   const [activateMode, setActivateMode] = useState<ActivateMode>('inactive');
@@ -103,6 +143,16 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
   }, [loadSettings, loadCounterData]);
 
   /**
+   * 화면에 포커스될 때마다 설정 및 카운터 데이터 다시 로드
+   */
+  useFocusEffect(
+    useCallback(() => {
+      loadSettings();
+      loadCounterData();
+    }, [loadSettings, loadCounterData])
+  );
+
+  /**
    * 사운드 파일 로드 및 초기화
    */
   useEffect(() => {
@@ -120,6 +170,41 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
       clickSoundRef.current?.release();
     };
   }, []);
+
+  /**
+   * 패딩 탑 애니메이션 관리
+   */
+  const updatePaddingTopAnimation = useCallback((height: number, subModalIsOpen: boolean, options?: { animate?: boolean }) => {
+    const shouldAnimate = options?.animate ?? true;
+    const targetPaddingTop = subModalIsOpen
+      ? PADDING_TOP_MULTIPLIER * height  // 열려있으면 0.085 * height
+      : PADDING_TOP_MULTIPLIER * PADDING_TOP_RATIO * height; // 닫혀있으면 0.17 * height
+
+    // 첫 실행이거나 초기화되지 않은 경우
+    if (prevSubModalIsOpen.current === null) {
+      // 초기 설정 시에는 애니메이션 없이 즉시 설정
+      paddingTopAnim.setValue(targetPaddingTop);
+      isInitialized.current = true;
+    } else if (prevSubModalIsOpen.current !== subModalIsOpen) {
+      // subModalIsOpen이 변경된 경우에만 애니메이션 적용
+      if (shouldAnimate) {
+        Animated.timing(paddingTopAnim, {
+          toValue: targetPaddingTop,
+          duration: 300,
+          useNativeDriver: false,
+        }).start();
+      } else {
+        // shouldAnimate가 false인 경우 (강제로 애니메이션 비활성화)
+        paddingTopAnim.setValue(targetPaddingTop);
+      }
+    } else {
+      // height만 변경된 경우에는 즉시 설정 (애니메이션 없음)
+      paddingTopAnim.setValue(targetPaddingTop);
+    }
+
+    // 이전 값 업데이트
+    prevSubModalIsOpen.current = subModalIsOpen;
+  }, [paddingTopAnim]);
 
   /**
    * 카운터 상태 동기화
@@ -328,6 +413,170 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     handleClose();
   }, [counter, updateCountAndMaybeWay, handleClose]);
 
+  // 보조 카운터 액션 함수들
+  const handleSubAdd = useCallback(async () => {
+    if (!counter) {
+      return;
+    }
+
+    // 범위 체크: 9999 초과 시 경고 모달 표시
+    if (counter.subCount >= 9999) {
+      setActiveModal('subLimit');
+      return;
+    }
+
+    playSound();
+    triggerHaptics();
+
+    let newSubCount = counter.subCount + 1;
+    let newMainCount = counter.count;
+
+    // 규칙이 활성화되어 있고 규칙 값 이상이 되면 자동 리셋
+    if (counter.subRuleIsActive && newSubCount >= counter.subRule) {
+      newSubCount = 0;
+      newMainCount = counter.count + 1;
+    }
+
+    const updatedCounter = {
+      ...counter,
+      subCount: newSubCount,
+      count: newMainCount,
+    };
+
+    await updateItem(counter.id, updatedCounter);
+    setCounter(updatedCounter);
+  }, [counter, playSound, triggerHaptics]);
+
+  const handleSubSubtract = useCallback(async () => {
+    if (!counter) {
+      return;
+    }
+
+    // 범위 체크: 0 미만 시 경고 모달 표시
+    if (counter.subCount <= 0) {
+      setActiveModal('subLimit');
+      return;
+    }
+
+    playSound();
+    triggerHaptics();
+
+    const newSubCount = counter.subCount - 1;
+
+    const updatedCounter = {
+      ...counter,
+      subCount: newSubCount,
+    };
+
+    await updateItem(counter.id, updatedCounter);
+    setCounter(updatedCounter);
+  }, [counter, playSound, triggerHaptics]);
+
+  const handleSubReset = useCallback(() => {
+    setActiveModal('subReset');
+  }, []);
+
+  const handleSubEdit = useCallback(() => {
+    setActiveModal('subEdit');
+  }, []);
+
+  const handleSubRule = useCallback(() => {
+    setActiveModal('rule');
+  }, []);
+
+  // 보조 카운터 초기화 확인
+  const handleSubResetConfirm = useCallback(() => {
+    if (!counter) {
+      return;
+    }
+
+    const updatedCounter = {
+      ...counter,
+      subCount: 0,
+    };
+
+    updateItem(counter.id, updatedCounter);
+    setCounter(updatedCounter);
+    handleClose();
+  }, [counter, handleClose]);
+
+  // 보조 카운터 편집 확인
+  const handleSubEditConfirm = useCallback((value: string) => {
+    if (!counter) {
+      return;
+    }
+
+    const newValue = parseInt(value, 10);
+
+    let newSubCount = newValue;
+    let newMainCount = counter.count;
+
+    // 규칙이 활성화되어 있고 규칙 값 이상이 되면 자동 리셋
+    if (counter.subRuleIsActive && newSubCount >= counter.subRule) {
+      newSubCount = 0;
+      newMainCount = counter.count + 1;
+    }
+
+    const updatedCounter = {
+      ...counter,
+      subCount: newSubCount,
+      count: newMainCount,
+    };
+
+    updateItem(counter.id, updatedCounter);
+    setCounter(updatedCounter);
+    handleClose();
+  }, [counter, handleClose]);
+
+  // 보조 카운터 규칙 확인
+  const handleSubRuleConfirm = useCallback((rule: number, isRuleActive: boolean) => {
+    if (!counter) {
+      return;
+    }
+
+    // 규칙이 활성화되려고 하는데 값이 0이면 에러
+    if (isRuleActive && rule <= 0) {
+      showErrorModal('규칙 값은 1 이상이어야 합니다.');
+      return;
+    }
+
+    let newSubCount = counter.subCount;
+    let newMainCount = counter.count;
+
+    // 규칙을 활성화할 때 기존 보조 카운터 값이 규칙 값 이상이면 자동 리셋
+    if (isRuleActive && counter.subCount >= rule) {
+      newSubCount = 0;
+      newMainCount = counter.count + 1;
+    }
+
+    const updatedCounter = {
+      ...counter,
+      subRule: rule,
+      subRuleIsActive: isRuleActive,
+      subCount: newSubCount,
+      count: newMainCount,
+    };
+
+    updateItem(counter.id, updatedCounter);
+    setCounter(updatedCounter);
+    handleClose();
+  }, [counter, handleClose, showErrorModal]);
+
+  // 보조 카운터 모달 토글
+  const handleSubModalToggle = useCallback(async () => {
+    if (!counter) {
+      return;
+    }
+
+    const updatedCounter = {
+      ...counter,
+      subModalIsOpen: !counter.subModalIsOpen,
+    };
+
+    await updateItem(counter.id, updatedCounter);
+    setCounter(updatedCounter);
+  }, [counter]);
+
   return {
     // 상태
     counter,
@@ -337,6 +586,12 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     activeModal,
     errorModalVisible,
     errorMessage,
+
+    // 보조 카운터 상태
+    subCount: counter?.subCount ?? 0,
+    subRule: counter?.subRule ?? 0,
+    subRuleIsActive: counter?.subRuleIsActive ?? false,
+    subModalIsOpen: counter?.subModalIsOpen ?? false,
 
     // 액션 함수들
     handleAdd,
@@ -350,5 +605,20 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     showErrorModal,
     setErrorModalVisible,
     setActiveModal,
+
+    // 보조 카운터 액션 함수들
+    handleSubAdd,
+    handleSubSubtract,
+    handleSubReset,
+    handleSubEdit,
+    handleSubRule,
+    handleSubResetConfirm,
+    handleSubEditConfirm,
+    handleSubRuleConfirm,
+    handleSubModalToggle,
+
+    // 패딩 탑 애니메이션
+    paddingTopAnim,
+    updatePaddingTopAnimation,
   };
 };

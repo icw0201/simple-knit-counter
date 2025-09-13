@@ -1,0 +1,69 @@
+// src/components/counter/SubCounterTouchArea.tsx
+import React, { useState } from 'react';
+import { View, Pressable } from 'react-native';
+import { Minus, Plus } from 'lucide-react-native';
+
+interface SubCounterTouchAreaProps {
+  handleWidth?: number;
+  onAdd?: () => void;
+  onSubtract?: () => void;
+}
+
+/**
+ * 보조 카운터 터치 영역 컴포넌트
+ * 보조모달용 작은 터치 영역 UI (터치 시 색깔 변경)
+ */
+const SubCounterTouchArea: React.FC<SubCounterTouchAreaProps> = ({
+  handleWidth = 30,
+  onAdd,
+  onSubtract,
+}) => {
+  const [leftPressed, setLeftPressed] = useState(false);
+  const [rightPressed, setRightPressed] = useState(false);
+
+  return (
+    <View className="absolute top-0 left-0 right-0 bottom-0 flex-row" style={{ paddingLeft: handleWidth }}>
+      {/* 왼쪽 영역 (감소) - 투명 배경 */}
+      <Pressable
+        className={`flex-1 items-start justify-center ${leftPressed ? 'bg-gray-100' : 'bg-transparent'}`}
+        style={{
+          mixBlendMode: leftPressed ? 'multiply' : 'normal',
+        }}
+        onPress={() => {
+          setLeftPressed(true);
+          onSubtract?.();
+          setTimeout(() => setLeftPressed(false), 100);
+        }}
+      >
+        <Minus
+          size={24}
+          color="#fc3e39"
+          strokeWidth={2}
+          className="ml-3"
+        />
+      </Pressable>
+
+      {/* 오른쪽 영역 (증가) - 투명 배경 */}
+      <Pressable
+        className={`flex-1 items-end justify-center ${rightPressed ? 'bg-gray-100' : 'bg-transparent'}`}
+        style={{
+          mixBlendMode: rightPressed ? 'multiply' : 'normal',
+        }}
+        onPress={() => {
+          setRightPressed(true);
+          onAdd?.();
+          setTimeout(() => setRightPressed(false), 100);
+        }}
+      >
+        <Plus
+          size={24}
+          color="#fc3e39"
+          strokeWidth={2}
+          className="mr-3"
+        />
+      </Pressable>
+    </View>
+  );
+};
+
+export default SubCounterTouchArea;

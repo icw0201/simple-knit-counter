@@ -1,5 +1,7 @@
 // src/constants/screenSizeConfig.ts
 
+import { DimensionValue } from 'react-native';
+
 /**
  * 화면 크기에 따른 UI 요소 크기 분류
  * 컴팩트, 작음, 중간, 큼으로 구분하여 반응형 UI 제공
@@ -20,21 +22,67 @@ export const iconSizeConfig = {
 };
 
 /**
- * 화면 크기별 아이콘 마진 설정
+ * 화면 크기별 서브 아이콘 크기 설정 (서브모달용, 더 작은 크기)
  */
-export const iconMarginConfig = {
-  [ScreenSize.COMPACT]: 'mt-3',           // 컴팩트: 위쪽 여백만
-  [ScreenSize.SMALL]: 'mt-3',             // 작음: 위쪽 여백만
-  [ScreenSize.LARGE]: 'mt-12 mb-14',      // 큼: 위아래 여백
+export const subIconSizeConfig = {
+  [ScreenSize.COMPACT]: 32,   // 컴팩트: 매우 작은 아이콘
+  [ScreenSize.SMALL]: 36,     // 작음: 작은 아이콘
+  [ScreenSize.LARGE]: 44,     // 큼: 중간 아이콘
 };
+
 
 /**
  * 화면 크기별 숫자 텍스트 스타일 설정
  */
 export const textClassConfig = {
-  [ScreenSize.COMPACT]: 'text-5xl mb-7',      // 컴팩트: 작은 글씨, 아래 여백
-  [ScreenSize.SMALL]: 'text-7xl mb-2 mt-3',   // 작음: 중간 글씨, 위아래 여백
-  [ScreenSize.LARGE]: 'text-8xl mb-10 mt-10', // 큼: 큰 글씨, 큰 여백
+  [ScreenSize.COMPACT]: 'text-5xl',      // 컴팩트: 작은 글씨
+  [ScreenSize.SMALL]: 'text-7xl',        // 작음: 중간 글씨
+  [ScreenSize.LARGE]: 'text-8xl',        // 큼: 큰 글씨
+};
+
+/**
+ * 화면 크기별 컴포넌트 간 세로 간격 설정 (margin-top)
+ */
+export const gapConfig = {
+  [ScreenSize.COMPACT]: 'mt-4',          // 컴팩트: 작은 간격
+  [ScreenSize.SMALL]: 'mt-6',            // 작음: 중간 간격
+  [ScreenSize.LARGE]: 'mt-16',            // 큼: 큰 간격
+};
+
+/**
+ * 화면 크기별 서브 모달 텍스트 마진 설정
+ */
+export const subModalTextMarginConfig = {
+  [ScreenSize.COMPACT]: '',     // 컴팩트: 작은 마진
+  [ScreenSize.SMALL]: '',       // 작음: 중간 마진
+  [ScreenSize.LARGE]: 'mt-3 mb-8',      // 큼: 큰 마진
+};
+
+/**
+ * 화면 크기별 서브 모달 width 비율 설정
+ */
+export const subModalWidthRatioConfig = {
+  [ScreenSize.COMPACT]: 1.0,    // 컴팩트: 100%
+  [ScreenSize.SMALL]: 1.0,      // 작음: 100%
+  [ScreenSize.LARGE]: 0.9,      // 큼: 90%
+};
+
+/**
+ * 화면 크기별 서브 모달 height 비율 설정
+ */
+export const subModalHeightRatioConfig = {
+  [ScreenSize.COMPACT]: 0.45,   // 컴팩트: 45%
+  [ScreenSize.SMALL]: 0.45,     // 작음: 45%
+  [ScreenSize.LARGE]: 0.27,     // 큼: 27%
+};
+
+/**
+ * 화면 크기별 서브 모달 top 위치 설정
+ */
+export const subModalTopConfig: Record<ScreenSize, DimensionValue> = {
+  [ScreenSize.COMPACT]: '80%',  // 컴팩트: 80%
+  [ScreenSize.SMALL]: '85%',    // 작음: 85%
+  [ScreenSize.LARGE]: '80%',    // 큼: 80%
 };
 
 /**
@@ -63,13 +111,14 @@ export const getIconSize = (screenSize: ScreenSize): number => {
 };
 
 /**
- * 화면 크기에 따른 아이콘 마진을 반환합니다.
+ * 화면 크기에 따른 서브 아이콘 크기를 반환합니다.
  * @param screenSize - 화면 크기
- * @returns 아이콘 마진 클래스
+ * @returns 서브 아이콘 크기
  */
-export const getIconMargin = (screenSize: ScreenSize): string => {
-  return iconMarginConfig[screenSize];
+export const getSubIconSize = (screenSize: ScreenSize): number => {
+  return subIconSizeConfig[screenSize];
 };
+
 
 /**
  * 화면 크기에 따른 텍스트 클래스를 반환합니다.
@@ -79,3 +128,60 @@ export const getIconMargin = (screenSize: ScreenSize): string => {
 export const getTextClass = (screenSize: ScreenSize): string => {
   return textClassConfig[screenSize];
 };
+
+/**
+ * 화면 크기에 따른 gap 클래스를 반환합니다.
+ * @param screenSize - 화면 크기
+ * @returns gap 클래스
+ */
+export const getGapClass = (screenSize: ScreenSize): string => {
+  return gapConfig[screenSize];
+};
+
+/**
+ * 화면 크기에 따른 서브 모달 텍스트 마진 클래스를 반환합니다.
+ * @param screenSize - 화면 크기
+ * @returns 텍스트 마진 클래스
+ */
+export const getSubModalTextMarginClass = (screenSize: ScreenSize): string => {
+  return subModalTextMarginConfig[screenSize];
+};
+
+/**
+ * 화면 크기에 따른 서브 모달 width 비율을 반환합니다.
+ * @param screenSize - 화면 크기
+ * @returns width 비율 (0.0 ~ 1.0)
+ */
+export const getSubModalWidthRatio = (screenSize: ScreenSize): number => {
+  return subModalWidthRatioConfig[screenSize];
+};
+
+/**
+ * 화면 크기에 따른 서브 모달 height 비율을 반환합니다.
+ * @param screenSize - 화면 크기
+ * @returns height 비율 (0.0 ~ 1.0)
+ */
+export const getSubModalHeightRatio = (screenSize: ScreenSize): number => {
+  return subModalHeightRatioConfig[screenSize];
+};
+
+/**
+ * 화면 크기에 따른 서브 모달 top 위치를 반환합니다.
+ * @param screenSize - 화면 크기
+ * @returns top 위치 (DimensionValue)
+ */
+export const getSubModalTop = (screenSize: ScreenSize): DimensionValue => {
+  return subModalTopConfig[screenSize];
+};
+
+// ===== 패딩 탑 애니메이션 상수 =====
+
+/**
+ * 패딩 탑 배수 (기본값)
+ */
+export const PADDING_TOP_MULTIPLIER = 0.085;
+
+/**
+ * SubCounterModal 열릴 때 패딩 탑 배수 (2배)
+ */
+export const PADDING_TOP_RATIO = 2;

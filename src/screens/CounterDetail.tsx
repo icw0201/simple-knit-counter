@@ -1,7 +1,8 @@
 // src/screens/CounterDetail.tsx
 
-import React, { useLayoutEffect, useCallback } from 'react';
-import { View, Text, UIManager, Platform, useWindowDimensions } from 'react-native';
+import { useLayoutEffect, useCallback, useEffect, useRef, useState } from 'react';
+import { View, Text, useWindowDimensions, Animated } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '@navigation/AppNavigator';
@@ -10,18 +11,10 @@ import { activateKeepAwake, deactivateKeepAwake } from '@sayem314/react-native-k
 import { getHeaderRightWithActivateInfoSettings } from '@navigation/HeaderOptions';
 import { getScreenAwakeSetting } from '@storage/settings';
 
-import { CounterTouchArea, CounterDirection, CounterActions, CounterModals } from '@components/counter';
-import { getScreenSize, getIconSize, getIconMargin, getTextClass, ScreenSize } from '@constants/screenSizeConfig';
+import { CounterTouchArea, CounterDirection, CounterActions, CounterModals, SubCounterModal } from '@components/counter';
+import { getScreenSize, getIconSize, getTextClass, getGapClass, getSubModalWidthRatio, getSubModalHeightRatio, getSubModalTop, ScreenSize } from '@constants/screenSizeConfig';
 import { useCounter } from '@hooks/useCounter';
 
-// Android New Architecture에서 레이아웃 애니메이션 활성화
-if (
-  Platform.OS === 'android' &&
-  !(globalThis as any)._REACT_NATIVE_NEW_ARCH_ENABLED && // New Architecture에서 무시
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
-  UIManager.setLayoutAnimationEnabledExperimental(true);
-}
 
 /**
  * 카운터 상세 화면 컴포넌트
@@ -46,6 +39,11 @@ const CounterDetail = () => {
 
   // 화면 크기 정보
   const { height, width } = useWindowDimensions();
+  const screenSize = getScreenSize(height, width);
+  const iconSize = getIconSize(screenSize);
+  const textClass = getTextClass(screenSize);
+  const gapClass = getGapClass(screenSize);
+
 
   // 카운터 비즈니스 로직 훅
   const {
@@ -66,17 +64,55 @@ const CounterDetail = () => {
     toggleWay,
     setErrorModalVisible,
     setActiveModal,
+    // 보조 카운터 관련
+    subCount,
+    subRule,
+    subRuleIsActive,
+    subModalIsOpen,
+    handleSubAdd,
+    handleSubSubtract,
+    handleSubReset,
+    handleSubEdit,
+    handleSubRule,
+    handleSubResetConfirm,
+    handleSubEditConfirm,
+    handleSubRuleConfirm,
+    handleSubModalToggle,
+    // 패딩 탑 애니메이션
+    paddingTopAnim,
+    updatePaddingTopAnimation,
   } = useCounter({ counterId });
 
-  // 화면 크기 및 설정값 계산
-  const screenSize = getScreenSize(height, width);
-  const iconSize = getIconSize(screenSize);
-  const iconMargin = getIconMargin(screenSize);
-  const textClass = getTextClass(screenSize);
+  // 패딩 탑 애니메이션 업데이트
+  // 최초 진입 시에는 애니메이션 없이 즉시 설정하고, 이후에는 subModalIsOpen 변경 시에만 애니메이션
+  const didInitPadding = useRef(false);
+  const prevCounterId = useRef<string | null>(null);
+  const [isPaddingReady, setPaddingReady] = useState(false);
+  useEffect(() => {
+    if (!counter) return;
+
+    // 최초 진입(또는 다른 카운터로 전환) 시에는 애니메이션 없이 즉시 설정
+    if (!didInitPadding.current || prevCounterId.current !== counter.id) {
+      updatePaddingTopAnimation(height, subModalIsOpen, { animate: false });
+      didInitPadding.current = true;
+      prevCounterId.current = counter.id;
+      setPaddingReady(true);
+      return;
+    }
+
+    // 이후에는 상태 변경 시에만 애니메이션 적용
+    updatePaddingTopAnimation(height, subModalIsOpen, { animate: true });
+    setPaddingReady(true);
+  }, [counter, subModalIsOpen, height, updatePaddingTopAnimation]);
 
   // 방향 이미지 크기 계산 (원본 비율 87:134 유지)
   const imageWidth = iconSize;
   const imageHeight = iconSize * (87 / 134);
+
+  // SubCounterModal 크기 및 위치 계산 (화면 크기별)
+  const subModalWidth = width * getSubModalWidthRatio(screenSize);
+  const subModalHeight = height * getSubModalHeightRatio(screenSize);
+  const subModalTop = getSubModalTop(screenSize);
 
   /**
    * 화면 포커스 시 실행되는 효과
@@ -132,12 +168,20 @@ const CounterDetail = () => {
   }
 
   return (
-    <View className="flex-1 bg-white">
+    <SafeAreaView style={{ flex: 1 }} edges={['left', 'right', 'bottom']}>
+      <View className="flex-1 bg-white">
       {/* 좌우 터치 레이어 */}
       <CounterTouchArea onAdd={handleAdd} onSubtract={handleSubtract} />
 
       {/* 중앙 콘텐츠 영역 */}
-      <View className="flex-1 items-center justify-center">
+      <Animated.View
+        className="flex-1 items-center"
+        style={{ 
+          pointerEvents: 'box-none', 
+          paddingTop: paddingTopAnim,
+          opacity: isPaddingReady ? 1 : 0
+        }}
+      >
         {/* 방향 표시 이미지 영역 */}
         <CounterDirection
           activateMode={activateMode}
@@ -147,8 +191,8 @@ const CounterDetail = () => {
           onToggleWay={toggleWay}
         />
 
-        현재 카운트 표시
-        <View pointerEvents="none">
+        {/* 현재 카운트 표시 */}
+        <View pointerEvents="none" className={gapClass}>
           <Text
             className={`${textClass} font-bold text-black`}
           >
@@ -156,15 +200,37 @@ const CounterDetail = () => {
           </Text>
         </View>
 
-        {/* 액션 버튼들 */}
-        <CounterActions
-          screenSize={screenSize}
-          iconSize={iconSize}
-          iconMargin={iconMargin}
-          onReset={() => setActiveModal('reset')}
-          onEdit={handleEditOpen}
-        />
-      </View>
+        {/* 액션 버튼들 - SMALL 화면에서 SubCounterModal이 열려있으면 숨김 */}
+        {!(screenSize === ScreenSize.SMALL && subModalIsOpen) && (
+          <View className={gapClass}>
+            <CounterActions
+              screenSize={screenSize}
+              iconSize={iconSize}
+              onReset={() => setActiveModal('reset')}
+              onEdit={handleEditOpen}
+            />
+          </View>
+        )}
+      </Animated.View>
+
+
+      {/* 보조 카운터 모달 */}
+      <SubCounterModal
+        isOpen={subModalIsOpen}
+        onToggle={handleSubModalToggle}
+        onAdd={handleSubAdd}
+        onSubtract={handleSubSubtract}
+        onReset={handleSubReset}
+        onEdit={handleSubEdit}
+        onRule={handleSubRule}
+        subCount={subCount}
+        subRule={subRule}
+        subRuleIsActive={subRuleIsActive}
+        screenSize={screenSize}
+        width={subModalWidth}
+        height={subModalHeight}
+        top={subModalTop}
+      />
 
       {/* 모달들 */}
       <CounterModals
@@ -172,12 +238,19 @@ const CounterDetail = () => {
         errorModalVisible={errorModalVisible}
         errorMessage={errorMessage}
         currentCount={currentCount}
+        subCount={subCount}
+        subRule={subRule}
+        subRuleIsActive={subRuleIsActive}
         onClose={handleClose}
         onEditConfirm={handleEditConfirm}
         onResetConfirm={handleResetConfirm}
         onErrorModalClose={() => setErrorModalVisible(false)}
+        onSubEditConfirm={handleSubEditConfirm}
+        onSubResetConfirm={handleSubResetConfirm}
+        onSubRuleConfirm={handleSubRuleConfirm}
       />
-    </View>
+      </View>
+    </SafeAreaView>
   );
 };
 

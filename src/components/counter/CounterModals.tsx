@@ -1,16 +1,23 @@
 // src/components/counter/CounterModals.tsx
 import React from 'react';
 import { ConfirmModal, CounterEditModal } from '@components/common/modals';
+import { SubCounterRuleModal } from '@components/counter';
 
 interface CounterModalsProps {
-  activeModal: 'reset' | 'edit' | 'limit' | null;
+  activeModal: 'reset' | 'edit' | 'limit' | 'rule' | 'subReset' | 'subEdit' | 'subLimit' | null;
   errorModalVisible: boolean;
   errorMessage: string;
   currentCount: string;
+  subCount: number;
+  subRule: number;
+  subRuleIsActive: boolean;
   onClose: () => void;
   onEditConfirm: (value: string) => void;
   onResetConfirm: () => void;
   onErrorModalClose: () => void;
+  onSubEditConfirm: (value: string) => void;
+  onSubResetConfirm: () => void;
+  onSubRuleConfirm: (rule: number, isActive: boolean) => void;
 }
 
 /**
@@ -22,10 +29,16 @@ const CounterModals: React.FC<CounterModalsProps> = ({
   errorModalVisible,
   errorMessage,
   currentCount,
+  subCount,
+  subRule,
+  subRuleIsActive,
   onClose,
   onEditConfirm,
   onResetConfirm,
   onErrorModalClose,
+  onSubEditConfirm,
+  onSubResetConfirm,
+  onSubRuleConfirm,
 }) => {
   return (
     <>
@@ -60,6 +73,48 @@ const CounterModals: React.FC<CounterModalsProps> = ({
         confirmText="확인"
         cancelText=""
         confirmButtonStyle="primary"
+      />
+
+      {/* 보조 카운터 초기화 확인 모달 */}
+      <ConfirmModal
+        visible={activeModal === 'subReset'}
+        onClose={onClose}
+        title="보조 카운터 초기화"
+        description="보조 카운터를 0으로 초기화하시겠습니까?"
+        onConfirm={onSubResetConfirm}
+        confirmText="초기화"
+        cancelText="취소"
+        confirmButtonStyle="danger"
+      />
+
+      {/* 보조 카운터 편집 모달 */}
+      <CounterEditModal
+        visible={activeModal === 'subEdit'}
+        onClose={onClose}
+        onConfirm={onSubEditConfirm}
+        initialValue={subCount.toString()}
+        title="보조 카운터 편집"
+      />
+
+      {/* 보조 카운터 범위 초과 경고 모달 */}
+      <ConfirmModal
+        visible={activeModal === 'subLimit'}
+        onClose={onClose}
+        title="보조 카운터 범위 초과 안내"
+        description="보조 카운터에는 0에서 9999 사이의 값만 입력할 수 있습니다."
+        onConfirm={onClose}
+        confirmText="확인"
+        cancelText=""
+        confirmButtonStyle="primary"
+      />
+
+      {/* 보조 카운터 규칙 모달 */}
+      <SubCounterRuleModal
+        visible={activeModal === 'rule'}
+        onClose={onClose}
+        onConfirm={onSubRuleConfirm}
+        initialRule={subRule}
+        initialIsRuleActive={subRuleIsActive}
       />
 
       {/* 에러 모달 */}

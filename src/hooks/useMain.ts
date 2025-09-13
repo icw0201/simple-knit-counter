@@ -66,6 +66,10 @@ export const useMain = () => {
       title,
       count: 0,
       parentProjectId: null,
+      subCount: 0,
+      subRule: 0,
+      subRuleIsActive: false,
+      subModalIsOpen: false,
     };
   }, []);
 
