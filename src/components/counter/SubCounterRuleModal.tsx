@@ -45,10 +45,10 @@ const SubCounterRuleModal: React.FC<SubCounterRuleModalProps> = ({
     <BaseModal visible={visible} onClose={onClose} title="설정">
       <View className="px-6 py-4">
         {/* 보조 카운터 규칙 설정 */}
-        <View className="flex-row items-center justify-between">
-          <Text className="text-base text-black">보조 카운터</Text>
+        <View className="flex-row items-center justify-start">
+          <Text className="text-base text-black mr-2">보조 카운터</Text>
           <View className="flex-row items-center">
-            <View className="w-20">
+            <View className="w-20 mr-2">
               <TextInputBox
                 label=""
                 value={rule}
@@ -58,7 +58,7 @@ const SubCounterRuleModal: React.FC<SubCounterRuleModalProps> = ({
                 placeholder="0"
               />
             </View>
-            <Text className="text-base text-black ml-2">코마다</Text>
+            <Text className="text-base text-black">코마다</Text>
           </View>
         </View>
 
