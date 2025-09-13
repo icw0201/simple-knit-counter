@@ -227,15 +227,17 @@ const CounterDetail = () => {
           </Text>
         </View>
 
-        {/* 액션 버튼들 */}
-        <View className={gapClass}>
-          <CounterActions
-            screenSize={screenSize}
-            iconSize={iconSize}
-            onReset={() => setActiveModal('reset')}
-            onEdit={handleEditOpen}
-          />
-        </View>
+        {/* 액션 버튼들 - SMALL 화면에서 SubCounterModal이 열려있으면 숨김 */}
+        {!(screenSize === ScreenSize.SMALL && subModalIsOpen) && (
+          <View className={gapClass}>
+            <CounterActions
+              screenSize={screenSize}
+              iconSize={iconSize}
+              onReset={() => setActiveModal('reset')}
+              onEdit={handleEditOpen}
+            />
+          </View>
+        )}
       </Animated.View>
 
 
