@@ -1,6 +1,6 @@
 // src/screens/CounterDetail.tsx
 
-import React, { useLayoutEffect, useCallback, useEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useCallback, useEffect, useRef, useState } from 'react';
 import { View, Text, useWindowDimensions, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
