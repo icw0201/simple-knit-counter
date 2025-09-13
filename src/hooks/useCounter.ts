@@ -461,19 +461,11 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     playSound();
     triggerHaptics();
 
-    let newSubCount = counter.subCount - 1;
-    let newMainCount = counter.count;
-
-    // 규칙이 활성화되어 있고 규칙 값 이상이 되면 자동 리셋
-    if (counter.subRuleIsActive && newSubCount >= counter.subRule) {
-      newSubCount = 0;
-      newMainCount = counter.count + 1;
-    }
+    const newSubCount = counter.subCount - 1;
 
     const updatedCounter = {
       ...counter,
       subCount: newSubCount,
-      count: newMainCount,
     };
 
     await updateItem(counter.id, updatedCounter);
