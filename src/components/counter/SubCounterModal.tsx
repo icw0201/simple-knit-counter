@@ -3,7 +3,8 @@ import { View, Text } from 'react-native';
 import { SlideModal } from '../common/modals/SlideModal/SlideModal';
 import SubCounterAction from './SubCounterAction';
 import SubCounterTouchArea from './SubCounterTouchArea';
-import { getSubIconSize, ScreenSize } from '@constants/screenSizeConfig';
+import { getSubIconSize, getSubModalTextMarginClass, ScreenSize } from '@constants/screenSizeConfig';
+import { DimensionValue } from 'react-native';
 
 // ===== 타입 정의 =====
 interface SubCounterModalProps {
@@ -21,6 +22,8 @@ interface SubCounterModalProps {
   subRuleIsActive?: boolean;
   screenSize: ScreenSize;
   width: number;
+  height: number;
+  top: DimensionValue;
 }
 
 // ===== 메인 컴포넌트 =====
@@ -39,19 +42,22 @@ export const SubCounterModal: React.FC<SubCounterModalProps> = ({
   subRuleIsActive: _subRuleIsActive = false,
   screenSize,
   width,
+  height,
+  top,
 }) => {
-  // 아이콘 크기 정보
+  // 아이콘 크기 및 간격 정보
   const iconSize = getSubIconSize(screenSize);
+  const textMarginClass = getSubModalTextMarginClass(screenSize);
   return (
     <SlideModal
       isOpen={isOpen}
       onToggle={onToggle}
-      height={230}
+      height={height}
       width={width}
       handleWidth={handleWidth}
       backgroundColor="white"
       padding={0}
-      top="80%"
+      top={top}
       onClose={onClose}
     >
       {/* 터치 영역 - 배경 100% 차지 */}
@@ -65,7 +71,7 @@ export const SubCounterModal: React.FC<SubCounterModalProps> = ({
       <View className="flex-1 items-center justify-center" style={{ paddingLeft: handleWidth }}>
 
       <View pointerEvents="none">
-        <Text className="text-4xl font-bold text-black mt-5 mb-10">
+        <Text className={`text-4xl font-bold text-black ${textMarginClass}`}>
           {subCount}
         </Text>
       </View>

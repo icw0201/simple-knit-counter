@@ -48,6 +48,42 @@ export const gapConfig = {
 };
 
 /**
+ * 화면 크기별 서브 모달 텍스트 마진 설정
+ */
+export const subModalTextMarginConfig = {
+  [ScreenSize.COMPACT]: '',     // 컴팩트: 작은 마진
+  [ScreenSize.SMALL]: '',       // 작음: 중간 마진
+  [ScreenSize.LARGE]: 'mt-3 mb-8',      // 큼: 큰 마진
+};
+
+/**
+ * 화면 크기별 서브 모달 width 비율 설정
+ */
+export const subModalWidthRatioConfig = {
+  [ScreenSize.COMPACT]: 1.0,    // 컴팩트: 100%
+  [ScreenSize.SMALL]: 1.0,      // 작음: 100%
+  [ScreenSize.LARGE]: 0.9,      // 큼: 90%
+};
+
+/**
+ * 화면 크기별 서브 모달 height 비율 설정
+ */
+export const subModalHeightRatioConfig = {
+  [ScreenSize.COMPACT]: 0.45,   // 컴팩트: 45%
+  [ScreenSize.SMALL]: 0.45,     // 작음: 45%
+  [ScreenSize.LARGE]: 0.27,     // 큼: 27%
+};
+
+/**
+ * 화면 크기별 서브 모달 top 위치 설정
+ */
+export const subModalTopConfig = {
+  [ScreenSize.COMPACT]: '80%',  // 컴팩트: 80%
+  [ScreenSize.SMALL]: '85%',    // 작음: 85%
+  [ScreenSize.LARGE]: '80%',    // 큼: 80%
+};
+
+/**
  * 현재 화면 크기를 판단하여 적절한 ScreenSize 열거값을 반환합니다.
  * @param height - 화면 높이
  * @param width - 화면 너비
@@ -98,4 +134,40 @@ export const getTextClass = (screenSize: ScreenSize): string => {
  */
 export const getGapClass = (screenSize: ScreenSize): string => {
   return gapConfig[screenSize];
+};
+
+/**
+ * 화면 크기에 따른 서브 모달 텍스트 마진 클래스를 반환합니다.
+ * @param screenSize - 화면 크기
+ * @returns 텍스트 마진 클래스
+ */
+export const getSubModalTextMarginClass = (screenSize: ScreenSize): string => {
+  return subModalTextMarginConfig[screenSize];
+};
+
+/**
+ * 화면 크기에 따른 서브 모달 width 비율을 반환합니다.
+ * @param screenSize - 화면 크기
+ * @returns width 비율 (0.0 ~ 1.0)
+ */
+export const getSubModalWidthRatio = (screenSize: ScreenSize): number => {
+  return subModalWidthRatioConfig[screenSize];
+};
+
+/**
+ * 화면 크기에 따른 서브 모달 height 비율을 반환합니다.
+ * @param screenSize - 화면 크기
+ * @returns height 비율 (0.0 ~ 1.0)
+ */
+export const getSubModalHeightRatio = (screenSize: ScreenSize): number => {
+  return subModalHeightRatioConfig[screenSize];
+};
+
+/**
+ * 화면 크기에 따른 서브 모달 top 위치를 반환합니다.
+ * @param screenSize - 화면 크기
+ * @returns top 위치 (DimensionValue)
+ */
+export const getSubModalTop = (screenSize: ScreenSize): string => {
+  return subModalTopConfig[screenSize];
 };

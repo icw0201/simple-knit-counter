@@ -12,7 +12,7 @@ import { getHeaderRightWithActivateInfoSettings } from '@navigation/HeaderOption
 import { getScreenAwakeSetting } from '@storage/settings';
 
 import { CounterTouchArea, CounterDirection, CounterActions, CounterModals, SubCounterModal } from '@components/counter';
-import { getScreenSize, getIconSize, getTextClass, getGapClass, ScreenSize } from '@constants/screenSizeConfig';
+import { getScreenSize, getIconSize, getTextClass, getGapClass, getSubModalWidthRatio, getSubModalHeightRatio, getSubModalTop, ScreenSize } from '@constants/screenSizeConfig';
 import { useCounter } from '@hooks/useCounter';
 
 // 패딩 탑 상수
@@ -137,8 +137,10 @@ const CounterDetail = () => {
   const imageWidth = iconSize;
   const imageHeight = iconSize * (87 / 134);
 
-  // SubCounterModal width 계산
-  const subModalWidth = screenSize === ScreenSize.LARGE ? width * 0.9 : width;
+  // SubCounterModal 크기 및 위치 계산 (화면 크기별)
+  const subModalWidth = width * getSubModalWidthRatio(screenSize);
+  const subModalHeight = height * getSubModalHeightRatio(screenSize);
+  const subModalTop = getSubModalTop(screenSize);
 
   /**
    * 화면 포커스 시 실행되는 효과
@@ -252,6 +254,8 @@ const CounterDetail = () => {
         subRuleIsActive={subRuleIsActive}
         screenSize={screenSize}
         width={subModalWidth}
+        height={subModalHeight}
+        top={subModalTop}
       />
 
       {/* 모달들 */}
