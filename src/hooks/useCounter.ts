@@ -50,14 +50,14 @@ interface UseCounterReturn {
   handleSubReset: () => void;
   handleSubEdit: () => void;
   handleSubRule: () => void;
-
-  // 패딩 탑 애니메이션
-  paddingTopAnim: Animated.Value;
-  updatePaddingTopAnimation: (height: number, subModalIsOpen: boolean, options?: { animate?: boolean }) => void;
   handleSubResetConfirm: () => void;
   handleSubEditConfirm: (value: string) => void;
   handleSubRuleConfirm: (rule: number, isRuleActive: boolean) => void;
   handleSubModalToggle: () => void;
+
+  // 패딩 탑 애니메이션
+  paddingTopAnim: Animated.Value;
+  updatePaddingTopAnimation: (height: number, subModalIsOpen: boolean, options?: { animate?: boolean }) => void;
 }
 
 /**
@@ -194,6 +194,7 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
           useNativeDriver: false,
         }).start();
       } else {
+        // shouldAnimate가 false인 경우 (강제로 애니메이션 비활성화)
         paddingTopAnim.setValue(targetPaddingTop);
       }
     } else {
@@ -497,20 +498,15 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
       return;
     }
 
-    try {
-      const updatedCounter = {
-        ...counter,
-        subCount: 0,
-      };
+    const updatedCounter = {
+      ...counter,
+      subCount: 0,
+    };
 
-      updateItem(counter.id, updatedCounter);
-      setCounter(updatedCounter);
-      handleClose();
-    } catch (error) {
-      console.error('보조 카운터 초기화 실패:', error);
-      showErrorModal('보조 카운터 초기화에 실패했습니다.');
-    }
-  }, [counter, handleClose, showErrorModal]);
+    updateItem(counter.id, updatedCounter);
+    setCounter(updatedCounter);
+    handleClose();
+  }, [counter, handleClose]);
 
   // 보조 카운터 편집 확인
   const handleSubEditConfirm = useCallback((value: string) => {
