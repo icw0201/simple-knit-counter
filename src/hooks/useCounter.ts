@@ -507,10 +507,6 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     }
 
     const newValue = parseInt(value, 10);
-    if (isNaN(newValue) || newValue < 0 || newValue > 9999) {
-      setActiveModal('subLimit');
-      return;
-    }
 
     let newSubCount = newValue;
     let newMainCount = counter.count;
