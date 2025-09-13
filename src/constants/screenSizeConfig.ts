@@ -1,5 +1,7 @@
 // src/constants/screenSizeConfig.ts
 
+import { DimensionValue } from 'react-native';
+
 /**
  * 화면 크기에 따른 UI 요소 크기 분류
  * 컴팩트, 작음, 중간, 큼으로 구분하여 반응형 UI 제공
@@ -77,7 +79,7 @@ export const subModalHeightRatioConfig = {
 /**
  * 화면 크기별 서브 모달 top 위치 설정
  */
-export const subModalTopConfig = {
+export const subModalTopConfig: Record<ScreenSize, DimensionValue> = {
   [ScreenSize.COMPACT]: '80%',  // 컴팩트: 80%
   [ScreenSize.SMALL]: '85%',    // 작음: 85%
   [ScreenSize.LARGE]: '80%',    // 큼: 80%
@@ -168,7 +170,7 @@ export const getSubModalHeightRatio = (screenSize: ScreenSize): number => {
  * @param screenSize - 화면 크기
  * @returns top 위치 (DimensionValue)
  */
-export const getSubModalTop = (screenSize: ScreenSize): string => {
+export const getSubModalTop = (screenSize: ScreenSize): DimensionValue => {
   return subModalTopConfig[screenSize];
 };
 
