@@ -7,7 +7,6 @@ import { ScreenSize } from '@constants/screenSizeConfig';
 interface CounterActionsProps {
   screenSize: ScreenSize;
   iconSize: number;
-  iconMargin: string;
   onReset: () => void;
   onEdit: () => void;
 }
@@ -19,7 +18,6 @@ interface CounterActionsProps {
 const CounterActions: React.FC<CounterActionsProps> = ({
   screenSize,
   iconSize,
-  iconMargin,
   onReset,
   onEdit,
 }) => {
@@ -29,7 +27,7 @@ const CounterActions: React.FC<CounterActionsProps> = ({
   }
 
   return (
-    <View className={`${iconMargin} flex-row items-end`}>
+    <View className="flex-row items-end">
       {/* 초기화 버튼 */}
       <CircleIcon
         size={iconSize}

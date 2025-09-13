@@ -28,22 +28,23 @@ export const subIconSizeConfig = {
   [ScreenSize.LARGE]: 44,     // 큼: 중간 아이콘
 };
 
-/**
- * 화면 크기별 아이콘 마진 설정
- */
-export const iconMarginConfig = {
-  [ScreenSize.COMPACT]: 'mt-3',           // 컴팩트: 위쪽 여백만
-  [ScreenSize.SMALL]: 'mt-3',             // 작음: 위쪽 여백만
-  [ScreenSize.LARGE]: 'mt-12 mb-14',      // 큼: 위아래 여백
-};
 
 /**
  * 화면 크기별 숫자 텍스트 스타일 설정
  */
 export const textClassConfig = {
-  [ScreenSize.COMPACT]: 'text-5xl mb-7',      // 컴팩트: 작은 글씨, 아래 여백
-  [ScreenSize.SMALL]: 'text-7xl mb-2 mt-3',   // 작음: 중간 글씨, 위아래 여백
-  [ScreenSize.LARGE]: 'text-8xl mb-10 mt-10', // 큼: 큰 글씨, 큰 여백
+  [ScreenSize.COMPACT]: 'text-5xl',      // 컴팩트: 작은 글씨
+  [ScreenSize.SMALL]: 'text-7xl',        // 작음: 중간 글씨
+  [ScreenSize.LARGE]: 'text-8xl',        // 큼: 큰 글씨
+};
+
+/**
+ * 화면 크기별 컴포넌트 간 세로 간격 설정 (margin-top)
+ */
+export const gapConfig = {
+  [ScreenSize.COMPACT]: 'mt-4',          // 컴팩트: 작은 간격
+  [ScreenSize.SMALL]: 'mt-6',            // 작음: 중간 간격
+  [ScreenSize.LARGE]: 'mt-16',            // 큼: 큰 간격
 };
 
 /**
@@ -80,14 +81,6 @@ export const getSubIconSize = (screenSize: ScreenSize): number => {
   return subIconSizeConfig[screenSize];
 };
 
-/**
- * 화면 크기에 따른 아이콘 마진을 반환합니다.
- * @param screenSize - 화면 크기
- * @returns 아이콘 마진 클래스
- */
-export const getIconMargin = (screenSize: ScreenSize): string => {
-  return iconMarginConfig[screenSize];
-};
 
 /**
  * 화면 크기에 따른 텍스트 클래스를 반환합니다.
@@ -96,4 +89,13 @@ export const getIconMargin = (screenSize: ScreenSize): string => {
  */
 export const getTextClass = (screenSize: ScreenSize): string => {
   return textClassConfig[screenSize];
+};
+
+/**
+ * 화면 크기에 따른 gap 클래스를 반환합니다.
+ * @param screenSize - 화면 크기
+ * @returns gap 클래스
+ */
+export const getGapClass = (screenSize: ScreenSize): string => {
+  return gapConfig[screenSize];
 };

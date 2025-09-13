@@ -1,7 +1,7 @@
 // src/screens/CounterDetail.tsx
 
 import React, { useLayoutEffect, useCallback } from 'react';
-import { View, Text, UIManager, Platform, useWindowDimensions } from 'react-native';
+import { View, Text, UIManager, Platform, useWindowDimensions, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -12,8 +12,12 @@ import { getHeaderRightWithActivateInfoSettings } from '@navigation/HeaderOption
 import { getScreenAwakeSetting } from '@storage/settings';
 
 import { CounterTouchArea, CounterDirection, CounterActions, CounterModals, SubCounterModal } from '@components/counter';
-import { getScreenSize, getIconSize, getIconMargin, getTextClass, ScreenSize } from '@constants/screenSizeConfig';
+import { getScreenSize, getIconSize, getTextClass, getGapClass, ScreenSize } from '@constants/screenSizeConfig';
 import { useCounter } from '@hooks/useCounter';
+
+// 패딩 탑 상수
+const PADDING_TOP_MULTIPLIER = 0.085;
+const PADDING_TOP_RATIO = 2; // SUBCOUNTERMODAL 열릴 때 2배
 
 // Android New Architecture에서 레이아웃 애니메이션 활성화
 if (
@@ -47,6 +51,10 @@ const CounterDetail = () => {
 
   // 화면 크기 정보
   const { height, width } = useWindowDimensions();
+  const screenSize = getScreenSize(height, width);
+  const iconSize = getIconSize(screenSize);
+  const textClass = getTextClass(screenSize);
+  const gapClass = getGapClass(screenSize);
 
   // 슬라이드 모달 핸들러
   const handleSlideModalClose = useCallback(() => {
@@ -88,11 +96,42 @@ const CounterDetail = () => {
     handleSubModalToggle,
   } = useCounter({ counterId });
 
-  // 화면 크기 및 설정값 계산
-  const screenSize = getScreenSize(height, width);
-  const iconSize = getIconSize(screenSize);
-  const iconMargin = getIconMargin(screenSize);
-  const textClass = getTextClass(screenSize);
+  // 패딩 탑 애니메이션
+  const paddingTopAnim = React.useRef(new Animated.Value(0)).current;
+  const isInitialized = React.useRef(false);
+
+  // 이전 subModalIsOpen 값을 추적
+  const prevSubModalIsOpen = React.useRef(subModalIsOpen);
+
+  // 패딩 탑 위치 조정 (height 변화 시 즉시, subModalIsOpen 변화 시 애니메이션)
+  React.useEffect(() => {
+    const targetPaddingTop = subModalIsOpen
+      ? PADDING_TOP_MULTIPLIER * height  // 열려있으면 0.085 * height
+      : PADDING_TOP_MULTIPLIER * PADDING_TOP_RATIO * height; // 닫혀있으면 0.17 * height
+
+    console.log('subModalIsOpen changed:', subModalIsOpen, 'targetPaddingTop:', targetPaddingTop);
+
+    if (!isInitialized.current) {
+      // 초기 설정 시에는 애니메이션 없이 즉시 설정
+      paddingTopAnim.setValue(targetPaddingTop);
+      isInitialized.current = true;
+    } else if (prevSubModalIsOpen.current !== subModalIsOpen) {
+      // subModalIsOpen이 변경된 경우에만 애니메이션 적용
+      Animated.timing(paddingTopAnim, {
+        toValue: targetPaddingTop,
+        duration: 300,
+        useNativeDriver: false,
+      }).start();
+    } else {
+      // height만 변경된 경우에는 즉시 설정 (애니메이션 없음)
+      paddingTopAnim.setValue(targetPaddingTop);
+    }
+
+    // 이전 값 업데이트
+    prevSubModalIsOpen.current = subModalIsOpen;
+  }, [subModalIsOpen, height, paddingTopAnim]);
+
+  // 화면 크기 및 설정값 계산 (이미 위에서 정의됨)
 
   // 방향 이미지 크기 계산 (원본 비율 87:134 유지)
   const imageWidth = iconSize;
@@ -158,7 +197,13 @@ const CounterDetail = () => {
       <CounterTouchArea onAdd={handleAdd} onSubtract={handleSubtract} />
 
       {/* 중앙 콘텐츠 영역 */}
-      <View className="flex-1 items-center justify-center">
+      <Animated.View
+        className="flex-1 items-center"
+        style={{ 
+          pointerEvents: 'box-none', 
+          paddingTop: paddingTopAnim 
+        }}
+      >
         {/* 방향 표시 이미지 영역 */}
         <CounterDirection
           activateMode={activateMode}
@@ -169,7 +214,7 @@ const CounterDetail = () => {
         />
 
         {/* 현재 카운트 표시 */}
-        <View pointerEvents="none">
+        <View pointerEvents="none" className={gapClass}>
           <Text
             className={`${textClass} font-bold text-black`}
           >
@@ -178,14 +223,15 @@ const CounterDetail = () => {
         </View>
 
         {/* 액션 버튼들 */}
-        <CounterActions
-          screenSize={screenSize}
-          iconSize={iconSize}
-          iconMargin={iconMargin}
-          onReset={() => setActiveModal('reset')}
-          onEdit={handleEditOpen}
-        />
-      </View>
+        <View className={gapClass}>
+          <CounterActions
+            screenSize={screenSize}
+            iconSize={iconSize}
+            onReset={() => setActiveModal('reset')}
+            onEdit={handleEditOpen}
+          />
+        </View>
+      </Animated.View>
 
 
       {/* 서브 카운터 모달 */}
