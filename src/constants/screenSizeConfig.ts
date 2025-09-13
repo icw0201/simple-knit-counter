@@ -171,3 +171,15 @@ export const getSubModalHeightRatio = (screenSize: ScreenSize): number => {
 export const getSubModalTop = (screenSize: ScreenSize): string => {
   return subModalTopConfig[screenSize];
 };
+
+// ===== 패딩 탑 애니메이션 상수 =====
+
+/**
+ * 패딩 탑 배수 (기본값)
+ */
+export const PADDING_TOP_MULTIPLIER = 0.085;
+
+/**
+ * SubCounterModal 열릴 때 패딩 탑 배수 (2배)
+ */
+export const PADDING_TOP_RATIO = 2;

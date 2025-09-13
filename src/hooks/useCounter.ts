@@ -2,13 +2,14 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-import { Platform, Vibration } from 'react-native';
+import { Platform, Vibration, Animated, UIManager } from 'react-native';
 import HapticFeedback from 'react-native-haptic-feedback';
 import Sound from 'react-native-sound';
 
 import { getStoredItems, updateItem } from '@storage/storage';
 import { ActivateMode, Way, Counter } from '@storage/types';
 import { getSoundSetting, getVibrationSetting } from '@storage/settings';
+import { PADDING_TOP_MULTIPLIER, PADDING_TOP_RATIO } from '@constants/screenSizeConfig';
 
 interface UseCounterProps {
   counterId: string;
@@ -49,6 +50,10 @@ interface UseCounterReturn {
   handleSubReset: () => void;
   handleSubEdit: () => void;
   handleSubRule: () => void;
+
+  // 패딩 탑 애니메이션
+  paddingTopAnim: Animated.Value;
+  updatePaddingTopAnimation: (height: number, subModalIsOpen: boolean) => void;
   handleSubResetConfirm: () => void;
   handleSubEditConfirm: (value: string) => void;
   handleSubRuleConfirm: (rule: number, isRuleActive: boolean) => void;
@@ -68,6 +73,17 @@ interface UseCounterReturn {
  * - 에러 처리
  */
 export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => {
+  // Android New Architecture에서 레이아웃 애니메이션 활성화
+  useEffect(() => {
+    if (
+      Platform.OS === 'android' &&
+      !(globalThis as any)._REACT_NATIVE_NEW_ARCH_ENABLED && // New Architecture에서 무시
+      UIManager.setLayoutAnimationEnabledExperimental
+    ) {
+      UIManager.setLayoutAnimationEnabledExperimental(true);
+    }
+  }, []);
+
   // 카운터 데이터 상태
   const [counter, setCounter] = useState<Counter | null>(null);
 
@@ -83,6 +99,11 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
   // 설정 상태
   const [soundSetting, setSoundSettingState] = useState(true);
   const [vibrationSetting, setVibrationSettingState] = useState(true);
+
+  // 패딩 탑 애니메이션 상태
+  const paddingTopAnim = useRef(new Animated.Value(0)).current;
+  const isInitialized = useRef(false);
+  const prevSubModalIsOpen = useRef(false);
 
   // 카운터 동작 상태
   const [activateMode, setActivateMode] = useState<ActivateMode>('inactive');
@@ -149,6 +170,34 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
       clickSoundRef.current?.release();
     };
   }, []);
+
+  /**
+   * 패딩 탑 애니메이션 관리
+   */
+  const updatePaddingTopAnimation = useCallback((height: number, subModalIsOpen: boolean) => {
+    const targetPaddingTop = subModalIsOpen
+      ? PADDING_TOP_MULTIPLIER * height  // 열려있으면 0.085 * height
+      : PADDING_TOP_MULTIPLIER * PADDING_TOP_RATIO * height; // 닫혀있으면 0.17 * height
+
+    if (!isInitialized.current) {
+      // 초기 설정 시에는 애니메이션 없이 즉시 설정
+      paddingTopAnim.setValue(targetPaddingTop);
+      isInitialized.current = true;
+    } else if (prevSubModalIsOpen.current !== subModalIsOpen) {
+      // subModalIsOpen이 변경된 경우에만 애니메이션 적용
+      Animated.timing(paddingTopAnim, {
+        toValue: targetPaddingTop,
+        duration: 300,
+        useNativeDriver: false,
+      }).start();
+    } else {
+      // height만 변경된 경우에는 즉시 설정 (애니메이션 없음)
+      paddingTopAnim.setValue(targetPaddingTop);
+    }
+
+    // 이전 값 업데이트
+    prevSubModalIsOpen.current = subModalIsOpen;
+  }, [paddingTopAnim]);
 
   /**
    * 카운터 상태 동기화
@@ -577,5 +626,9 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     handleSubEditConfirm,
     handleSubRuleConfirm,
     handleSubModalToggle,
+
+    // 패딩 탑 애니메이션
+    paddingTopAnim,
+    updatePaddingTopAnimation,
   };
 };

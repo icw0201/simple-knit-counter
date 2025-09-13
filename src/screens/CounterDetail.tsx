@@ -1,7 +1,7 @@
 // src/screens/CounterDetail.tsx
 
-import React, { useLayoutEffect, useCallback, useEffect, useRef } from 'react';
-import { View, Text, UIManager, Platform, useWindowDimensions, Animated } from 'react-native';
+import React, { useLayoutEffect, useCallback, useEffect } from 'react';
+import { View, Text, useWindowDimensions, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -15,18 +15,6 @@ import { CounterTouchArea, CounterDirection, CounterActions, CounterModals, SubC
 import { getScreenSize, getIconSize, getTextClass, getGapClass, getSubModalWidthRatio, getSubModalHeightRatio, getSubModalTop, ScreenSize } from '@constants/screenSizeConfig';
 import { useCounter } from '@hooks/useCounter';
 
-// 패딩 탑 상수
-const PADDING_TOP_MULTIPLIER = 0.085;
-const PADDING_TOP_RATIO = 2; // SUBCOUNTERMODAL 열릴 때 2배
-
-// Android New Architecture에서 레이아웃 애니메이션 활성화
-if (
-  Platform.OS === 'android' &&
-  !(globalThis as any)._REACT_NATIVE_NEW_ARCH_ENABLED && // New Architecture에서 무시
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
-  UIManager.setLayoutAnimationEnabledExperimental(true);
-}
 
 /**
  * 카운터 상세 화면 컴포넌트
@@ -94,43 +82,15 @@ const CounterDetail = () => {
     handleSubEditConfirm,
     handleSubRuleConfirm,
     handleSubModalToggle,
+    // 패딩 탑 애니메이션
+    paddingTopAnim,
+    updatePaddingTopAnimation,
   } = useCounter({ counterId });
 
-  // 패딩 탑 애니메이션
-  const paddingTopAnim = useRef(new Animated.Value(0)).current;
-  const isInitialized = useRef(false);
-
-  // 이전 subModalIsOpen 값을 추적
-  const prevSubModalIsOpen = useRef(subModalIsOpen);
-
-  // 패딩 탑 위치 조정 (height 변화 시 즉시, subModalIsOpen 변화 시 애니메이션)
+  // 패딩 탑 애니메이션 업데이트
   useEffect(() => {
-    const targetPaddingTop = subModalIsOpen
-      ? PADDING_TOP_MULTIPLIER * height  // 열려있으면 0.085 * height
-      : PADDING_TOP_MULTIPLIER * PADDING_TOP_RATIO * height; // 닫혀있으면 0.17 * height
-
-    console.log('subModalIsOpen changed:', subModalIsOpen, 'targetPaddingTop:', targetPaddingTop);
-
-    if (!isInitialized.current) {
-      // 초기 설정 시에는 애니메이션 없이 즉시 설정
-      paddingTopAnim.setValue(targetPaddingTop);
-      isInitialized.current = true;
-    } else if (prevSubModalIsOpen.current !== subModalIsOpen) {
-      // subModalIsOpen이 변경된 경우에만 애니메이션 적용
-      Animated.timing(paddingTopAnim, {
-        toValue: targetPaddingTop,
-        duration: 300,
-        useNativeDriver: false,
-      }).start();
-    } else {
-      // height만 변경된 경우에는 즉시 설정 (애니메이션 없음)
-      paddingTopAnim.setValue(targetPaddingTop);
-    }
-
-    // 이전 값 업데이트
-    prevSubModalIsOpen.current = subModalIsOpen;
-  }, [subModalIsOpen, height, paddingTopAnim]);
-
+    updatePaddingTopAnimation(height, subModalIsOpen);
+  }, [subModalIsOpen, height, updatePaddingTopAnimation]);
 
   // 방향 이미지 크기 계산 (원본 비율 87:134 유지)
   const imageWidth = iconSize;
