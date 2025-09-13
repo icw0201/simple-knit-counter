@@ -3,8 +3,7 @@ import { View, Text } from 'react-native';
 import { SlideModal } from '../common/modals/SlideModal/SlideModal';
 import SubCounterAction from './SubCounterAction';
 import SubCounterTouchArea from './SubCounterTouchArea';
-import { getScreenSize, getSubIconSize } from '@constants/screenSizeConfig';
-import { useWindowDimensions } from 'react-native';
+import { getSubIconSize, ScreenSize } from '@constants/screenSizeConfig';
 
 // ===== 타입 정의 =====
 interface SubCounterModalProps {
@@ -20,6 +19,8 @@ interface SubCounterModalProps {
   subCount?: number;
   subRule?: number;
   subRuleIsActive?: boolean;
+  screenSize: ScreenSize;
+  width: number;
 }
 
 // ===== 메인 컴포넌트 =====
@@ -36,16 +37,17 @@ export const SubCounterModal: React.FC<SubCounterModalProps> = ({
   subCount = 0,
   subRule: _subRule = 0,
   subRuleIsActive: _subRuleIsActive = false,
+  screenSize,
+  width,
 }) => {
-  // 화면 크기 정보
-  const { height, width } = useWindowDimensions();
-  const screenSize = getScreenSize(height, width);
+  // 아이콘 크기 정보
   const iconSize = getSubIconSize(screenSize);
   return (
     <SlideModal
       isOpen={isOpen}
       onToggle={onToggle}
       height={230}
+      width={width}
       handleWidth={handleWidth}
       backgroundColor="white"
       padding={0}
@@ -68,14 +70,16 @@ export const SubCounterModal: React.FC<SubCounterModalProps> = ({
         </Text>
       </View>
 
-        {/* 액션 버튼들 */}
-        <SubCounterAction
-          screenSize={screenSize}
-          iconSize={iconSize}
-          onReset={onReset}
-          onEdit={onEdit}
-          onRule={onRule}
-        />
+        {/* 액션 버튼들 - LARGE 화면에서만 표시 */}
+        {screenSize === ScreenSize.LARGE && (
+          <SubCounterAction
+            screenSize={screenSize}
+            iconSize={iconSize}
+            onReset={onReset}
+            onEdit={onEdit}
+            onRule={onRule}
+          />
+        )}
       </View>
     </SlideModal>
   );

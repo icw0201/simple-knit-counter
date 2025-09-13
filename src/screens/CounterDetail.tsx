@@ -137,6 +137,9 @@ const CounterDetail = () => {
   const imageWidth = iconSize;
   const imageHeight = iconSize * (87 / 134);
 
+  // SubCounterModal width 계산
+  const subModalWidth = screenSize === ScreenSize.LARGE ? width * 0.9 : width;
+
   /**
    * 화면 포커스 시 실행되는 효과
    * 화면 켜짐 상태 관리만 담당합니다.
@@ -247,6 +250,8 @@ const CounterDetail = () => {
         subCount={subCount}
         subRule={subRule}
         subRuleIsActive={subRuleIsActive}
+        screenSize={screenSize}
+        width={subModalWidth}
       />
 
       {/* 모달들 */}

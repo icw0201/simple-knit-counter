@@ -9,6 +9,7 @@ interface SlideModalProps {
   isOpen?: boolean; // 모달 열림 상태 (기본값: false)
   onToggle?: () => void; // 토글 콜백 (선택사항)
   height?: number; // 모달의 세로 길이 (기본값: 300)
+  width?: number; // 모달의 가로 길이 (기본값: screenWidth)
   handleWidth?: number; // 핸들의 가로 길이 (기본값: 40)
   backgroundColor?: string; // 배경색 (기본값: white)
   padding?: number; // 모달 내부 패딩 (기본값: 20)
@@ -26,6 +27,7 @@ export const SlideModal: React.FC<SlideModalProps> = ({
   isOpen = false,
   onToggle,
   height = 300,
+  width = screenWidth,
   handleWidth = 40,
   backgroundColor = 'white',
   padding = 20,
@@ -33,21 +35,20 @@ export const SlideModal: React.FC<SlideModalProps> = ({
   onClose,
 }) => {
   // ===== 상태 관리 =====
-  const modalWidth = screenWidth * 0.9; // 화면의 90%
-  const [translateY, setTranslateY] = useState(isOpen ? -modalWidth : -handleWidth);
+  const [translateY, setTranslateY] = useState(isOpen ? -width : -handleWidth);
 
   const modalRef = useRef<View>(null);
 
   // isOpen props가 변경될 때 translateY 업데이트
   useEffect(() => {
-    setTranslateY(isOpen ? -modalWidth : -handleWidth);
-  }, [isOpen, modalWidth, handleWidth]);
+    setTranslateY(isOpen ? -width : -handleWidth);
+  }, [isOpen, width, handleWidth]);
 
   // ===== 핸들러 함수들 =====
 
   // 모달 열기
   const handleOpen = () => {
-    setTranslateY(-modalWidth);
+    setTranslateY(-width);
     onToggle?.();
   };
 
@@ -77,8 +78,8 @@ export const SlideModal: React.FC<SlideModalProps> = ({
         className="absolute border-t-2 border-l-2 border-white"
         style={{
           top: top,
-          right: -modalWidth,
-          width: modalWidth,
+          right: -width,
+          width: width,
           height: height,
           backgroundColor,
           borderTopLeftRadius: 16,
@@ -117,7 +118,7 @@ export const SlideModal: React.FC<SlideModalProps> = ({
         isOpen={isOpen}
         height={height}
         handleWidth={handleWidth}
-        modalWidth={modalWidth}
+        modalWidth={width}
         translateY={translateY}
         top={top}
         onOpen={handleOpen}
