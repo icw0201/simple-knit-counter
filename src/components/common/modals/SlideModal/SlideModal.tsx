@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Dimensions, DimensionValue } from 'react-native';
+import { View, Dimensions, DimensionValue, Animated } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { ModalHandle } from './ModalHandle';
 
@@ -35,33 +35,45 @@ export const SlideModal: React.FC<SlideModalProps> = ({
   onClose,
 }) => {
   // ===== 상태 관리 =====
-  const [translateY, setTranslateY] = useState(isOpen ? -width : -handleWidth);
-
+  const translateYAnim = useRef(new Animated.Value(isOpen ? -width : -handleWidth)).current;
   const modalRef = useRef<View>(null);
 
-  // isOpen props가 변경될 때 translateY 업데이트
+  // isOpen props가 변경될 때 애니메이션으로 translateY 업데이트
   useEffect(() => {
-    setTranslateY(isOpen ? -width : -handleWidth);
-  }, [isOpen, width, handleWidth]);
+    const targetValue = isOpen ? -width : -handleWidth;
+    Animated.timing(translateYAnim, {
+      toValue: targetValue,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  }, [isOpen, width, handleWidth, translateYAnim]);
 
   // ===== 핸들러 함수들 =====
 
   // 모달 열기
   const handleOpen = () => {
-    setTranslateY(-width);
+    Animated.timing(translateYAnim, {
+      toValue: -width,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
     onToggle?.();
   };
 
   // 모달 닫기
   const handleClose = () => {
-    setTranslateY(-handleWidth);
+    Animated.timing(translateYAnim, {
+      toValue: -handleWidth,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
     onToggle?.();
     onClose?.();
   };
 
   // 드래그 위치 업데이트
   const handleDragUpdate = (newTranslateY: number) => {
-    setTranslateY(newTranslateY);
+    translateYAnim.setValue(newTranslateY);
   };
 
 
@@ -73,7 +85,7 @@ export const SlideModal: React.FC<SlideModalProps> = ({
       pointerEvents="box-none"
     >
       {/* 모달 내용 - 항상 보임, 드래그에 따라 위치 변경 */}
-      <View
+      <Animated.View
         ref={modalRef}
         className="absolute border-t-2 border-l-2 border-white"
         style={{
@@ -92,7 +104,7 @@ export const SlideModal: React.FC<SlideModalProps> = ({
           // Android용 그림자
           elevation: 3,
           transform: [
-            { translateX: translateY },
+            { translateX: translateYAnim },
             { translateY: -height / 2 },
           ],
         }}
@@ -111,7 +123,7 @@ export const SlideModal: React.FC<SlideModalProps> = ({
         >
           {children}
         </LinearGradient>
-      </View>
+      </Animated.View>
 
       {/* 핸들 - 터치/드래그 로직은 ModalHandle에서 처리 */}
       <ModalHandle
@@ -119,7 +131,7 @@ export const SlideModal: React.FC<SlideModalProps> = ({
         height={height}
         handleWidth={handleWidth}
         modalWidth={width}
-        translateY={translateY}
+        translateYAnim={translateYAnim}
         top={top}
         onOpen={handleOpen}
         onClose={handleClose}

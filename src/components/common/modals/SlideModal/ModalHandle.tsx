@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, DimensionValue } from 'react-native';
+import { View, DimensionValue, Animated } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 
 // ===== 타입 정의 =====
@@ -8,7 +8,7 @@ interface ModalHandleProps {
   height: number;
   handleWidth: number;
   modalWidth: number;
-  translateY: number;
+  translateYAnim: Animated.Value;
   top: DimensionValue;
   onOpen: () => void;
   onClose: () => void;
@@ -33,7 +33,7 @@ export const ModalHandle: React.FC<ModalHandleProps> = ({
   height,
   handleWidth,
   modalWidth,
-  translateY,
+  translateYAnim,
   top,
   onOpen,
   onClose,
@@ -147,7 +147,7 @@ export const ModalHandle: React.FC<ModalHandleProps> = ({
     }
   };
   return (
-    <View
+    <Animated.View
       className="absolute bg-transparent"
       style={{
         top: top,
@@ -158,7 +158,7 @@ export const ModalHandle: React.FC<ModalHandleProps> = ({
         borderTopLeftRadius: 16,
         borderBottomLeftRadius: 16,
         transform: [
-          { translateX: translateY },
+          { translateX: translateYAnim },
           { translateY: -height / 2 },
         ],
       }}
@@ -191,7 +191,7 @@ export const ModalHandle: React.FC<ModalHandleProps> = ({
           />
         </View>
       )}
-    </View>
+    </Animated.View>
   );
 };
 

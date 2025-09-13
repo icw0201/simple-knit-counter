@@ -1,6 +1,6 @@
 // src/screens/CounterDetail.tsx
 
-import React, { useLayoutEffect, useCallback } from 'react';
+import React, { useLayoutEffect, useCallback, useEffect, useRef } from 'react';
 import { View, Text, UIManager, Platform, useWindowDimensions, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
@@ -97,14 +97,14 @@ const CounterDetail = () => {
   } = useCounter({ counterId });
 
   // 패딩 탑 애니메이션
-  const paddingTopAnim = React.useRef(new Animated.Value(0)).current;
-  const isInitialized = React.useRef(false);
+  const paddingTopAnim = useRef(new Animated.Value(0)).current;
+  const isInitialized = useRef(false);
 
   // 이전 subModalIsOpen 값을 추적
-  const prevSubModalIsOpen = React.useRef(subModalIsOpen);
+  const prevSubModalIsOpen = useRef(subModalIsOpen);
 
   // 패딩 탑 위치 조정 (height 변화 시 즉시, subModalIsOpen 변화 시 애니메이션)
-  React.useEffect(() => {
+  useEffect(() => {
     const targetPaddingTop = subModalIsOpen
       ? PADDING_TOP_MULTIPLIER * height  // 열려있으면 0.085 * height
       : PADDING_TOP_MULTIPLIER * PADDING_TOP_RATIO * height; // 닫혀있으면 0.17 * height
@@ -131,7 +131,6 @@ const CounterDetail = () => {
     prevSubModalIsOpen.current = subModalIsOpen;
   }, [subModalIsOpen, height, paddingTopAnim]);
 
-  // 화면 크기 및 설정값 계산 (이미 위에서 정의됨)
 
   // 방향 이미지 크기 계산 (원본 비율 87:134 유지)
   const imageWidth = iconSize;
