@@ -10,7 +10,6 @@ import { DimensionValue } from 'react-native';
 interface SubCounterModalProps {
   isOpen: boolean;
   onToggle: () => void;
-  onClose: () => void;
   onReset?: () => void;
   onEdit?: () => void;
   onRule?: () => void;
@@ -30,7 +29,6 @@ interface SubCounterModalProps {
 export const SubCounterModal: React.FC<SubCounterModalProps> = ({
   isOpen,
   onToggle,
-  onClose,
   onReset,
   onEdit,
   onRule,
@@ -58,7 +56,6 @@ export const SubCounterModal: React.FC<SubCounterModalProps> = ({
       backgroundColor="white"
       padding={0}
       top={top}
-      onClose={onClose}
     >
       {/* 터치 영역 - 배경 100% 차지 */}
       <SubCounterTouchArea

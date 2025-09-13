@@ -44,10 +44,6 @@ const CounterDetail = () => {
   const textClass = getTextClass(screenSize);
   const gapClass = getGapClass(screenSize);
 
-  // 슬라이드 모달 핸들러
-  const handleSlideModalClose = useCallback(() => {
-    // 모달 닫기 로직 (필요시 추가)
-  }, []);
 
   // 카운터 비즈니스 로직 훅
   const {
@@ -222,7 +218,6 @@ const CounterDetail = () => {
       <SubCounterModal
         isOpen={subModalIsOpen}
         onToggle={handleSubModalToggle}
-        onClose={handleSlideModalClose}
         onAdd={handleSubAdd}
         onSubtract={handleSubSubtract}
         onReset={handleSubReset}
