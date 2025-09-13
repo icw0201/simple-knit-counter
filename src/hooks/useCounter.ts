@@ -1,6 +1,7 @@
 // src/hooks/useCounter.ts
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import { Platform, Vibration } from 'react-native';
 import HapticFeedback from 'react-native-haptic-feedback';
 import Sound from 'react-native-sound';
@@ -119,6 +120,16 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     loadSettings();
     loadCounterData();
   }, [loadSettings, loadCounterData]);
+
+  /**
+   * 화면에 포커스될 때마다 설정 및 카운터 데이터 다시 로드
+   */
+  useFocusEffect(
+    useCallback(() => {
+      loadSettings();
+      loadCounterData();
+    }, [loadSettings, loadCounterData])
+  );
 
   /**
    * 사운드 파일 로드 및 초기화
