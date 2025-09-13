@@ -15,8 +15,8 @@ interface SubCounterRuleModalProps {
 }
 
 /**
- * 서브 카운터 규칙 설정 모달
- * 서브 카운터의 규칙 번호와 활성화 상태를 설정할 수 있습니다.
+ * 보조 카운터 규칙 설정 모달
+ * 보조 카운터의 규칙 번호와 활성화 상태를 설정할 수 있습니다.
  */
 const SubCounterRuleModal: React.FC<SubCounterRuleModalProps> = ({
   visible,

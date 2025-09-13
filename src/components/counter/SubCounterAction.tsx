@@ -12,7 +12,7 @@ interface SubCounterActionProps {
 }
 
 /**
- * 서브 카운터 액션 버튼 컴포넌트
+ * 보조 카운터 액션 버튼 컴포넌트
  * 초기화, 편집, 규칙 버튼을 제공합니다.
  */
 const SubCounterAction: React.FC<SubCounterActionProps> = ({

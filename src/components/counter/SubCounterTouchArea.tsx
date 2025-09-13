@@ -10,8 +10,8 @@ interface SubCounterTouchAreaProps {
 }
 
 /**
- * 서브 카운터 터치 영역 컴포넌트
- * 서브모달용 작은 터치 영역 UI (터치 시 색깔 변경)
+ * 보조 카운터 터치 영역 컴포넌트
+ * 보조모달용 작은 터치 영역 UI (터치 시 색깔 변경)
  */
 const SubCounterTouchArea: React.FC<SubCounterTouchAreaProps> = ({
   handleWidth = 30,

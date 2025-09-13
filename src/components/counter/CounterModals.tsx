@@ -75,40 +75,40 @@ const CounterModals: React.FC<CounterModalsProps> = ({
         confirmButtonStyle="primary"
       />
 
-      {/* 서브 카운터 초기화 확인 모달 */}
+      {/* 보조 카운터 초기화 확인 모달 */}
       <ConfirmModal
         visible={activeModal === 'subReset'}
         onClose={onClose}
-        title="서브 카운터 초기화"
-        description="서브 카운터를 0으로 초기화하시겠습니까?"
+        title="보조 카운터 초기화"
+        description="보조 카운터를 0으로 초기화하시겠습니까?"
         onConfirm={onSubResetConfirm}
         confirmText="초기화"
         cancelText="취소"
         confirmButtonStyle="danger"
       />
 
-      {/* 서브 카운터 편집 모달 */}
+      {/* 보조 카운터 편집 모달 */}
       <CounterEditModal
         visible={activeModal === 'subEdit'}
         onClose={onClose}
         onConfirm={onSubEditConfirm}
         initialValue={subCount.toString()}
-        title="서브 카운터 편집"
+        title="보조 카운터 편집"
       />
 
-      {/* 서브 카운터 범위 초과 경고 모달 */}
+      {/* 보조 카운터 범위 초과 경고 모달 */}
       <ConfirmModal
         visible={activeModal === 'subLimit'}
         onClose={onClose}
-        title="서브 카운터 범위 초과 안내"
-        description="서브 카운터에는 0에서 9999 사이의 값만 입력할 수 있습니다."
+        title="보조 카운터 범위 초과 안내"
+        description="보조 카운터에는 0에서 9999 사이의 값만 입력할 수 있습니다."
         onConfirm={onClose}
         confirmText="확인"
         cancelText=""
         confirmButtonStyle="primary"
       />
 
-      {/* 서브 카운터 규칙 모달 */}
+      {/* 보조 카운터 규칙 모달 */}
       <SubCounterRuleModal
         visible={activeModal === 'rule'}
         onClose={onClose}

@@ -38,11 +38,11 @@ export type Counter = {
   parentProjectId?: string | null; // 상위 프로젝트 ID (독립 카운터는 null)
   info?: Info;                   // 카운터 정보 (독립 카운터만 사용)
   activateMode?: ActivateMode;   // 활성화 모드
-  // 서브 카운터 필드들
-  subCount: number;              // 서브 카운터의 현재 카운트 수
-  subRule: number;               // 서브 카운터의 규칙 번호
-  subRuleIsActive: boolean;      // 서브 카운터의 규칙 활성화 여부
-  subModalIsOpen: boolean;       // 서브 카운터 모달 열림 여부
+  // 보조 카운터 필드들
+  subCount: number;              // 보조 카운터의 현재 카운트 수
+  subRule: number;               // 보조 카운터의 규칙 번호
+  subRuleIsActive: boolean;      // 보조 카운터의 규칙 활성화 여부
+  subModalIsOpen: boolean;       // 보조 카운터 모달 열림 여부
 };
 
 /**
