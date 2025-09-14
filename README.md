@@ -20,38 +20,35 @@
 
 <table border="1" cellpadding="5" cellspacing="0" style="border-collapse: collapse;">
 <tr>
-<td width="100" style="border-right: 1px solid #000;"><a href="https://github.com/icw0201">임채원</a></td>
+<td width="100" style="border-right: 1px solid #000; text-align: center;"><a href="https://github.com/icw0201">임채원</a></td>
 <td rowspan="3" style="border-left: 1px solid #000;">제작하며 성장 중인 개발자 임채원입니다. 초기 계획보다 기능이 많아져서 디자인이 가장 큰 고민이었는데, 감사하게도 중간부터 디자이너분이 합류해주셨습니다. 앞으로도 뜨개인들이 필요한 기능 모두 담아낼 수 있도록, 간편함과 직관성도 잃지 않도록 힘써서 개발하겠습니다. 디자이너님과 파이팅!
 
-📧 **contact** : </td>
+📧 **contact** : Gabal0201@gmail.com</td>
 </tr>
 <tr>
-<td width="100" style="border-right: 1px solid #000;"><img src="https://avatars.githubusercontent.com/u/218532127?v=4" width="120" /></td>
+<td width="100" style="border-right: 1px solid #000; text-align: center;"><img src="https://avatars.githubusercontent.com/u/218532127?v=4" width="120" /></td>
 </tr>
 <tr>
-<td width="100" style="border-right: 1px solid #000;">이것저것 다 합니다</td>
+<td width="100" style="border-right: 1px solid #000; text-align: center;">이것저것 다 합니다</td>
 </tr>
 <tr>
-<td width="100" style="border-right: 1px solid #000;">***</td>
+<td width="100" style="border-right: 1px solid #000; text-align: center;">***</td>
 <td rowspan="3" style="border-left: 1px solid #000;">개발자님께 공예과는 시각디자인과와 다르다는 사실을 설득하는 데에 실패해서 잡혀왔습니다. 힘낼게요.
 
 📧 **contact** : </td>
 </tr>
 <tr>
-<td width="100" style="border-right: 1px solid #000;">(프사)</td>
+<td width="100" style="border-right: 1px solid #000; text-align: center;">(프사)</td>
 </tr>
 <tr>
-<td width="100" style="border-right: 1px solid #000;">디자이너</td>
+<td width="100" style="border-right: 1px solid #000; text-align: center;">디자이너</td>
 </tr>
 </table>
 
 ## 기술 스택
 ### FE
 
-<img src="https://img.shields.io/badge/Reactnatvie-61DAFB?style=for-the-badge&logo=React&logoColor=white">
-<img src="https://img.shields.io/badge/tailwindCss-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white">
-<img src="https://img.shields.io/badge/typescript-3178C6?style=for-the-badge&logo=typescript&logoColor=white">
-<img src="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white">
+<img src="https://img.shields.io/badge/Reactnatvie-61DAFB?style=for-the-badge&logo=React&logoColor=white"> <img src="https://img.shields.io/badge/tailwindCss-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white"> <img src="https://img.shields.io/badge/typescript-3178C6?style=for-the-badge&logo=typescript&logoColor=white"> <img src="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white">
 
 
 ### DESIGN
