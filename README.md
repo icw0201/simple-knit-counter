@@ -22,7 +22,7 @@
 <tr>
 <td width="100" style="border-right: 1px solid #000; text-align: center;"><a href="https://github.com/icw0201">임채원</a></td>
 <td rowspan="3" style="border-left: 1px solid #000;">제작하며 성장 중인 개발자 임채원입니다. 초기 계획보다 기능이 많아져서 디자인이 가장 큰 고민이었는데, 감사하게도 중간부터 디자이너분이 합류해주셨습니다. 앞으로도 뜨개인들이 필요한 기능 모두 담아낼 수 있도록, 간편함과 직관성도 잃지 않도록 힘써서 개발하겠습니다. 디자이너님과 파이팅!<br/>
-📧 **contact** : Gaebal0201@gmail.com</td>
+📧 <b>contact</b> : Gaebal0201@gmail.com</td>
 </tr>
 <tr>
 <td width="100" style="border-right: 1px solid #000; text-align: center;"><img src="https://avatars.githubusercontent.com/u/218532127?v=4" width="120" /></td>
@@ -33,7 +33,7 @@
 <tr>
 <td width="100" style="border-right: 1px solid #000; text-align: center;"><a href="https://x.com/tu_mooner">뜨문어</a></td>
 <td rowspan="3" style="border-left: 1px solid #000;">개발자님께 공예과는 시각디자인과와 다르다는 사실을 설득하는 데에 실패해서 잡혀왔습니다. 힘낼게요.<br/>
-📧 **contact** : schmucki@naver.com<br/>
+📧 <b>contact</b> : schmucki@naver.com<br/>
 🕊️ **Twitter(X)**: <a href="https://x.com/tu_mooner">@Tu_mooner</a> </td>
 </tr>
 <tr>
