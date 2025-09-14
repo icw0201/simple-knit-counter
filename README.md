@@ -34,7 +34,7 @@
 <td width="100" style="border-right: 1px solid #000; text-align: center;"><a href="https://x.com/tu_mooner">뜨문어</a></td>
 <td rowspan="3" style="border-left: 1px solid #000;">개발자님께 공예과는 시각디자인과와 다르다는 사실을 설득하는 데에 실패해서 잡혀왔습니다. 힘낼게요.<br/>
 📧 <b>contact</b> : schmucki@naver.com<br/>
-🕊️ **Twitter(X)**: <a href="https://x.com/tu_mooner">@Tu_mooner</a> </td>
+🕊️ <b>Twitter(X)</b>: <a href="https://x.com/tu_mooner">@Tu_mooner</a> </td>
 </tr>
 <tr>
 <td width="100" style="border-right: 1px solid #000; text-align: center;"><img src="https://pbs.twimg.com/profile_images/1944051589326786560/Y47_ofUL_400x400.jpg"/></td>
