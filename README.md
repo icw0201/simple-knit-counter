@@ -23,7 +23,7 @@
 <td width="100" style="border-right: 1px solid #000; text-align: center;"><a href="https://github.com/icw0201">임채원</a></td>
 <td rowspan="3" style="border-left: 1px solid #000;">제작하며 성장 중인 개발자 임채원입니다. 초기 계획보다 기능이 많아져서 디자인이 가장 큰 고민이었는데, 감사하게도 중간부터 디자이너분이 합류해주셨습니다. 앞으로도 뜨개인들이 필요한 기능 모두 담아낼 수 있도록, 간편함과 직관성도 잃지 않도록 힘써서 개발하겠습니다. 디자이너님과 파이팅!
 
-📧 **contact** : Gabal0201@gmail.com</td>
+📧 **contact** : Gaebal0201@gmail.com</td>
 </tr>
 <tr>
 <td width="100" style="border-right: 1px solid #000; text-align: center;"><img src="https://avatars.githubusercontent.com/u/218532127?v=4" width="120" /></td>
