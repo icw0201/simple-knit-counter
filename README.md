@@ -13,6 +13,8 @@
 
 👾 **개발 기간** : 2025.04 ~
 
+🎨 **피그마** : https://www.figma.com/design/iJus1gL8k37k0GdTV9aamk/%EC%96%B4%EC%A9%9C--%EB%8B%A8%EC%88%98-%EC%B9%B4%EC%9A%B4%ED%84%B0?node-id=0-1&t=VF4pWbYiaHTTskPY-1
+
 </div>
 
 ## 함께 만드는 사람들
