@@ -1,5 +1,5 @@
 <div align="center">
-(헤더 이미지)
+<img width="1500" height="500" alt="간편단수카운터 그래픽 이미지 헤더" src="https://github.com/user-attachments/assets/f1e94b5b-4751-43aa-abc4-c0040d8371c9" />
 
 # 어쩜! 단수 카운터
 
@@ -91,3 +91,7 @@
 쉽고 직관적인 단수 카운터 앱을 경험해보세요!
 
 ## 화면 구성
+<img width="527" height="1037" alt="간편단수카운터 상세페이지 1" src="https://github.com/user-attachments/assets/e3f065eb-f175-441b-842d-35b9fe6184c6" /><img width="527" height="1037" alt="간편단수카운터 상세페이지2" src="https://github.com/user-attachments/assets/7a339b9d-eec2-476d-8ba2-449672161e57" />
+<img width="527" height="1037" alt="간편단수카운터 상세페이지3" src="https://github.com/user-attachments/assets/87cfaedb-776b-480e-af6f-4741f7fbdd03" /><img width="527" height="1037" alt="간편단수카운터 상세페이지4" src="https://github.com/user-attachments/assets/398121d2-47f8-4985-afad-b0524dc5a301" />
+<img width="527" height="1037" alt="간편단수카운터 상세페이지5" src="https://github.com/user-attachments/assets/fe229ce5-9cd8-410e-937d-4c069be48c37" /><img width="527" height="1037" alt="간편단수카운터 상세페이지6" src="https://github.com/user-attachments/assets/8046b6f9-2ed5-4e2d-874a-52f58073a1bd" />
+
