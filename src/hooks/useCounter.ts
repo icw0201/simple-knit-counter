@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-import { Platform, Vibration, Animated, UIManager } from 'react-native';
+import { Platform, Vibration, Animated, UIManager, AppState } from 'react-native';
 import HapticFeedback from 'react-native-haptic-feedback';
 import Sound from 'react-native-sound';
 
@@ -143,14 +143,93 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
   }, [loadSettings, loadCounterData]);
 
   /**
-   * 화면에 포커스될 때마다 설정 및 카운터 데이터 다시 로드
+   * 화면에 포커스될 때마다 설정 및 카운터 메타데이터(제목 등) 다시 로드
+   * count 값은 로드하지 않아 롤백 방지
    */
   useFocusEffect(
     useCallback(() => {
       loadSettings();
-      loadCounterData();
-    }, [loadSettings, loadCounterData])
+      // 카운터 제목 등 메타데이터만 업데이트 (count는 보존)
+      const allItems = getStoredItems();
+      const latest = allItems.find(
+        (item): item is Counter => item.id === counterId && item.type === 'counter'
+      );
+
+      if (latest) {
+        // title과 info만 업데이트(헤더/표시용), 조작 가능한 필드들은 유지
+        setCounter(prevCounter => {
+          if (!prevCounter) {
+            return latest;
+          }
+          return {
+            ...prevCounter,
+            title: latest.title,
+            info: latest.info,
+          };
+        });
+        setWay(latest.info?.way ?? 'front');
+      }
+    }, [counterId, loadSettings]) // counter 의존성 제거
   );
+
+  /**
+   * AppState 기반 동기화
+   * - background 진입 시: 메모리 상태 저장
+   * - active 복귀 시: updatedAt 비교로 최신 상태 채택
+   */
+  useEffect(() => {
+    const onChange = (next: string) => {
+      if (!counter) {
+        return;
+      }
+
+      if (next === 'background') {
+        console.log('🌙 AppState → background: flush memory to storage', {
+          id: counter.id,
+          count: counter.count,
+          subCount: counter.subCount,
+          updatedAt: counter.updatedAt ?? null,
+        });
+        updateItem(counter.id, counter);
+        return;
+      }
+
+      if (next === 'active') {
+        const items = getStoredItems();
+        const persisted = items.find(
+          (i): i is Counter => i.id === counterId && i.type === 'counter'
+        );
+        if (!persisted) {
+          return;
+        }
+
+        const memTs = counter.updatedAt ?? 0;
+        const perTs = persisted.updatedAt ?? 0;
+
+        console.log('☀️ AppState → active: reconcile memory vs persisted', {
+          id: counter.id,
+          memory: { count: counter.count, subCount: counter.subCount, updatedAt: memTs },
+          persisted: { count: persisted.count, subCount: persisted.subCount, updatedAt: perTs },
+        });
+
+        if (perTs > memTs) {
+          console.log('✅ Choosing persisted (persisted is newer)');
+          setCounter(persisted);
+          setWay(persisted.info?.way ?? 'front');
+          setCurrentCount(String(persisted.count));
+        } else if (perTs < memTs) {
+          console.log('⬆️ Pushing memory to storage (memory is newer)');
+          updateItem(counter.id, counter);
+        } else {
+          console.log('⏸️ Timestamps equal: no action taken');
+        }
+      }
+    };
+
+    const sub = AppState.addEventListener('change', onChange);
+    return () => sub.remove();
+  }, [counter, counterId]);
+
 
   /**
    * 사운드 파일 로드 및 초기화
