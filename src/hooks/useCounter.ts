@@ -73,16 +73,6 @@ interface UseCounterReturn {
  * - 에러 처리
  */
 export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => {
-  // Android New Architecture에서 레이아웃 애니메이션 활성화
-  useEffect(() => {
-    if (
-      Platform.OS === 'android' &&
-      !(globalThis as any)._REACT_NATIVE_NEW_ARCH_ENABLED && // New Architecture에서 무시
-      UIManager.setLayoutAnimationEnabledExperimental
-    ) {
-      UIManager.setLayoutAnimationEnabledExperimental(true);
-    }
-  }, []);
 
   // 카운터 데이터 상태
   const [counter, setCounter] = useState<Counter | null>(null);
@@ -173,45 +163,58 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
   );
 
   /**
-   * AppState 기반 동기화
-   * - background 진입 시: 메모리 상태 저장
-   * - active 복귀 시: updatedAt 비교로 최신 상태 채택
+   * AppState 기반 데이터 동기화
+   *
+   * 동작 방식:
+   * 1. background 진입 시: 현재 메모리의 카운터 상태를 MMKV에 저장 (방어적 저장)
+   * 2. active 복귀 시: MMKV의 데이터와 메모리 상태를 updatedAt 타임스탬프로 비교
+   *    - persisted.updatedAt > memory.updatedAt: MMKV 데이터가 더 최신 → 메모리를 MMKV 데이터로 교체
+   *    - persisted.updatedAt < memory.updatedAt: 메모리가 더 최신 → MMKV에 메모리 데이터 저장
+   *    - updatedAt이 같으면: 변경 없음
+   *
+   * 참고: counter 상태 변경 시 activateMode, way 등은 별도 useEffect에서 자동 동기화됨
    */
   useEffect(() => {
-    const onChange = (next: string) => {
+    const handleAppStateChange = (nextState: string) => {
       if (!counter) {
         return;
       }
 
-      if (next === 'background') {
+      // 백그라운드 진입: 현재 메모리 상태를 MMKV에 저장 (방어적 저장)
+      if (nextState === 'background') {
         updateItem(counter.id, counter);
         return;
       }
 
-      if (next === 'active') {
+      // 포그라운드 복귀: MMKV와 메모리 상태 비교 후 최신 데이터 선택
+      if (nextState === 'active') {
         const items = getStoredItems();
         const persisted = items.find(
-          (i): i is Counter => i.id === counterId && i.type === 'counter'
+          (item): item is Counter => item.id === counterId && item.type === 'counter'
         );
         if (!persisted) {
           return;
         }
 
-        const memTs = counter.updatedAt ?? 0;
-        const perTs = persisted.updatedAt ?? 0;
+        const memoryTimestamp = counter.updatedAt ?? 0;
+        const persistedTimestamp = persisted.updatedAt ?? 0;
 
-        if (perTs > memTs) {
+        if (persistedTimestamp > memoryTimestamp) {
+          // MMKV 데이터가 더 최신: 메모리를 MMKV 데이터로 교체
           setCounter(persisted);
-          setWay(persisted.info?.way ?? 'front');
           setCurrentCount(String(persisted.count));
-        } else if (perTs < memTs) {
+        } else if (persistedTimestamp < memoryTimestamp) {
+          // 메모리가 더 최신: MMKV에 메모리 데이터 저장
           updateItem(counter.id, counter);
         }
+        // updatedAt이 같으면 변경 없음
       }
     };
 
-    const sub = AppState.addEventListener('change', onChange);
-    return () => sub.remove();
+    // AppState 변경 이벤트 리스너 등록
+    const subscription = AppState.addEventListener('change', handleAppStateChange);
+    // 컴포넌트 언마운트 시 리스너 정리
+    return () => subscription.remove();
   }, [counter, counterId]);
 
 
