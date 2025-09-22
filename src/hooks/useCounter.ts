@@ -184,12 +184,6 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
       }
 
       if (next === 'background') {
-        console.log('🌙 AppState → background: flush memory to storage', {
-          id: counter.id,
-          count: counter.count,
-          subCount: counter.subCount,
-          updatedAt: counter.updatedAt ?? null,
-        });
         updateItem(counter.id, counter);
         return;
       }
@@ -206,22 +200,12 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
         const memTs = counter.updatedAt ?? 0;
         const perTs = persisted.updatedAt ?? 0;
 
-        console.log('☀️ AppState → active: reconcile memory vs persisted', {
-          id: counter.id,
-          memory: { count: counter.count, subCount: counter.subCount, updatedAt: memTs },
-          persisted: { count: persisted.count, subCount: persisted.subCount, updatedAt: perTs },
-        });
-
         if (perTs > memTs) {
-          console.log('✅ Choosing persisted (persisted is newer)');
           setCounter(persisted);
           setWay(persisted.info?.way ?? 'front');
           setCurrentCount(String(persisted.count));
         } else if (perTs < memTs) {
-          console.log('⬆️ Pushing memory to storage (memory is newer)');
           updateItem(counter.id, counter);
-        } else {
-          console.log('⏸️ Timestamps equal: no action taken');
         }
       }
     };
