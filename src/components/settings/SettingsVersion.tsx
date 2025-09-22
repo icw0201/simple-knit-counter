@@ -10,7 +10,7 @@ interface SettingsVersionProps {
  * 설정 화면의 앱 버전 정보 컴포넌트
  */
 const SettingsVersion: React.FC<SettingsVersionProps> = ({
-  version = '1.1.2',
+  version = '1.1.3',
 }) => {
   return (
     <View className="items-center mt-4">

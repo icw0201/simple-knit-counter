@@ -43,6 +43,7 @@ export type Counter = {
   subRule: number;               // 보조 카운터의 규칙 번호
   subRuleIsActive: boolean;      // 보조 카운터의 규칙 활성화 여부
   subModalIsOpen: boolean;       // 보조 카운터 모달 열림 여부
+  updatedAt?: number;            // 마지막 업데이트 시각 (epoch ms)
 };
 
 /**
@@ -54,6 +55,7 @@ export type Project = {
   title: string;     // 프로젝트 제목
   counterIds: string[]; // 하위 카운터 ID 배열
   info?: Info;       // 프로젝트 정보
+  updatedAt?: number; // 마지막 업데이트 시각 (epoch ms)
 };
 
 /**
