@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-import { Platform, Vibration, Animated, UIManager } from 'react-native';
+import { Platform, Vibration, Animated, UIManager, AppState } from 'react-native';
 import HapticFeedback from 'react-native-haptic-feedback';
 import Sound from 'react-native-sound';
 
@@ -73,16 +73,6 @@ interface UseCounterReturn {
  * - 에러 처리
  */
 export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => {
-  // Android New Architecture에서 레이아웃 애니메이션 활성화
-  useEffect(() => {
-    if (
-      Platform.OS === 'android' &&
-      !(globalThis as any)._REACT_NATIVE_NEW_ARCH_ENABLED && // New Architecture에서 무시
-      UIManager.setLayoutAnimationEnabledExperimental
-    ) {
-      UIManager.setLayoutAnimationEnabledExperimental(true);
-    }
-  }, []);
 
   // 카운터 데이터 상태
   const [counter, setCounter] = useState<Counter | null>(null);
@@ -143,14 +133,90 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
   }, [loadSettings, loadCounterData]);
 
   /**
-   * 화면에 포커스될 때마다 설정 및 카운터 데이터 다시 로드
+   * 화면에 포커스될 때마다 설정 및 카운터 메타데이터(제목 등) 다시 로드
+   * count 값은 로드하지 않아 롤백 방지
    */
   useFocusEffect(
     useCallback(() => {
       loadSettings();
-      loadCounterData();
-    }, [loadSettings, loadCounterData])
+      // 카운터 제목 등 메타데이터만 업데이트 (count는 보존)
+      const allItems = getStoredItems();
+      const latest = allItems.find(
+        (item): item is Counter => item.id === counterId && item.type === 'counter'
+      );
+
+      if (latest) {
+        // title과 info만 업데이트(헤더/표시용), 조작 가능한 필드들은 유지
+        setCounter(prevCounter => {
+          if (!prevCounter) {
+            return latest;
+          }
+          return {
+            ...prevCounter,
+            title: latest.title,
+            info: latest.info,
+          };
+        });
+        setWay(latest.info?.way ?? 'front');
+      }
+    }, [counterId, loadSettings]) // counter 의존성 제거
   );
+
+  /**
+   * AppState 기반 데이터 동기화
+   *
+   * 동작 방식:
+   * 1. background 진입 시: 현재 메모리의 카운터 상태를 MMKV에 저장 (방어적 저장)
+   * 2. active 복귀 시: MMKV의 데이터와 메모리 상태를 updatedAt 타임스탬프로 비교
+   *    - persisted.updatedAt > memory.updatedAt: MMKV 데이터가 더 최신 → 메모리를 MMKV 데이터로 교체
+   *    - persisted.updatedAt < memory.updatedAt: 메모리가 더 최신 → MMKV에 메모리 데이터 저장
+   *    - updatedAt이 같으면: 변경 없음
+   *
+   * 참고: counter 상태 변경 시 activateMode, way 등은 별도 useEffect에서 자동 동기화됨
+   */
+  useEffect(() => {
+    const handleAppStateChange = (nextState: string) => {
+      if (!counter) {
+        return;
+      }
+
+      // 백그라운드 진입: 현재 메모리 상태를 MMKV에 저장 (방어적 저장)
+      if (nextState === 'background') {
+        updateItem(counter.id, counter);
+        return;
+      }
+
+      // 포그라운드 복귀: MMKV와 메모리 상태 비교 후 최신 데이터 선택
+      if (nextState === 'active') {
+        const items = getStoredItems();
+        const persisted = items.find(
+          (item): item is Counter => item.id === counterId && item.type === 'counter'
+        );
+        if (!persisted) {
+          return;
+        }
+
+        const memoryTimestamp = counter.updatedAt ?? 0;
+        const persistedTimestamp = persisted.updatedAt ?? 0;
+
+        if (persistedTimestamp > memoryTimestamp) {
+          // MMKV 데이터가 더 최신: 메모리를 MMKV 데이터로 교체
+          setCounter(persisted);
+          setCurrentCount(String(persisted.count));
+        } else if (persistedTimestamp < memoryTimestamp) {
+          // 메모리가 더 최신: MMKV에 메모리 데이터 저장
+          updateItem(counter.id, counter);
+        }
+        // updatedAt이 같으면 변경 없음
+      }
+    };
+
+    // AppState 변경 이벤트 리스너 등록
+    const subscription = AppState.addEventListener('change', handleAppStateChange);
+    // 컴포넌트 언마운트 시 리스너 정리
+    return () => subscription.remove();
+  }, [counter, counterId]);
+
 
   /**
    * 사운드 파일 로드 및 초기화

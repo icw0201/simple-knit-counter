@@ -77,9 +77,10 @@ const setStoredItems = (items: Item[]) => {
  * @param newItem 추가할 새로운 Item
  */
 export const addItem = (newItem: Item) => {
-
   const existing = getStoredItems();
-  setStoredItems([...existing, newItem]);
+  const now = Date.now();
+  const withTs = { ...(newItem as any), updatedAt: now } as Item;
+  setStoredItems([...existing, withTs]);
 };
 
 /**
@@ -99,9 +100,17 @@ export const removeItem = (id: string) => {
  */
 export const updateItem = (id: string, updatedFields: Record<string, any>) => {
   const items = getStoredItems();
-  const updatedItems = items.map((item) =>
-    item.id === id ? { ...item, ...updatedFields } : item
-  );
+
+  const now = Date.now();
+  const updatedItems = items.map((item) => {
+    if (item.id !== id) {
+      return item;
+    }
+    const merged = { ...item, ...updatedFields } as Item;
+    // updatedAt 타임스탬프 자동 갱신
+    (merged as any).updatedAt = now;
+    return merged;
+  });
   setStoredItems(updatedItems);
 };
 
