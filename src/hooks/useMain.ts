@@ -65,11 +65,24 @@ export const useMain = () => {
       type: 'counter',
       title,
       count: 0,
+      targetCount: undefined,
+      elapsedTime: undefined,
+      timerIsActive: false,
       parentProjectId: null,
       subCount: 0,
       subRule: 0,
       subRuleIsActive: false,
       subModalIsOpen: false,
+      // 마스코트 반복 규칙 기본값
+      mascotIsActive: false,
+      wayChange: false,
+      repeatRuleIsActive: false,
+      repeatRuleNumber: 0,
+      repeatRuleStartNumber: 0,
+      repeatRuleEndNumber: 0,
+      // 구간 기록 기본값 (빈 배열)
+      sectionRecords: [],
+      sectionModalIsOpen: false,
     };
   }, []);
 
