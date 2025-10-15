@@ -1,10 +1,28 @@
 
-/**
- * 진행 방향 타입
- * - front: 앞으로 진행
- * - back: 뒤로 진행
- */
+// ===== 기본 타입들 =====
+
+/* 어쩌미 way 상태 */
 export type Way = 'front' | 'back';
+
+// 정렬 기준 타입
+export type SortCriteria = 'name' | 'created' | 'startDate' | 'endDate' | 'progress' | 'elapsedTime';
+
+// 정렬 순서 타입
+export type SortOrder = 'asc' | 'desc';
+
+// 편집 내용 로그 타입
+export type EditLogType =
+  | 'count_increase'     // 단수 증
+  | 'count_decrease'     // 단수 감
+  | 'count_reset'        // 단수 초기화
+  | 'count_edit'         // 단수 편집
+  | 'sub_count_increase' // 코수 증
+  | 'sub_count_decrease' // 코수 감
+  | 'sub_count_reset'    // 코수 초기화
+  | 'sub_count_edit'     // 코수 편집
+  | 'sub_rule_activate'; // 코수 규칙 활성화
+
+// ===== 공통 정보 타입 =====
 
 // 프로젝트/카운터 정보 타입
 export type Info = {
@@ -16,6 +34,15 @@ export type Info = {
   notes?: string;     // 메모 (최대 500자)
   way?: Way;          // 진행 방향
 };
+
+// 구간 기록 타입
+export type SectionRecord = {
+  time: string;          // 시간 (HH:MM:SS 형식)
+  editedCount: number;   // 편집 후 코수
+  editContent: EditLogType; // 편집 내용
+};
+
+// ===== 아이템 타입들 =====
 
 // 카운터 아이템 타입
 export type Counter = {
@@ -56,30 +83,7 @@ export type Project = {
   updatedAt?: number; // 마지막 업데이트 시각 (epoch ms)
 };
 
-// 편집 내용 로그 타입
-export type EditLogType =
-  | 'count_increase'     // 단수 증
-  | 'count_decrease'     // 단수 감
-  | 'count_reset'        // 단수 초기화
-  | 'count_edit'         // 단수 편집
-  | 'sub_count_increase' // 코수 증
-  | 'sub_count_decrease' // 코수 감
-  | 'sub_count_reset'    // 코수 초기화
-  | 'sub_count_edit'     // 코수 편집
-  | 'sub_rule_activate'; // 코수 규칙 활성화
-
-// 구간 기록 타입
-export type SectionRecord = {
-  time: string;          // 시간 (HH:MM:SS 형식)
-  editedCount: number;   // 편집 후 코수
-  editContent: EditLogType; // 편집 내용
-};
-
-// 정렬 기준 타입
-export type SortCriteria = 'name' | 'created' | 'startDate' | 'endDate' | 'progress' | 'elapsedTime';
-
-// 정렬 순서 타입
-export type SortOrder = 'asc' | 'desc';
+// ===== 통합 타입 =====
 
 // 모든 아이템의 공통 타입 (프로젝트 또는 카운터)
 export type Item = Project | Counter;
