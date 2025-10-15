@@ -19,6 +19,7 @@ interface UseCounterReturn {
   // 상태
   counter: Counter | null;
   wayIsChange: boolean;
+  mascotIsActive: boolean;
   way: Way;
   currentCount: string;
   activeModal: 'reset' | 'edit' | 'limit' | 'rule' | 'subReset' | 'subEdit' | 'subLimit' | null;
@@ -38,7 +39,7 @@ interface UseCounterReturn {
   handleEditConfirm: (value: string) => void;
   handleResetConfirm: () => void;
   handleClose: () => void;
-  toggleWayIsChange: () => void;
+  toggleMascotIsActive: () => void;
   toggleWay: () => void;
   showErrorModal: (message: string) => void;
   setErrorModalVisible: (visible: boolean) => void;
@@ -97,6 +98,7 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
 
   // 카운터 동작 상태
   const [wayIsChange, setWayIsChange] = useState<boolean>(false);
+  const [mascotIsActive, setMascotIsActive] = useState<boolean>(false);
   const [way, setWay] = useState<Way>('front');
 
   /**
@@ -111,6 +113,7 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     if (latest) {
       setCounter(latest);
       setWayIsChange(latest.wayIsChange ?? false);
+      setMascotIsActive(latest.mascotIsActive ?? false);
       setWay(latest.info?.way ?? 'front');
       setCurrentCount(String(latest.count));
     }
@@ -279,6 +282,9 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     if (counter?.wayIsChange !== undefined) {
       setWayIsChange(counter.wayIsChange);
     }
+    if (counter?.mascotIsActive !== undefined) {
+      setMascotIsActive(counter.mascotIsActive);
+    }
     if (counter?.info?.way) {
       setWay(counter.info.way);
     }
@@ -339,23 +345,27 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
   }, [wayIsChange, way]);
 
   /**
-   * wayIsChange 토글
+   * mascotIsActive 토글
    */
-  const toggleWayIsChange = useCallback(() => {
-    const newWayIsChange = !wayIsChange;
+  const toggleMascotIsActive = useCallback(() => {
+    const newMascotIsActive = !mascotIsActive;
 
-    setWayIsChange(newWayIsChange);
+    setMascotIsActive(newMascotIsActive);
 
     if (counter) {
-      updateItem(counter.id, { wayIsChange: newWayIsChange });
-      setCounter({ ...counter, wayIsChange: newWayIsChange });
+      updateItem(counter.id, { mascotIsActive: newMascotIsActive });
+      setCounter({ ...counter, mascotIsActive: newMascotIsActive });
     }
-  }, [wayIsChange, counter]);
+  }, [mascotIsActive, counter]);
 
   /**
-   * 방향 토글
+   * 방향 토글 (wayIsChange가 true일 때만 동작)
    */
   const toggleWay = useCallback(() => {
+    if (!wayIsChange) {
+      return; // wayIsChange가 false면 방향 토글하지 않음
+    }
+
     const newWay = way === 'front' ? 'back' : 'front';
     setWay(newWay);
 
@@ -364,7 +374,7 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
       updateItem(counter.id, { info: updatedInfo });
       setCounter({ ...counter, info: updatedInfo });
     }
-  }, [way, counter]);
+  }, [way, counter, wayIsChange]);
 
   /**
    * 카운트 업데이트 및 자동 방향 전환
@@ -647,6 +657,7 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     // 상태
     counter,
     wayIsChange,
+    mascotIsActive,
     way,
     currentCount,
     activeModal,
@@ -666,7 +677,7 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     handleEditConfirm,
     handleResetConfirm,
     handleClose,
-    toggleWayIsChange,
+    toggleMascotIsActive,
     toggleWay,
     showErrorModal,
     setErrorModalVisible,

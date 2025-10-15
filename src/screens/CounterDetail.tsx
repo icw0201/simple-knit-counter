@@ -49,6 +49,7 @@ const CounterDetail = () => {
   const {
     counter,
     wayIsChange,
+    mascotIsActive,
     way,
     currentCount,
     activeModal,
@@ -60,7 +61,7 @@ const CounterDetail = () => {
     handleEditConfirm,
     handleResetConfirm,
     handleClose,
-    toggleWayIsChange,
+    toggleMascotIsActive,
     toggleWay,
     setErrorModalVisible,
     setActiveModal,
@@ -89,7 +90,7 @@ const CounterDetail = () => {
   const prevCounterId = useRef<string | null>(null);
   const [isPaddingReady, setPaddingReady] = useState(false);
   useEffect(() => {
-    if (!counter) return;
+    if (!counter) { return; }
 
     // 최초 진입(또는 다른 카운터로 전환) 시에는 애니메이션 없이 즉시 설정
     if (!didInitPadding.current || prevCounterId.current !== counter.id) {
@@ -154,12 +155,12 @@ const CounterDetail = () => {
       headerRight: () =>
         getHeaderRightWithActivateInfoSettings(
           navigation,
-          wayIsChange,
-          toggleWayIsChange,
+          mascotIsActive,
+          toggleMascotIsActive,
           hasParent ? undefined : () => navigation.navigate('InfoScreen', { itemId: counter.id })
         ),
     });
-  }, [navigation, counter, wayIsChange, height, width, toggleWayIsChange]);
+  }, [navigation, counter, mascotIsActive, height, width, toggleMascotIsActive]);
 
 
   // 카운터 데이터가 없으면 렌더링하지 않음
@@ -184,6 +185,7 @@ const CounterDetail = () => {
       >
         {/* 방향 표시 이미지 영역 */}
         <CounterDirection
+          mascotIsActive={mascotIsActive}
           wayIsChange={wayIsChange}
           way={way}
           imageWidth={imageWidth}

@@ -72,7 +72,7 @@ export const getHeaderRightWithInfoEditAndSettings = (
 //활성이, 인포, 세팅 (CounterDetail전용)
 export const getHeaderRightWithActivateInfoSettings = (
   navigation: NativeStackNavigationProp<RootStackParamList>,
-  wayIsChange: boolean,
+  mascotIsActive: boolean,
   onActivatePress: () => void,
   onInfoPress?: () => void
 ): React.JSX.Element => {
@@ -81,7 +81,7 @@ export const getHeaderRightWithActivateInfoSettings = (
       {/* 활성 아이콘 */}
       <TouchableOpacity onPress={onActivatePress}>
         <Image
-          source={activateIcons[wayIsChange ? 'auto' : 'inactive']}
+          source={activateIcons[mascotIsActive ? 'active' : 'inactive']}
           style={{ width: 23, height: 23, marginRight: 13 }}
           resizeMode="contain"
         />

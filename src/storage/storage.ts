@@ -25,17 +25,22 @@ const migrateV1_ActiveToAuto = (items: Item[]): Item[] => {
 };
 
 /**
- * 버전 2: activateMode를 wayIsChange로 마이그레이션
- * inactive → false, auto → true
+ * 버전 2: activateMode를 wayIsChange와 mascotIsActive로 마이그레이션
+ * inactive → wayIsChange: false, mascotIsActive: false
+ * auto → wayIsChange: true, mascotIsActive: true
  * @param items 마이그레이션할 아이템 배열
  * @returns 마이그레이션된 아이템 배열
  */
-const migrateV2_ActivateModeToWayIsChange = (items: Item[]): Item[] => {
+const migrateV2_ActivateModeToWayIsChangeAndMascotIsActive = (items: Item[]): Item[] => {
   return items.map((item) => {
     if (item.type === 'counter' && (item as any).activateMode !== undefined) {
       const { activateMode, ...rest } = item as any;
+
+      // activateMode에 따른 매핑
       const wayIsChange = activateMode === 'auto';
-      return { ...rest, wayIsChange };
+      const mascotIsActive = activateMode === 'auto';
+
+      return { ...rest, wayIsChange, mascotIsActive };
     }
     return item;
   });
@@ -57,7 +62,7 @@ const runMigrations = (items: Item[], fromVersion: number, toVersion: number): I
   }
 
   if (fromVersion < 2 && toVersion >= 2) {
-    migratedItems = migrateV2_ActivateModeToWayIsChange(migratedItems);
+    migratedItems = migrateV2_ActivateModeToWayIsChangeAndMascotIsActive(migratedItems);
   }
 
   return migratedItems;
