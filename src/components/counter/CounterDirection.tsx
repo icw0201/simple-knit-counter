@@ -5,7 +5,7 @@ import { Way } from '@storage/types';
 import { Images } from '@assets/images';
 
 interface CounterDirectionProps {
-  activateMode: 'inactive' | 'auto';
+  wayIsChange: boolean;
   way: Way;
   imageWidth: number;
   imageHeight: number;
@@ -14,10 +14,10 @@ interface CounterDirectionProps {
 
 /**
  * 카운터 방향 표시 컴포넌트
- * 활성화 모드에 따라 방향을 표시하고 토글할 수 있습니다.
+ * wayIsChange 활성화 상태에 따라 방향을 표시하고 토글할 수 있습니다.
  */
 const CounterDirection: React.FC<CounterDirectionProps> = ({
-  activateMode,
+  wayIsChange,
   way,
   imageWidth,
   imageHeight,
@@ -25,7 +25,7 @@ const CounterDirection: React.FC<CounterDirectionProps> = ({
 }) => {
   return (
     <View className="mb-2" style={{ height: imageHeight }}>
-      {activateMode !== 'inactive' && (
+      {wayIsChange && (
         <Pressable onPress={onToggleWay}>
           <Image
             source={way === 'front' ? Images.way_front : Images.way_back}

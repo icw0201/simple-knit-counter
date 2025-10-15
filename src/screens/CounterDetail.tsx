@@ -48,7 +48,7 @@ const CounterDetail = () => {
   // 카운터 비즈니스 로직 훅
   const {
     counter,
-    activateMode,
+    wayIsChange,
     way,
     currentCount,
     activeModal,
@@ -60,7 +60,7 @@ const CounterDetail = () => {
     handleEditConfirm,
     handleResetConfirm,
     handleClose,
-    cycleActivateMode,
+    toggleWayIsChange,
     toggleWay,
     setErrorModalVisible,
     setActiveModal,
@@ -154,12 +154,12 @@ const CounterDetail = () => {
       headerRight: () =>
         getHeaderRightWithActivateInfoSettings(
           navigation,
-          activateMode,
-          cycleActivateMode,
+          wayIsChange,
+          toggleWayIsChange,
           hasParent ? undefined : () => navigation.navigate('InfoScreen', { itemId: counter.id })
         ),
     });
-  }, [navigation, counter, activateMode, height, width, cycleActivateMode]);
+  }, [navigation, counter, wayIsChange, height, width, toggleWayIsChange]);
 
 
   // 카운터 데이터가 없으면 렌더링하지 않음
@@ -184,7 +184,7 @@ const CounterDetail = () => {
       >
         {/* 방향 표시 이미지 영역 */}
         <CounterDirection
-          activateMode={activateMode}
+          wayIsChange={wayIsChange}
           way={way}
           imageWidth={imageWidth}
           imageHeight={imageHeight}

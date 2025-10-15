@@ -2,12 +2,12 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-import { Platform, Vibration, Animated, UIManager, AppState } from 'react-native';
+import { Platform, Vibration, Animated, AppState } from 'react-native';
 import HapticFeedback from 'react-native-haptic-feedback';
 import Sound from 'react-native-sound';
 
 import { getStoredItems, updateItem } from '@storage/storage';
-import { ActivateMode, Way, Counter } from '@storage/types';
+import { Way, Counter } from '@storage/types';
 import { getSoundSetting, getVibrationSetting } from '@storage/settings';
 import { PADDING_TOP_MULTIPLIER, PADDING_TOP_RATIO } from '@constants/screenSizeConfig';
 
@@ -18,7 +18,7 @@ interface UseCounterProps {
 interface UseCounterReturn {
   // 상태
   counter: Counter | null;
-  activateMode: ActivateMode;
+  wayIsChange: boolean;
   way: Way;
   currentCount: string;
   activeModal: 'reset' | 'edit' | 'limit' | 'rule' | 'subReset' | 'subEdit' | 'subLimit' | null;
@@ -38,7 +38,7 @@ interface UseCounterReturn {
   handleEditConfirm: (value: string) => void;
   handleResetConfirm: () => void;
   handleClose: () => void;
-  cycleActivateMode: () => void;
+  toggleWayIsChange: () => void;
   toggleWay: () => void;
   showErrorModal: (message: string) => void;
   setErrorModalVisible: (visible: boolean) => void;
@@ -96,7 +96,7 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
   const prevSubModalIsOpen = useRef<boolean | null>(null); // null로 초기화하여 첫 실행과 구분
 
   // 카운터 동작 상태
-  const [activateMode, setActivateMode] = useState<ActivateMode>('inactive');
+  const [wayIsChange, setWayIsChange] = useState<boolean>(false);
   const [way, setWay] = useState<Way>('front');
 
   /**
@@ -110,7 +110,7 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
 
     if (latest) {
       setCounter(latest);
-      setActivateMode(latest.activateMode ?? 'inactive');
+      setWayIsChange(latest.wayIsChange ?? false);
       setWay(latest.info?.way ?? 'front');
       setCurrentCount(String(latest.count));
     }
@@ -276,8 +276,8 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
    * 카운터 상태 동기화
    */
   useEffect(() => {
-    if (counter?.activateMode) {
-      setActivateMode(counter.activateMode);
+    if (counter?.wayIsChange !== undefined) {
+      setWayIsChange(counter.wayIsChange);
     }
     if (counter?.info?.way) {
       setWay(counter.info.way);
@@ -329,28 +329,28 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
   }, [vibrationSetting]);
 
   /**
-   * 자동 모드일 때 방향을 자동으로 반전시킵니다.
+   * wayIsChange가 활성화되어 있을 때 방향을 자동으로 반전시킵니다.
    */
-  const getReversedWayIfAuto = useCallback((): Way | null => {
-    if (activateMode === 'auto') {
+  const getReversedWayIfWayIsChange = useCallback((): Way | null => {
+    if (wayIsChange) {
       return way === 'front' ? 'back' : 'front';
     }
     return null;
-  }, [activateMode, way]);
+  }, [wayIsChange, way]);
 
   /**
-   * 활성화 모드 순환 전환
+   * wayIsChange 토글
    */
-  const cycleActivateMode = useCallback(() => {
-    const nextMode: ActivateMode = activateMode === 'inactive' ? 'auto' : 'inactive';
+  const toggleWayIsChange = useCallback(() => {
+    const newWayIsChange = !wayIsChange;
 
-    setActivateMode(nextMode);
+    setWayIsChange(newWayIsChange);
 
     if (counter) {
-      updateItem(counter.id, { activateMode: nextMode });
-      setCounter({ ...counter, activateMode: nextMode });
+      updateItem(counter.id, { wayIsChange: newWayIsChange });
+      setCounter({ ...counter, wayIsChange: newWayIsChange });
     }
-  }, [activateMode, counter]);
+  }, [wayIsChange, counter]);
 
   /**
    * 방향 토글
@@ -376,7 +376,7 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
 
     const diff = Math.abs(counter.count - newCount);
 
-    const newWay = activateMode === 'auto' && diff % 2 === 1
+    const newWay = wayIsChange && diff % 2 === 1
       ? way === 'front' ? 'back' : 'front'
       : way;
 
@@ -384,7 +384,7 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
 
     updateItem(counter.id, { count: newCount, info: updatedInfo });
     setCounter({ ...counter, count: newCount, info: updatedInfo });
-  }, [counter, activateMode, way]);
+  }, [counter, wayIsChange, way]);
 
   /**
    * 숫자 증가 처리
@@ -400,7 +400,7 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
       return;
     }
 
-    const newWay = getReversedWayIfAuto();
+    const newWay = getReversedWayIfWayIsChange();
     const updatedInfo = newWay ? { ...counter.info, way: newWay as Way } : counter.info;
 
     updateItem(counter.id, { count: newCount, info: updatedInfo });
@@ -408,7 +408,7 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
 
     triggerHaptics();
     playSound();
-  }, [counter, getReversedWayIfAuto, triggerHaptics, playSound]);
+  }, [counter, getReversedWayIfWayIsChange, triggerHaptics, playSound]);
 
   /**
    * 숫자 감소 처리
@@ -424,7 +424,7 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
       return;
     }
 
-    const newWay = getReversedWayIfAuto();
+    const newWay = getReversedWayIfWayIsChange();
     const updatedInfo = newWay ? { ...counter.info, way: newWay as Way } : counter.info;
 
     updateItem(counter.id, { count: newCount, info: updatedInfo });
@@ -432,7 +432,7 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
 
     triggerHaptics();
     playSound();
-  }, [counter, getReversedWayIfAuto, triggerHaptics, playSound]);
+  }, [counter, getReversedWayIfWayIsChange, triggerHaptics, playSound]);
 
   /**
    * 편집 모달 열기
@@ -646,7 +646,7 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
   return {
     // 상태
     counter,
-    activateMode,
+    wayIsChange,
     way,
     currentCount,
     activeModal,
@@ -666,7 +666,7 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     handleEditConfirm,
     handleResetConfirm,
     handleClose,
-    cycleActivateMode,
+    toggleWayIsChange,
     toggleWay,
     showErrorModal,
     setErrorModalVisible,

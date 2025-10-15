@@ -4,6 +4,9 @@
 /* 어쩌미 way 상태 */
 export type Way = 'front' | 'back';
 
+// 활성화 모드 타입 (마이그레이션용 - 더 이상 사용하지 않음)
+export type ActivateMode = 'inactive' | 'auto';
+
 // 정렬 기준 타입
 export type SortCriteria = 'name' | 'created' | 'startDate' | 'endDate' | 'progress' | 'elapsedTime';
 
@@ -62,7 +65,7 @@ export type Counter = {
   subModalIsOpen: boolean;       // 보조 카운터 모달 열림 여부
   // 마스코트 반복 규칙 필드들
   mascotIsActive: boolean;       // 마스코트 활성화 여부
-  wayChange: boolean;            // 마스코트 앞뒤 변경 여부
+  wayIsChange: boolean;          // 마스코트 앞뒤 변경 여부
   repeatRuleIsActive: boolean;   // 반복 규칙 활성화 여부
   repeatRuleNumber: number;      // 반복 규칙 숫자
   repeatRuleStartNumber: number; // 반복 규칙 시작 숫자

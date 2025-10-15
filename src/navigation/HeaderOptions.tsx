@@ -7,7 +7,6 @@ import { RootStackParamList } from './AppNavigator';
 
 import { View, Image, TouchableOpacity } from 'react-native';
 import { activateIcons } from '@assets/images';
-import { ActivateMode } from '@storage/types';
 
 export const getDefaultHeaderLeft = (
   navigation: any
@@ -73,7 +72,7 @@ export const getHeaderRightWithInfoEditAndSettings = (
 //활성이, 인포, 세팅 (CounterDetail전용)
 export const getHeaderRightWithActivateInfoSettings = (
   navigation: NativeStackNavigationProp<RootStackParamList>,
-  currentActivateMode: ActivateMode,
+  wayIsChange: boolean,
   onActivatePress: () => void,
   onInfoPress?: () => void
 ): React.JSX.Element => {
@@ -82,7 +81,7 @@ export const getHeaderRightWithActivateInfoSettings = (
       {/* 활성 아이콘 */}
       <TouchableOpacity onPress={onActivatePress}>
         <Image
-          source={activateIcons[currentActivateMode]}
+          source={activateIcons[wayIsChange ? 'auto' : 'inactive']}
           style={{ width: 23, height: 23, marginRight: 13 }}
           resizeMode="contain"
         />
