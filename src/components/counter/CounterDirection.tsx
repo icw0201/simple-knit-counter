@@ -5,7 +5,8 @@ import { Way } from '@storage/types';
 import { Images } from '@assets/images';
 
 interface CounterDirectionProps {
-  activateMode: 'inactive' | 'auto';
+  mascotIsActive: boolean;
+  wayIsChange: boolean;
   way: Way;
   imageWidth: number;
   imageHeight: number;
@@ -14,10 +15,11 @@ interface CounterDirectionProps {
 
 /**
  * 카운터 방향 표시 컴포넌트
- * 활성화 모드에 따라 방향을 표시하고 토글할 수 있습니다.
+ * mascotIsActive가 true일 때만 표시되고, wayIsChange가 true일 때만 클릭으로 방향 토글 가능합니다.
  */
 const CounterDirection: React.FC<CounterDirectionProps> = ({
-  activateMode,
+  mascotIsActive,
+  wayIsChange,
   way,
   imageWidth,
   imageHeight,
@@ -25,8 +27,8 @@ const CounterDirection: React.FC<CounterDirectionProps> = ({
 }) => {
   return (
     <View className="mb-2" style={{ height: imageHeight }}>
-      {activateMode !== 'inactive' && (
-        <Pressable onPress={onToggleWay}>
+      {mascotIsActive && (
+        <Pressable onPress={wayIsChange ? onToggleWay : undefined}>
           <Image
             source={way === 'front' ? Images.way_front : Images.way_back}
             style={{ width: imageWidth, height: imageHeight, resizeMode: 'contain' }}

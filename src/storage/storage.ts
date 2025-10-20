@@ -1,53 +1,11 @@
 // src/storage/storage.ts
 import { MMKV } from 'react-native-mmkv';
 import { Item, Counter, Project } from './types';
+import { ensureDataMigration } from './migration';
 
 // MMKV 스토리지 인스턴스 생성
 const storage = new MMKV();
 const STORAGE_KEY = 'knit_items';
-const MIGRATION_KEY = 'migration_active_to_auto_completed';
-
-/**
- * 기존 'active' 상태를 'auto'로 마이그레이션합니다.
- * 배포된 앱의 기존 사용자 데이터 호환성을 위한 함수입니다.
- * @param items 마이그레이션할 아이템 배열
- * @returns 마이그레이션된 아이템 배열
- */
-const migrateActiveToAuto = (items: Item[]): Item[] => {
-  return items.map((item) => {
-    if (item.type === 'counter' && item.activateMode === ('active' as any)) {
-      return { ...item, activateMode: 'auto' as const };
-    }
-    return item;
-  });
-};
-
-/**
- * 마이그레이션이 필요한지 확인하고 필요시 실행합니다.
- * 한 번만 실행되도록 플래그를 사용합니다.
- */
-const ensureMigrationCompleted = (): void => {
-  const migrationCompleted = storage.getBoolean(MIGRATION_KEY);
-
-  if (migrationCompleted) {
-    return; // 이미 마이그레이션 완료
-  }
-
-  // 마이그레이션 실행
-  const json = storage.getString(STORAGE_KEY);
-  if (json) {
-    const items = JSON.parse(json);
-    const migratedItems = migrateActiveToAuto(items);
-
-    // 변경사항이 있으면 저장
-    if (migratedItems !== items) {
-      storage.set(STORAGE_KEY, JSON.stringify(migratedItems));
-    }
-  }
-
-  // 마이그레이션 완료 플래그 설정
-  storage.set(MIGRATION_KEY, true);
-};
 
 /**
  * 모든 항목을 불러옵니다.
@@ -56,7 +14,7 @@ const ensureMigrationCompleted = (): void => {
  */
 export const getStoredItems = (): Item[] => {
   // 마이그레이션 확인 (한 번만)
-  ensureMigrationCompleted();
+  ensureDataMigration();
 
   const json = storage.getString(STORAGE_KEY);
   const items = json ? JSON.parse(json) : [];

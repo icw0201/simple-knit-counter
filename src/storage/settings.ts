@@ -1,5 +1,6 @@
 // src/storage/settings.ts
 import { MMKV } from 'react-native-mmkv';
+import { SortCriteria, SortOrder } from './types';
 
 // MMKV 스토리지 인스턴스 생성
 export const storage = new MMKV();
@@ -8,11 +9,21 @@ export const storage = new MMKV();
 const KEY_SOUND = 'settings.sound';
 const KEY_VIBRATION = 'settings.vibration';
 const KEY_SCREEN_AWAKE = 'settings.screenAwake';
+const KEY_SORT_CRITERIA = 'settings.sortCriteria';
+const KEY_SORT_ORDER = 'settings.sortOrder';
+const KEY_MOVE_COMPLETED_TO_BOTTOM = 'settings.moveCompletedToBottom';
+const KEY_AUTO_PLAY_ELAPSED_TIME = 'settings.autoPlayElapsedTime';
+const KEY_TOOLTIP_ENABLED = 'settings.tooltipEnabled';
 
 // 기본값 상수 정의
 const DEFAULT_SOUND = true;
 const DEFAULT_VIBRATION = true;
 const DEFAULT_SCREEN_AWAKE = false;
+const DEFAULT_SORT_CRITERIA: SortCriteria = 'created';
+const DEFAULT_SORT_ORDER: SortOrder = 'desc';
+const DEFAULT_MOVE_COMPLETED_TO_BOTTOM = true;
+const DEFAULT_AUTO_PLAY_ELAPSED_TIME = true;
+const DEFAULT_TOOLTIP_ENABLED = true;
 
 /**
  * 사운드 설정을 저장합니다.
@@ -66,11 +77,87 @@ export const getScreenAwakeSetting = (): boolean => {
 };
 
 /**
- * 모든 설정을 초기화합니다.
- * 저장된 설정값들을 모두 삭제하고 기본값으로 복원합니다.
+ * 정렬 기준 설정을 저장합니다.
+ * @param value 정렬 기준 ('name' | 'created' | 'startDate' | 'endDate' | 'progress')
  */
-export const clearSettings = () => {
-  storage.delete(KEY_SOUND);
-  storage.delete(KEY_VIBRATION);
-  storage.delete(KEY_SCREEN_AWAKE);
+export const setSortCriteriaSetting = (value: SortCriteria) => {
+  storage.set(KEY_SORT_CRITERIA, JSON.stringify(value));
 };
+
+/**
+ * 정렬 기준 설정을 가져옵니다.
+ * @returns 정렬 기준 (기본값: 'created')
+ */
+export const getSortCriteriaSetting = (): SortCriteria => {
+  const value = storage.getString(KEY_SORT_CRITERIA);
+  return value ? JSON.parse(value) : DEFAULT_SORT_CRITERIA;
+};
+
+/**
+ * 정렬 순서 설정을 저장합니다.
+ * @param value 정렬 순서 ('asc' | 'desc')
+ */
+export const setSortOrderSetting = (value: SortOrder) => {
+  storage.set(KEY_SORT_ORDER, JSON.stringify(value));
+};
+
+/**
+ * 정렬 순서 설정을 가져옵니다.
+ * @returns 정렬 순서 (기본값: 'desc')
+ */
+export const getSortOrderSetting = (): SortOrder => {
+  const value = storage.getString(KEY_SORT_ORDER);
+  return value ? JSON.parse(value) : DEFAULT_SORT_ORDER;
+};
+
+/**
+ * 완성된 편물을 하단으로 이동 설정을 저장합니다.
+ * @param value 완성된 편물을 하단으로 이동 여부
+ */
+export const setMoveCompletedToBottomSetting = (value: boolean) => {
+  storage.set(KEY_MOVE_COMPLETED_TO_BOTTOM, JSON.stringify(value));
+};
+
+/**
+ * 완성된 편물을 하단으로 이동 설정을 가져옵니다.
+ * @returns 완성된 편물을 하단으로 이동 여부 (기본값: true)
+ */
+export const getMoveCompletedToBottomSetting = (): boolean => {
+  const value = storage.getString(KEY_MOVE_COMPLETED_TO_BOTTOM);
+  return value ? JSON.parse(value) : DEFAULT_MOVE_COMPLETED_TO_BOTTOM;
+};
+
+/**
+ * 카운터 진입시 소요 시간 자동 재생 설정을 저장합니다.
+ * @param value 소요 시간 자동 재생 활성화 여부
+ */
+export const setAutoPlayElapsedTimeSetting = (value: boolean) => {
+  storage.set(KEY_AUTO_PLAY_ELAPSED_TIME, JSON.stringify(value));
+};
+
+/**
+ * 카운터 진입시 소요 시간 자동 재생 설정을 가져옵니다.
+ * @returns 소요 시간 자동 재생 활성화 여부 (기본값: true)
+ */
+export const getAutoPlayElapsedTimeSetting = (): boolean => {
+  const value = storage.getString(KEY_AUTO_PLAY_ELAPSED_TIME);
+  return value ? JSON.parse(value) : DEFAULT_AUTO_PLAY_ELAPSED_TIME;
+};
+
+/**
+ * 툴팁 설정을 저장합니다.
+ * @param value 툴팁 활성화 여부
+ */
+export const setTooltipEnabledSetting = (value: boolean) => {
+  storage.set(KEY_TOOLTIP_ENABLED, JSON.stringify(value));
+};
+
+/**
+ * 툴팁 설정을 가져옵니다.
+ * @returns 툴팁 활성화 여부 (기본값: true)
+ */
+export const getTooltipEnabledSetting = (): boolean => {
+  const value = storage.getString(KEY_TOOLTIP_ENABLED);
+  return value ? JSON.parse(value) : DEFAULT_TOOLTIP_ENABLED;
+};
+

@@ -63,11 +63,24 @@ export const useProjectDetail = () => {
       type: 'counter',
       title,
       count: 0,
+      targetCount: 0,
+      elapsedTime: 0,
+      timerIsActive: false,
       parentProjectId: project?.id ?? '',
       subCount: 0,
       subRule: 0,
       subRuleIsActive: false,
       subModalIsOpen: false,
+      // 마스코트 반복 규칙 기본값
+      mascotIsActive: false,
+      wayIsChange: false,
+      repeatRuleIsActive: false,
+      repeatRuleNumber: 0,
+      repeatRuleStartNumber: 0,
+      repeatRuleEndNumber: 0,
+      // 구간 기록 기본값
+      sectionRecords: [],
+      sectionModalIsOpen: false,
     };
   }, [project?.id]);
 
