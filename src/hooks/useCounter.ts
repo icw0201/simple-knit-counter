@@ -345,18 +345,27 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
   }, [wayIsChange, way]);
 
   /**
-   * mascotIsActive 토글
+   * mascotIsActive 토글 (wayIsChange도 함께 토글)
    */
   const toggleMascotIsActive = useCallback(() => {
     const newMascotIsActive = !mascotIsActive;
+    const newWayIsChange = !wayIsChange;
 
     setMascotIsActive(newMascotIsActive);
+    setWayIsChange(newWayIsChange);
 
     if (counter) {
-      updateItem(counter.id, { mascotIsActive: newMascotIsActive });
-      setCounter({ ...counter, mascotIsActive: newMascotIsActive });
+      updateItem(counter.id, {
+        mascotIsActive: newMascotIsActive,
+        wayIsChange: newWayIsChange,
+      });
+      setCounter({
+        ...counter,
+        mascotIsActive: newMascotIsActive,
+        wayIsChange: newWayIsChange,
+      });
     }
-  }, [mascotIsActive, counter]);
+  }, [mascotIsActive, wayIsChange, counter]);
 
   /**
    * 방향 토글 (wayIsChange가 true일 때만 동작)
