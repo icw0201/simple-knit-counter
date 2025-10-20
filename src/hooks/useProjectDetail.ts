@@ -73,7 +73,7 @@ export const useProjectDetail = () => {
       subModalIsOpen: false,
       // 마스코트 반복 규칙 기본값
       mascotIsActive: false,
-      wayChange: false,
+      wayIsChange: false,
       repeatRuleIsActive: false,
       repeatRuleNumber: 0,
       repeatRuleStartNumber: 0,
