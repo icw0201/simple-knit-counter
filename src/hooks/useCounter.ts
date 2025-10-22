@@ -606,6 +606,16 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     if (counter.subRuleIsActive && newSubCount >= counter.subRule) {
       newSubCount = 0;
       newMainCount = counter.count + 1;
+
+    // 본 카운터가 9999를 넘으면 리밋 모달 표시하고 증가하지 않음
+    if (newMainCount > 9999) {
+      // 현재 모달을 먼저 닫고, 그 다음에 리밋 모달 표시
+      handleClose();
+      setTimeout(() => {
+        setActiveModal('limit');
+      }, 100); // 모달 닫기 애니메이션 후에 리밋 모달 표시
+      return;
+    }
     }
 
     const updatedCounter = {
