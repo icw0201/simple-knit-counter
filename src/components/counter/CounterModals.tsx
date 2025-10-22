@@ -68,7 +68,7 @@ const CounterModals: React.FC<CounterModalsProps> = ({
         visible={activeModal === 'limit'}
         onClose={onClose}
         title="범위 초과 안내"
-        description="카운터에는 0에서 9999 사이의 값만 입력할 수 있습니다."
+        description="본 카운터에는 0에서 9999 사이의 값만 입력할 수 있습니다."
         onConfirm={onClose}
         confirmText="확인"
         cancelText=""
