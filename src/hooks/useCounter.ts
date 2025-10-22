@@ -520,17 +520,28 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     if (counter.subRuleIsActive && newSubCount >= counter.subRule) {
       newSubCount = 0;
       newMainCount = counter.count + 1;
+
+      // 본 카운터가 9999를 넘으면 리밋 모달 표시하고 증가하지 않음
+      if (newMainCount > 9999) {
+        setActiveModal('limit');
+        return;
+      }
     }
+
+    // way 변경 로직 적용 (본 카운터가 증가할 때)
+    const newWay = newMainCount > counter.count ? getReversedWayIfWayIsChange() : null;
+    const updatedInfo = newWay ? { ...counter.info, way: newWay as Way } : counter.info;
 
     const updatedCounter = {
       ...counter,
       subCount: newSubCount,
       count: newMainCount,
+      info: updatedInfo,
     };
 
     await updateItem(counter.id, updatedCounter);
     setCounter(updatedCounter);
-  }, [counter, playSound, triggerHaptics]);
+  }, [counter, playSound, triggerHaptics, getReversedWayIfWayIsChange]);
 
   const handleSubSubtract = useCallback(async () => {
     if (!counter) {
@@ -600,18 +611,33 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     if (counter.subRuleIsActive && newSubCount >= counter.subRule) {
       newSubCount = 0;
       newMainCount = counter.count + 1;
+
+    // 본 카운터가 9999를 넘으면 리밋 모달 표시하고 증가하지 않음
+    if (newMainCount > 9999) {
+      // 현재 모달을 먼저 닫고, 그 다음에 리밋 모달 표시
+      handleClose();
+      setTimeout(() => {
+        setActiveModal('limit');
+      }, 100); // 모달 닫기 애니메이션 후에 리밋 모달 표시
+      return;
     }
+    }
+
+    // way 변경 로직 적용 (본 카운터가 증가할 때)
+    const newWay = newMainCount > counter.count ? getReversedWayIfWayIsChange() : null;
+    const updatedInfo = newWay ? { ...counter.info, way: newWay as Way } : counter.info;
 
     const updatedCounter = {
       ...counter,
       subCount: newSubCount,
       count: newMainCount,
+      info: updatedInfo,
     };
 
     updateItem(counter.id, updatedCounter);
     setCounter(updatedCounter);
     handleClose();
-  }, [counter, handleClose]);
+  }, [counter, handleClose, getReversedWayIfWayIsChange]);
 
   // 보조 카운터 규칙 확인
   const handleSubRuleConfirm = useCallback((rule: number, isRuleActive: boolean) => {
