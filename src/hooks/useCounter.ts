@@ -528,15 +528,20 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
       }
     }
 
+    // way 변경 로직 적용 (본 카운터가 증가할 때)
+    const newWay = newMainCount > counter.count ? getReversedWayIfWayIsChange() : null;
+    const updatedInfo = newWay ? { ...counter.info, way: newWay as Way } : counter.info;
+
     const updatedCounter = {
       ...counter,
       subCount: newSubCount,
       count: newMainCount,
+      info: updatedInfo,
     };
 
     await updateItem(counter.id, updatedCounter);
     setCounter(updatedCounter);
-  }, [counter, playSound, triggerHaptics]);
+  }, [counter, playSound, triggerHaptics, getReversedWayIfWayIsChange]);
 
   const handleSubSubtract = useCallback(async () => {
     if (!counter) {
@@ -618,16 +623,21 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     }
     }
 
+    // way 변경 로직 적용 (본 카운터가 증가할 때)
+    const newWay = newMainCount > counter.count ? getReversedWayIfWayIsChange() : null;
+    const updatedInfo = newWay ? { ...counter.info, way: newWay as Way } : counter.info;
+
     const updatedCounter = {
       ...counter,
       subCount: newSubCount,
       count: newMainCount,
+      info: updatedInfo,
     };
 
     updateItem(counter.id, updatedCounter);
     setCounter(updatedCounter);
     handleClose();
-  }, [counter, handleClose]);
+  }, [counter, handleClose, getReversedWayIfWayIsChange]);
 
   // 보조 카운터 규칙 확인
   const handleSubRuleConfirm = useCallback((rule: number, isRuleActive: boolean) => {
