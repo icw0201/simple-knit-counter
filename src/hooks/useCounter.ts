@@ -520,6 +520,12 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     if (counter.subRuleIsActive && newSubCount >= counter.subRule) {
       newSubCount = 0;
       newMainCount = counter.count + 1;
+
+      // 본 카운터가 9999를 넘으면 리밋 모달 표시하고 증가하지 않음
+      if (newMainCount > 9999) {
+        setActiveModal('limit');
+        return;
+      }
     }
 
     const updatedCounter = {
