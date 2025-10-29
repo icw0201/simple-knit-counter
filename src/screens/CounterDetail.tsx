@@ -191,6 +191,7 @@ const CounterDetail = () => {
         <ProgressBar
           count={counter.count}
           targetCount={counter.targetCount || 0}
+          screenSize={screenSize}
           onPress={handleTargetCountOpen}
         />
 
