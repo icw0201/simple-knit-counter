@@ -519,8 +519,7 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
       return;
     }
 
-    // 빈 값이면 0으로 설정 (목표 없음)
-    const newValue = value.trim() === '' ? 0 : parseInt(value, 10);
+    const newValue = parseInt(value, 10);
     if (isNaN(newValue) || newValue < 0) {
       return;
     }
