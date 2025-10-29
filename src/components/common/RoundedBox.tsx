@@ -9,10 +9,7 @@ import { getLucideIcon } from '@utils/iconUtils';
  * RoundedBox 컴포넌트의 Props 인터페이스
  * @param isButton - 터치 가능한 버튼으로 동작할지 여부 (기본값: false)
  * @param onPress - 버튼 클릭 시 실행될 콜백 함수 (isButton이 true일 때만 사용)
- * @param onLongPress - 버튼 길게 누르기 시 실행될 콜백 함수 (isButton이 true일 때만 사용)
  * @param title - 박스에 표시될 주요 텍스트
- * @param subtitle - title 아래에 표시될 부제목 (선택사항)
- * @param number - 숫자 값 (선택사항)
  * @param iconName - 표시할 Lucide 아이콘 이름 (기본값: 'star')
  * @param rounded - 모서리 둥글기 스타일 (기본값: 'xl')
  * @param colorStyle - 색상 테마 스타일 키 (기본값: 'A')
@@ -22,10 +19,7 @@ import { getLucideIcon } from '@utils/iconUtils';
 interface RoundedBoxProps {
   isButton?: boolean;
   onPress?: () => void;
-  onLongPress?: () => void;
   title?: string;
-  subtitle?: string;
-  number?: number;
   iconName?: string;
   rounded?: string;
   colorStyle?: ColorStyleKey;
@@ -77,10 +71,7 @@ const renderDefaultLayout = (title: string | undefined, textColor: string) => (
 const RoundedBox: React.FC<RoundedBoxProps> = ({
   isButton = false,
   onPress,
-  onLongPress,
   title,
-  subtitle: _subtitle,
-  number: _number,
   iconName = 'star',
   rounded = 'xl',
   colorStyle = 'A',
@@ -110,7 +101,7 @@ const RoundedBox: React.FC<RoundedBoxProps> = ({
 
   // isButton이 true면 TouchableOpacity로 감싸서 터치 가능하게, false면 단순 뷰 반환
   return isButton ? (
-    <TouchableOpacity onPress={onPress} onLongPress={onLongPress}>
+    <TouchableOpacity onPress={onPress}>
       {boxView}
     </TouchableOpacity>
   ) : (
