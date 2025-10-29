@@ -1,8 +1,9 @@
+// src/components/list/ItemRow.tsx
 import React from 'react';
 import { View } from 'react-native';
 import RoundedBox from '@components/common/RoundedBox';
 import CircleIcon from '@components/common/CircleIcon';
-import { Item } from '@storage/types';
+import { Item, Counter } from '@storage/types';
 
 interface ItemRowProps {
   item: Item;
@@ -35,6 +36,10 @@ const ItemRow: React.FC<ItemRowProps> = ({
     return item.count;
   };
 
+  const progressPercentage = item.type === 'counter' && (item as Counter).targetCount > 0
+    ? ((item as Counter).count / (item as Counter).targetCount) * 100
+    : undefined;
+
   return (
     <View className="mb-4 flex-row items-center">
       <View className="flex-1 mr-2">
@@ -47,6 +52,7 @@ const ItemRow: React.FC<ItemRowProps> = ({
           isButton
           onPress={() => onPress(item)}
           onLongPress={() => onLongPress(item)}
+          progressPercentage={progressPercentage}
         />
       </View>
 

@@ -11,7 +11,7 @@ import { activateKeepAwake, deactivateKeepAwake } from '@sayem314/react-native-k
 import { getHeaderRightWithActivateInfoSettings } from '@navigation/HeaderOptions';
 import { getScreenAwakeSetting } from '@storage/settings';
 
-import { CounterTouchArea, CounterDirection, CounterActions, CounterModals, SubCounterModal } from '@components/counter';
+import { CounterTouchArea, CounterDirection, CounterActions, CounterModals, SubCounterModal, ProgressBar } from '@components/counter';
 import { getScreenSize, getIconSize, getTextClass, getGapClass, getSubModalWidthRatio, getSubModalHeightRatio, getSubModalTop, ScreenSize } from '@constants/screenSizeConfig';
 import { useCounter } from '@hooks/useCounter';
 
@@ -52,6 +52,7 @@ const CounterDetail = () => {
     mascotIsActive,
     way,
     currentCount,
+    currentTargetCount,
     activeModal,
     errorModalVisible,
     errorMessage,
@@ -61,6 +62,8 @@ const CounterDetail = () => {
     handleEditConfirm,
     handleResetConfirm,
     handleClose,
+    handleTargetCountOpen,
+    handleTargetCountConfirm,
     toggleMascotIsActive,
     toggleWay,
     setErrorModalVisible,
@@ -171,18 +174,27 @@ const CounterDetail = () => {
   return (
     <SafeAreaView style={{ flex: 1 }} edges={['left', 'right', 'bottom']}>
       <View className="flex-1 bg-white">
+
       {/* 좌우 터치 레이어 */}
       <CounterTouchArea onAdd={handleAdd} onSubtract={handleSubtract} />
 
       {/* 중앙 콘텐츠 영역 */}
       <Animated.View
         className="flex-1 items-center"
-        style={{ 
-          pointerEvents: 'box-none', 
+        style={{
+          pointerEvents: 'box-none',
           paddingTop: paddingTopAnim,
-          opacity: isPaddingReady ? 1 : 0
+          opacity: isPaddingReady ? 1 : 0,
         }}
       >
+        {/* 프로그레스 바 - 화면 최상단에 고정 */}
+        <ProgressBar
+          count={counter.count}
+          targetCount={counter.targetCount || 0}
+          screenSize={screenSize}
+          onPress={handleTargetCountOpen}
+        />
+
         {/* 방향 표시 이미지 영역 */}
         <CounterDirection
           mascotIsActive={mascotIsActive}
@@ -240,6 +252,7 @@ const CounterDetail = () => {
         errorModalVisible={errorModalVisible}
         errorMessage={errorMessage}
         currentCount={currentCount}
+        currentTargetCount={currentTargetCount}
         subCount={subCount}
         subRule={subRule}
         subRuleIsActive={subRuleIsActive}
@@ -247,6 +260,7 @@ const CounterDetail = () => {
         onEditConfirm={handleEditConfirm}
         onResetConfirm={handleResetConfirm}
         onErrorModalClose={() => setErrorModalVisible(false)}
+        onTargetCountConfirm={handleTargetCountConfirm}
         onSubEditConfirm={handleSubEditConfirm}
         onSubResetConfirm={handleSubResetConfirm}
         onSubRuleConfirm={handleSubRuleConfirm}
