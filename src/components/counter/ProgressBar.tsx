@@ -44,8 +44,8 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ count, targetCount, screenSiz
         />
       )}
 
-      {/* 백분율 텍스트 - compact 화면에서는 표시하지 않음 */}
-      {percentageText && percentage !== null && progressWidth > 0 && !isCompact && (
+      {/* 백분율 텍스트 - compact 화면에서는 표시하지 않음, 목표 단수가 있을 때만 표시 */}
+      {percentageText && targetCount > 0 && !isCompact && (
         <View
           className="absolute left-0 top-0 bottom-0 justify-center"
           style={{
