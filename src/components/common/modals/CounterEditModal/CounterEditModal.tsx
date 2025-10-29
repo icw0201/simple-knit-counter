@@ -64,7 +64,7 @@ const CounterEditModal: React.FC<CounterEditModalProps> = ({
         label=""
         value={textValue}
         onChangeText={setTextValue}
-        placeholder={title === '목표 단수 설정' ? '목표 단수 (0 입력 시 목표 없음)' : '카운트 값을 입력하세요'}
+        placeholder="카운트 값을 입력하세요"
         type="number"
       />
 

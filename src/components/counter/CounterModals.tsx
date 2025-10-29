@@ -73,7 +73,7 @@ const CounterModals: React.FC<CounterModalsProps> = ({
         onClose={onClose}
         onConfirm={onTargetCountConfirm}
         initialValue={currentTargetCount}
-        title="목표 단수 설정"
+        title="목표 단수 설정 (0 입력 시 목표 없음)"
       />
 
       {/* 범위 초과 경고 모달 */}
