@@ -1,7 +1,7 @@
 // src/components/list/ItemRow.tsx
 import React from 'react';
 import { View } from 'react-native';
-import RoundedBox from '@components/common/RoundedBox';
+import ItemBox from './ItemBox';
 import CircleIcon from '@components/common/CircleIcon';
 import { Item, Counter } from '@storage/types';
 
@@ -43,13 +43,11 @@ const ItemRow: React.FC<ItemRowProps> = ({
   return (
     <View className="mb-4 flex-row items-center">
       <View className="flex-1 mr-2">
-        <RoundedBox
+        <ItemBox
           title={item.title}
           subtitle={getSubtitle()}
           number={getNumber()}
-          layoutStyle="C"
           colorStyle={isEditMode ? 'B' : 'A'}
-          isButton
           onPress={() => onPress(item)}
           onLongPress={() => onLongPress(item)}
           progressPercentage={progressPercentage}

@@ -16,9 +16,8 @@ import { getLucideIcon } from '@utils/iconUtils';
  * @param iconName - 표시할 Lucide 아이콘 이름 (기본값: 'star')
  * @param rounded - 모서리 둥글기 스타일 (기본값: 'xl')
  * @param colorStyle - 색상 테마 스타일 키 (기본값: 'A')
- * @param layoutStyle - 레이아웃 스타일 ('A' | 'B' | 'C' | 'D' | 'F')
+ * @param layoutStyle - 레이아웃 스타일 ('A' | 'B' | 'D' | 'F')
  * @param containerClassName - 추가적인 컨테이너 스타일 클래스
- * @param progressPercentage - 프로그레스 바 비율 (0-100, 선택사항)
  */
 interface RoundedBoxProps {
   isButton?: boolean;
@@ -30,9 +29,8 @@ interface RoundedBoxProps {
   iconName?: string;
   rounded?: string;
   colorStyle?: ColorStyleKey;
-  layoutStyle?: 'A' | 'B' | 'C' | 'D' | 'F';
+  layoutStyle?: 'A' | 'B' | 'D' | 'F';
   containerClassName?: string;
-  progressPercentage?: number;
 }
 
 /**
@@ -53,21 +51,6 @@ const getRoundedClass = (rounded?: string) => {
 const renderLayoutB = (title: string, textColor: string) => (
   <View className="items-center justify-center min-h-16">
     <Text className={clsx('text-base font-semibold', textColor)}>{title}</Text>
-  </View>
-);
-
-/**
- * 레이아웃 스타일 C: 제목과 숫자를 좌우로 배치
- */
-const renderLayoutC = (title: string, subtitle: string | undefined, number: number | undefined, textColor: string, subtextColor: string) => (
-  <View className="flex-row items-center justify-between">
-    <View className="flex flex-col">
-      {subtitle && <Text className={clsx('text-xs', subtextColor)}>{subtitle}</Text>}
-      <Text className={clsx('text-lg font-semibold', textColor)}>{title}</Text>
-    </View>
-    {number !== undefined && (
-      <Text className={clsx('text-2xl font-bold', textColor)}>{number}</Text>
-    )}
   </View>
 );
 
@@ -105,29 +88,25 @@ const RoundedBox: React.FC<RoundedBoxProps> = ({
   onPress,
   onLongPress,
   title,
-  subtitle,
-  number,
+  subtitle: _subtitle,
+  number: _number,
   iconName = 'star',
   rounded = 'xl',
   colorStyle = 'A',
   layoutStyle,
   containerClassName = '',
-  progressPercentage,
 }) => {
   // 선택된 색상 테마에서 색상 값들을 가져오기
-  const { container, text, subtext, icon } = colorStyles[colorStyle];
+  const { container, text, icon } = colorStyles[colorStyle];
 
   // 모서리 둥글기 클래스와 박스 전체 클래스 조합
   const roundedClass = getRoundedClass(rounded);
-  const hasProgress = progressPercentage !== undefined && progressPercentage !== null;
 
   // 레이아웃 스타일에 따라 다른 내용 구성
   const renderContent = () => {
     switch (layoutStyle) {
       case 'B':
         return renderLayoutB(title || '', text);
-      case 'C':
-        return renderLayoutC(title || '', subtitle, number, text, subtext);
       case 'F':
         return renderLayoutF(title || '', iconName, text, icon);
       default:
@@ -137,19 +116,8 @@ const RoundedBox: React.FC<RoundedBoxProps> = ({
 
   // 박스 뷰 생성
   const boxView = (
-    <View className={clsx('p-4', container, roundedClass, containerClassName, 'relative overflow-hidden')}>
-      {/* 프로그레스 바 - 배경색으로 채우기 */}
-      {hasProgress && progressPercentage > 0 && (
-        <View
-          className={`absolute left-0 top-0 bottom-0 bg-red-orange-200 ${progressPercentage >= 100 ? 'right-0' : ''}`}
-          style={progressPercentage >= 100 ? undefined : { width: `${progressPercentage}%` }}
-          pointerEvents="none"
-        />
-      )}
-      {/* 콘텐츠 - 프로그레스 바 위에 표시 */}
-      <View className="relative z-10">
-        {renderContent()}
-      </View>
+    <View className={clsx('p-4', container, roundedClass, containerClassName)}>
+      {renderContent()}
     </View>
   );
 
