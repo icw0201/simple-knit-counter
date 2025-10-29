@@ -29,13 +29,14 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ count, targetCount, screenSiz
   const minTextWidth = 50;
   const isProgressBarWideEnough = progressWidth >= minTextWidth;
   const isCompact = screenSize === ScreenSize.COMPACT;
-  const heightClass = isCompact ? 'h-5' : 'h-7';
+  const isSmall = screenSize === ScreenSize.SMALL;
+  const heightClass = isCompact ? 'h-3' : isSmall ? 'h-5' : 'h-7';
 
-  return (
-    <Pressable
-      className={`absolute top-0 left-0 right-0 ${heightClass} bg-red-orange-50`}
-      onPress={onPress}
-    >
+  const containerClassName = `absolute top-0 left-0 right-0 ${heightClass} bg-red-orange-50`;
+
+  // 프로그레스 바와 텍스트 내용
+  const content = (
+    <>
       {/* 프로그레스 바 (왼쪽부터 채워지는 부분) */}
       {percentage !== null && progressWidth > 0 && (
         <View
@@ -64,6 +65,15 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ count, targetCount, screenSiz
           </Text>
         </View>
       )}
+    </>
+  );
+
+  // compact일 때는 View, 그 외에는 Pressable
+  return isCompact ? (
+    <View className={containerClassName}>{content}</View>
+  ) : (
+    <Pressable className={containerClassName} onPress={onPress}>
+      {content}
     </Pressable>
   );
 };
