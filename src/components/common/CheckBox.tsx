@@ -39,7 +39,7 @@ const CheckBox: React.FC<CheckBoxProps> = ({ label, checked, onToggle, disabled 
     <TouchableOpacity
       onPress={disabled ? undefined : onToggle} // 비활성화 상태일 때는 onPress 이벤트를 무시
       activeOpacity={0.7} // 터치 시 투명도 효과
-      className={label ? "flex-row items-center justify-between px-4 py-3" : ""}
+      className={label ? 'flex-row items-center justify-between px-4 py-3' : ''}
     >
       {/* 체크박스 라벨 텍스트 - label이 있을 때만 표시 */}
       {label && (
