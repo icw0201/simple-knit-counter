@@ -22,7 +22,8 @@ interface UseCounterReturn {
   mascotIsActive: boolean;
   way: Way;
   currentCount: string;
-  activeModal: 'reset' | 'edit' | 'limit' | 'rule' | 'subReset' | 'subEdit' | 'subLimit' | null;
+  currentTargetCount: string;
+  activeModal: 'reset' | 'edit' | 'limit' | 'rule' | 'subReset' | 'subEdit' | 'subLimit' | 'targetCount' | null;
   errorModalVisible: boolean;
   errorMessage: string;
 
@@ -39,11 +40,13 @@ interface UseCounterReturn {
   handleEditConfirm: (value: string) => void;
   handleResetConfirm: () => void;
   handleClose: () => void;
+  handleTargetCountOpen: () => void;
+  handleTargetCountConfirm: (value: string) => void;
   toggleMascotIsActive: () => void;
   toggleWay: () => void;
   showErrorModal: (message: string) => void;
   setErrorModalVisible: (visible: boolean) => void;
-  setActiveModal: (modal: 'reset' | 'edit' | 'limit' | 'rule' | 'subReset' | 'subEdit' | 'subLimit' | null) => void;
+  setActiveModal: (modal: 'reset' | 'edit' | 'limit' | 'rule' | 'subReset' | 'subEdit' | 'subLimit' | 'targetCount' | null) => void;
 
   // 보조 카운터 액션 함수들
   handleSubAdd: () => void;
@@ -79,8 +82,9 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
   const [counter, setCounter] = useState<Counter | null>(null);
 
   // 모달 상태 관리
-  const [activeModal, setActiveModal] = useState<'reset' | 'edit' | 'limit' | 'rule' | 'subReset' | 'subEdit' | 'subLimit' | null>(null);
+  const [activeModal, setActiveModal] = useState<'reset' | 'edit' | 'limit' | 'rule' | 'subReset' | 'subEdit' | 'subLimit' | 'targetCount' | null>(null);
   const [currentCount, setCurrentCount] = useState('');
+  const [currentTargetCount, setCurrentTargetCount] = useState('');
   const [errorModalVisible, setErrorModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -467,6 +471,7 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
   const handleClose = useCallback(() => {
     setActiveModal(null);
     setCurrentCount(counter ? String(counter.count) : '');
+    setCurrentTargetCount(counter ? String(counter.targetCount || '') : '');
   }, [counter]);
 
   /**
@@ -497,6 +502,33 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     updateCountAndMaybeWay(0);
     handleClose();
   }, [counter, updateCountAndMaybeWay, handleClose]);
+
+  /**
+   * 목표 단수 편집 모달 열기
+   */
+  const handleTargetCountOpen = useCallback(() => {
+    setCurrentTargetCount(counter ? String(counter.targetCount || '') : '');
+    setActiveModal('targetCount');
+  }, [counter]);
+
+  /**
+   * 목표 단수 편집 모달에서 확인 시 목표 단수 업데이트
+   */
+  const handleTargetCountConfirm = useCallback((value: string) => {
+    if (!counter) {
+      return;
+    }
+
+    // 빈 값이면 0으로 설정 (목표 없음)
+    const newValue = value.trim() === '' ? 0 : parseInt(value, 10);
+    if (isNaN(newValue) || newValue < 0) {
+      return;
+    }
+
+    updateItem(counter.id, { targetCount: newValue });
+    setCounter({ ...counter, targetCount: newValue });
+    handleClose();
+  }, [counter, handleClose]);
 
   // 보조 카운터 액션 함수들
   const handleSubAdd = useCallback(async () => {
@@ -695,6 +727,7 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     mascotIsActive,
     way,
     currentCount,
+    currentTargetCount,
     activeModal,
     errorModalVisible,
     errorMessage,
@@ -712,6 +745,8 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     handleEditConfirm,
     handleResetConfirm,
     handleClose,
+    handleTargetCountOpen,
+    handleTargetCountConfirm,
     toggleMascotIsActive,
     toggleWay,
     showErrorModal,
