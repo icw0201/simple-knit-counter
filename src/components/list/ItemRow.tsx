@@ -3,7 +3,8 @@ import React from 'react';
 import { View } from 'react-native';
 import ItemBox from './ItemBox';
 import CircleIcon from '@components/common/CircleIcon';
-import { Item, Counter } from '@storage/types';
+import { Item, Counter, Project } from '@storage/types';
+import { getStoredItems } from '@storage/storage';
 
 interface ItemRowProps {
   item: Item;
@@ -36,9 +37,67 @@ const ItemRow: React.FC<ItemRowProps> = ({
     return item.count;
   };
 
-  const progressPercentage = item.type === 'counter' && (item as Counter).targetCount > 0
-    ? ((item as Counter).count / (item as Counter).targetCount) * 100
-    : undefined;
+  let progressPercentage: number | undefined;
+
+  if (item.type === 'counter') {
+    // 카운터: count/targetCount로 계산
+    const counter = item as Counter;
+    if (counter.targetCount > 0) {
+      progressPercentage = (counter.count / counter.targetCount) * 100;
+    }
+  } else if (item.type === 'project') {
+    // 프로젝트: 하위 카운터의 완료율로 계산
+    const project = item as Project;
+    const allItems = getStoredItems();
+    const childCounters = allItems.filter(
+      (i): i is Counter => i.type === 'counter' && project.counterIds.includes(i.id)
+    );
+
+    if (childCounters.length > 0) {
+      const completedCounters = childCounters.filter((counter) => {
+        if (counter.targetCount > 0) {
+          const counterProgress = (counter.count / counter.targetCount) * 100;
+          return counterProgress >= 100;
+        }
+        return false;
+      });
+      progressPercentage = (completedCounters.length / childCounters.length) * 100;
+    }
+  }
+
+  // 완료 상태 확인
+  let isCompleted = false;
+
+  if (item.type === 'counter') {
+    // 카운터: 100% 이상이거나 endDate가 있는 경우
+    isCompleted = (progressPercentage !== undefined && progressPercentage >= 100) ||
+                  (item.info?.endDate !== undefined && item.info.endDate !== '');
+  } else if (item.type === 'project') {
+    // 프로젝트: 종료일이 있거나 하위 카운터가 모두 완료 상태인 경우
+    const project = item as Project;
+    const hasEndDate = project.info?.endDate !== undefined && project.info.endDate !== '';
+
+    if (hasEndDate) {
+      isCompleted = true;
+    } else {
+      // 하위 카운터 확인
+      const allItems = getStoredItems();
+      const childCounters = allItems.filter(
+        (i): i is Counter => i.type === 'counter' && project.counterIds.includes(i.id)
+      );
+
+      if (childCounters.length > 0) {
+        // 모든 하위 카운터가 완료 상태인지 확인
+        isCompleted = childCounters.every((counter) => {
+          if (counter.targetCount > 0) {
+            const counterProgress = (counter.count / counter.targetCount) * 100;
+            return counterProgress >= 100;
+          }
+          return false; // targetCount가 없으면 미완료
+        });
+      }
+    }
+  }
 
   return (
     <View className="mb-4 flex-row items-center">
@@ -51,6 +110,7 @@ const ItemRow: React.FC<ItemRowProps> = ({
           onPress={() => onPress(item)}
           onLongPress={() => onLongPress(item)}
           progressPercentage={progressPercentage}
+          isCompleted={isCompleted}
         />
       </View>
 

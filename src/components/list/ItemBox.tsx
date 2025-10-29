@@ -12,6 +12,7 @@ interface ItemBoxProps {
   onPress: () => void;
   onLongPress?: () => void;
   progressPercentage?: number;
+  isCompleted?: boolean;
 }
 
 /**
@@ -26,25 +27,38 @@ const ItemBox: React.FC<ItemBoxProps> = ({
   onPress,
   onLongPress,
   progressPercentage,
+  isCompleted = false,
 }) => {
   const { container, text, subtext } = colorStyles[colorStyle];
   const hasProgress = progressPercentage !== undefined && progressPercentage !== null;
 
   const boxView = (
-    <View className={clsx('p-4', container, 'rounded-xl', 'relative overflow-hidden')}>
-      {/* 프로그레스 바 - 배경색으로 채우기 */}
-      {hasProgress && progressPercentage > 0 && (
+    <View className={clsx(container, 'rounded-xl', 'relative overflow-hidden')}>
+      {/* 완료 상태일 때 전체 배경 채우기 */}
+      {isCompleted ? (
         <View
-          className={`absolute left-0 top-0 bottom-0 bg-red-orange-200 ${progressPercentage >= 100 ? 'right-0' : ''}`}
-          style={progressPercentage >= 100 ? undefined : { width: `${progressPercentage}%` }}
+          className="absolute left-0 top-0 bottom-0 right-0 bg-red-orange-400"
           pointerEvents="none"
         />
+      ) : (
+        /* 미완료 상태일 때만 프로그레스 바 표시 */
+        hasProgress && progressPercentage > 0 && (
+          <View
+            className={`absolute left-0 top-0 bottom-0 bg-red-orange-200 ${progressPercentage >= 100 ? 'right-0' : ''}`}
+            style={progressPercentage >= 100 ? undefined : { width: `${progressPercentage}%` }}
+            pointerEvents="none"
+          />
+        )
       )}
-      {/* 콘텐츠 - 프로그레스 바 위에 표시 */}
-      <View className="relative z-10">
+      {/* 콘텐츠 - 프로그레스 바 위에 표시 (패딩 포함) */}
+      <View className="relative z-10 p-4">
         <View className="flex-row items-center justify-between">
           <View className="flex flex-col">
-            {subtitle && <Text className={clsx('text-xs', subtext)}>{subtitle}</Text>}
+            {subtitle && (
+              <Text className={clsx('text-xs', isCompleted ? 'text-white' : subtext)}>
+                {subtitle}
+              </Text>
+            )}
             <Text className={clsx('text-lg font-semibold', text)}>{title}</Text>
           </View>
           {number !== undefined && (
