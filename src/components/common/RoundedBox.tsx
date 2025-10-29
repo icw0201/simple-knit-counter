@@ -16,7 +16,7 @@ import { getLucideIcon } from '@utils/iconUtils';
  * @param iconName - 표시할 Lucide 아이콘 이름 (기본값: 'star')
  * @param rounded - 모서리 둥글기 스타일 (기본값: 'xl')
  * @param colorStyle - 색상 테마 스타일 키 (기본값: 'A')
- * @param layoutStyle - 레이아웃 스타일 ('A' | 'B' | 'D' | 'F')
+ * @param layoutStyle - 레이아웃 스타일 ('Icon' - 제목과 아이콘 좌우 배치, 미지정 시 기본 레이아웃)
  * @param containerClassName - 추가적인 컨테이너 스타일 클래스
  */
 interface RoundedBoxProps {
@@ -29,7 +29,7 @@ interface RoundedBoxProps {
   iconName?: string;
   rounded?: string;
   colorStyle?: ColorStyleKey;
-  layoutStyle?: 'A' | 'B' | 'D' | 'F';
+  layoutStyle?: 'Icon';
   containerClassName?: string;
 }
 
@@ -46,18 +46,9 @@ const getRoundedClass = (rounded?: string) => {
 };
 
 /**
- * 레이아웃 스타일 B: 중앙 정렬된 제목만 표시
+ * 레이아웃 스타일 Icon: 제목과 아이콘을 좌우로 배치
  */
-const renderLayoutB = (title: string, textColor: string) => (
-  <View className="items-center justify-center min-h-16">
-    <Text className={clsx('text-base font-semibold', textColor)}>{title}</Text>
-  </View>
-);
-
-/**
- * 레이아웃 스타일 F: 제목과 아이콘을 좌우로 배치
- */
-const renderLayoutF = (title: string, iconName: string, textColor: string, iconColor: string) => {
+const renderLayoutIcon = (title: string, iconName: string, textColor: string, iconColor: string) => {
     // 아이콘 이름을 PascalCase로 변환하고 Lucide 아이콘으로 렌더링
     const IconComponent = getLucideIcon(iconName);
 
@@ -104,14 +95,10 @@ const RoundedBox: React.FC<RoundedBoxProps> = ({
 
   // 레이아웃 스타일에 따라 다른 내용 구성
   const renderContent = () => {
-    switch (layoutStyle) {
-      case 'B':
-        return renderLayoutB(title || '', text);
-      case 'F':
-        return renderLayoutF(title || '', iconName, text, icon);
-      default:
-        return renderDefaultLayout(title, text);
+    if (layoutStyle === 'Icon') {
+      return renderLayoutIcon(title || '', iconName, text, icon);
     }
+    return renderDefaultLayout(title, text);
   };
 
   // 박스 뷰 생성
