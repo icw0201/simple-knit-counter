@@ -4,10 +4,11 @@ import { ConfirmModal, CounterEditModal } from '@components/common/modals';
 import { SubCounterRuleModal } from '@components/counter';
 
 interface CounterModalsProps {
-  activeModal: 'reset' | 'edit' | 'limit' | 'rule' | 'subReset' | 'subEdit' | 'subLimit' | null;
+  activeModal: 'reset' | 'edit' | 'limit' | 'rule' | 'subReset' | 'subEdit' | 'subLimit' | 'targetCount' | null;
   errorModalVisible: boolean;
   errorMessage: string;
   currentCount: string;
+  currentTargetCount: string;
   subCount: number;
   subRule: number;
   subRuleIsActive: boolean;
@@ -15,6 +16,7 @@ interface CounterModalsProps {
   onEditConfirm: (value: string) => void;
   onResetConfirm: () => void;
   onErrorModalClose: () => void;
+  onTargetCountConfirm: (value: string) => void;
   onSubEditConfirm: (value: string) => void;
   onSubResetConfirm: () => void;
   onSubRuleConfirm: (rule: number, isActive: boolean) => void;
@@ -29,6 +31,7 @@ const CounterModals: React.FC<CounterModalsProps> = ({
   errorModalVisible,
   errorMessage,
   currentCount,
+  currentTargetCount,
   subCount,
   subRule,
   subRuleIsActive,
@@ -36,6 +39,7 @@ const CounterModals: React.FC<CounterModalsProps> = ({
   onEditConfirm,
   onResetConfirm,
   onErrorModalClose,
+  onTargetCountConfirm,
   onSubEditConfirm,
   onSubResetConfirm,
   onSubRuleConfirm,
@@ -61,6 +65,15 @@ const CounterModals: React.FC<CounterModalsProps> = ({
         onConfirm={onEditConfirm}
         initialValue={currentCount}
         title="카운트 편집"
+      />
+
+      {/* 목표 단수 설정 모달 */}
+      <CounterEditModal
+        visible={activeModal === 'targetCount'}
+        onClose={onClose}
+        onConfirm={onTargetCountConfirm}
+        initialValue={currentTargetCount}
+        title="목표 단수 설정 (0 입력 시 목표 없음)"
       />
 
       {/* 범위 초과 경고 모달 */}

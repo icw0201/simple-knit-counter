@@ -18,6 +18,7 @@ import { getLucideIcon } from '@utils/iconUtils';
  * @param colorStyle - 색상 테마 스타일 키 (기본값: 'A')
  * @param layoutStyle - 레이아웃 스타일 ('A' | 'B' | 'C' | 'D' | 'F')
  * @param containerClassName - 추가적인 컨테이너 스타일 클래스
+ * @param progressPercentage - 프로그레스 바 비율 (0-100, 선택사항)
  */
 interface RoundedBoxProps {
   isButton?: boolean;
@@ -31,6 +32,7 @@ interface RoundedBoxProps {
   colorStyle?: ColorStyleKey;
   layoutStyle?: 'A' | 'B' | 'C' | 'D' | 'F';
   containerClassName?: string;
+  progressPercentage?: number;
 }
 
 /**
@@ -110,13 +112,14 @@ const RoundedBox: React.FC<RoundedBoxProps> = ({
   colorStyle = 'A',
   layoutStyle,
   containerClassName = '',
+  progressPercentage,
 }) => {
   // 선택된 색상 테마에서 색상 값들을 가져오기
   const { container, text, subtext, icon } = colorStyles[colorStyle];
 
   // 모서리 둥글기 클래스와 박스 전체 클래스 조합
   const roundedClass = getRoundedClass(rounded);
-  const boxClass = clsx('p-4', container, roundedClass, containerClassName);
+  const hasProgress = progressPercentage !== undefined && progressPercentage !== null;
 
   // 레이아웃 스타일에 따라 다른 내용 구성
   const renderContent = () => {
@@ -133,7 +136,22 @@ const RoundedBox: React.FC<RoundedBoxProps> = ({
   };
 
   // 박스 뷰 생성
-  const boxView = <View className={boxClass}>{renderContent()}</View>;
+  const boxView = (
+    <View className={clsx('p-4', container, roundedClass, containerClassName, 'relative overflow-hidden')}>
+      {/* 프로그레스 바 - 배경색으로 채우기 */}
+      {hasProgress && progressPercentage > 0 && (
+        <View
+          className={`absolute left-0 top-0 bottom-0 bg-red-orange-200 ${progressPercentage >= 100 ? 'right-0' : ''}`}
+          style={progressPercentage >= 100 ? undefined : { width: `${progressPercentage}%` }}
+          pointerEvents="none"
+        />
+      )}
+      {/* 콘텐츠 - 프로그레스 바 위에 표시 */}
+      <View className="relative z-10">
+        {renderContent()}
+      </View>
+    </View>
+  );
 
   // isButton이 true면 TouchableOpacity로 감싸서 터치 가능하게, false면 단순 뷰 반환
   return isButton ? (

@@ -42,10 +42,10 @@ const CounterEditModal: React.FC<CounterEditModalProps> = ({
   }, [visible, initialValue]);
 
   const handleConfirm = () => {
-    if (textValue.trim()) {
-      onConfirm(textValue.trim());
-      onClose();
-    }
+    // 빈 값일 경우 '0'으로 처리
+    const value = textValue.trim() || '0';
+    onConfirm(value);
+    onClose();
   };
 
   const handleClose = () => {
