@@ -205,7 +205,7 @@ const CounterDetail = () => {
         {screenSize !== ScreenSize.COMPACT && tooltipEnabled && (
           <Tooltip
             text="바를 눌러 목표 단수 설정하기"
-            containerClassName={`absolute left-0 right-0 items-center ${screenSize === ScreenSize.SMALL ? 'top-7' : 'top-9'}`}
+            containerClassName={`absolute left-0 right-0 items-center z-50 ${screenSize === ScreenSize.SMALL ? 'top-7' : 'top-9'}`}
           />
         )}
 
@@ -213,7 +213,7 @@ const CounterDetail = () => {
         {screenSize !== ScreenSize.COMPACT && tooltipEnabled && (
           <Tooltip
             text="편물 앞 뒤 체크하기"
-            containerClassName="absolute right-3 top-2"
+            containerClassName="absolute right-3 top-2 z-50"
           />
         )}
 
