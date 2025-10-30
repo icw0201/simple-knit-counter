@@ -34,7 +34,7 @@ const SettingsLinks: React.FC<SettingsLinksProps> = () => {
     <View className="mb-8">
       <RoundedBox
         title="별점 남기기"
-        layoutStyle="F"
+        layoutStyle="Icon"
         colorStyle="C"
         iconName="star"
         isButton
@@ -44,7 +44,7 @@ const SettingsLinks: React.FC<SettingsLinksProps> = () => {
       />
       <RoundedBox
         title="문의하기"
-        layoutStyle="F"
+        layoutStyle="Icon"
         colorStyle="C"
         iconName="mail"
         isButton
