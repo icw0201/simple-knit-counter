@@ -198,13 +198,10 @@ const CounterDetail = () => {
 
         {/* 프로그레스 바 아래 툴팁 (COMPACT 화면에서는 비표시) */}
         {screenSize !== ScreenSize.COMPACT && (
-          <View
-            className="absolute left-0 right-0 items-center"
-            style={{ top: (screenSize === ScreenSize.SMALL ? 20 : 28) + 8 }}
-            pointerEvents="none"
-          >
-            <Tooltip text="바를 눌러 목표 단수 설정하기" />
-          </View>
+          <Tooltip
+            text="바를 눌러 목표 단수 설정하기"
+            containerClassName={`absolute left-0 right-0 items-center ${screenSize === ScreenSize.SMALL ? 'top-7' : 'top-9'}`}
+          />
         )}
 
         {/* 방향 표시 이미지 영역 */}
