@@ -14,6 +14,8 @@ import {
   getVibrationSetting,
   getScreenAwakeSetting,
   setScreenAwakeSetting,
+  getTooltipEnabledSetting,
+  setTooltipEnabledSetting,
 } from '@storage/settings';
 
 interface SettingsCheckBoxesProps {}
@@ -29,6 +31,7 @@ const SettingsCheckBoxes: React.FC<SettingsCheckBoxesProps> = () => {
   const [sound, setSound] = useState(true);
   const [vibration, setVibration] = useState(true);
   const [screenAwake, setScreenAwake] = useState(true);
+  const [tooltipEnabled, setTooltipEnabled] = useState(true);
   const [resetConfirm, setResetConfirm] = useState(false);
   const [resetModalVisible, setResetModalVisible] = useState(false);
   const [errorModalVisible, setErrorModalVisible] = useState(false);
@@ -40,6 +43,7 @@ const SettingsCheckBoxes: React.FC<SettingsCheckBoxesProps> = () => {
     setVibration(getVibrationSetting());
     const currentSetting = getScreenAwakeSetting();
     setScreenAwake(currentSetting);
+    setTooltipEnabled(getTooltipEnabledSetting());
   }, []);
 
   /**
@@ -73,6 +77,15 @@ const SettingsCheckBoxes: React.FC<SettingsCheckBoxesProps> = () => {
     } else {
       deactivateKeepAwake();
     }
+  };
+
+  /**
+   * 툴팁 표시 설정 토글 처리
+   */
+  const handleTooltipToggle = () => {
+    const newValue = !tooltipEnabled;
+    setTooltipEnabled(newValue);
+    setTooltipEnabledSetting(newValue);
   };
 
   /**
@@ -138,6 +151,11 @@ const SettingsCheckBoxes: React.FC<SettingsCheckBoxesProps> = () => {
           label="카운터 스크린 항상 켜두기"
           checked={screenAwake}
           onToggle={handleScreenAwakeToggle}
+        />
+        <CheckBox
+          label="툴팁 표시하기"
+          checked={tooltipEnabled}
+          onToggle={handleTooltipToggle}
         />
         <CheckBox
           label="초기화하기"
