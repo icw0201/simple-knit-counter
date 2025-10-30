@@ -32,7 +32,7 @@ const ProjectDetail = () => {
 
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['left', 'right', 'bottom']}>
+    <SafeAreaView style={{ flex: 1 }} className={isEditMode ? 'bg-red-orange-400' : undefined} edges={['left', 'right', 'bottom']}>
       {/* 카운터 목록 스크롤뷰 */}
       <ScrollView contentContainerStyle={{ paddingBottom: 20 }} className="p-4">
         {items.map((item) => (

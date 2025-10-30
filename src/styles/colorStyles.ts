@@ -42,7 +42,7 @@ export const colorStyles: Record<ColorStyleKey, ColorStyle> = {
     container: 'bg-red-orange-100',
     text: 'text-red-orange-500',
     subtext: 'text-red-orange-400',
-    icon: '#fc3e39',
+    icon: '#490806',
   },
   G: {//비활성
     container: 'bg-lightgray',

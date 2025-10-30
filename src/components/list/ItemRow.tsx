@@ -106,11 +106,11 @@ const ItemRow: React.FC<ItemRowProps> = ({
           title={item.title}
           subtitle={getSubtitle()}
           number={getNumber()}
-          colorStyle={isEditMode ? 'B' : 'A'}
           onPress={() => onPress(item)}
           onLongPress={() => onLongPress(item)}
           progressPercentage={progressPercentage}
           isCompleted={isCompleted}
+          isEditMode={isEditMode}
         />
       </View>
 
@@ -120,7 +120,7 @@ const ItemRow: React.FC<ItemRowProps> = ({
           <CircleIcon
             size={48}
             iconName="trash-2"
-            colorStyle="D"
+            colorStyle="F"
             isButton
             onPress={() => onDelete(item)}
           />
