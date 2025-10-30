@@ -1,6 +1,6 @@
 // src/components/list/ItemBox.tsx
 import React from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View, Image } from 'react-native';
 import clsx from 'clsx';
 import { colorStyles, ColorStyleKey } from '@styles/colorStyles';
 
@@ -62,7 +62,16 @@ const ItemBox: React.FC<ItemBoxProps> = ({
             <Text className={clsx('text-lg font-semibold', text)}>{title}</Text>
           </View>
           {number !== undefined && (
-            <Text className={clsx('text-2xl font-bold', text)}>{number}</Text>
+            <View className="relative items-center justify-center">
+              {isCompleted && (
+                <Image
+                  source={require('@assets/images/complete.png')}
+                  className="absolute h-20 w-20 right-10 top-1/2 -mt-12"
+                  resizeMode="cover"
+                />
+              )}
+              <Text className={clsx('text-2xl font-bold', text)}>{number}</Text>
+            </View>
           )}
         </View>
       </View>
