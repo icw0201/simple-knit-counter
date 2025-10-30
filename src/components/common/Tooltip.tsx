@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { Animated } from 'react-native';
 import { View, Text } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
@@ -6,11 +7,37 @@ interface TooltipProps {
   text?: string;
   children?: React.ReactNode;
   containerClassName?: string;
+  autoHideMs?: number; // 렌더 후 자동 숨김 시간(ms), 기본 4000
+  fadeOutDurationMs?: number; // 페이드아웃 지속시간(ms), 기본 400
 }
 
-const Tooltip: React.FC<TooltipProps> = ({ text, children, containerClassName }) => {
+const Tooltip: React.FC<TooltipProps> = ({ text, children, containerClassName, autoHideMs = 4000, fadeOutDurationMs = 400 }) => {
+  const [visible, setVisible] = useState(true);
+  const opacity = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    if (autoHideMs > 0) {
+      const t = setTimeout(() => {
+        Animated.timing(opacity, {
+          toValue: 0,
+          duration: fadeOutDurationMs,
+          useNativeDriver: true,
+        }).start(({ finished }) => {
+          if (finished) {
+            setVisible(false);
+          }
+        });
+      }, autoHideMs);
+      return () => clearTimeout(t);
+    }
+  }, [autoHideMs, fadeOutDurationMs, opacity]);
+
+  if (!visible) {
+    return null;
+  }
+
   return (
-    <View pointerEvents="none" className={containerClassName}>
+    <Animated.View pointerEvents="none" className={containerClassName} style={{ opacity }}>
       <View className="relative self-center">
         {/* 위쪽 삼각형 화살표 (SVG로 꼭짓점 자체를 둥글게) */}
         <Svg
@@ -32,7 +59,7 @@ const Tooltip: React.FC<TooltipProps> = ({ text, children, containerClassName })
           )}
         </View>
       </View>
-    </View>
+    </Animated.View>
   );
 };
 
