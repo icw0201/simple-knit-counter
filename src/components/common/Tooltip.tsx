@@ -6,13 +6,12 @@ interface TooltipProps {
   text?: string;
   children?: React.ReactNode;
   containerClassName?: string;
-  containerStyle?: any;
 }
 
-const Tooltip: React.FC<TooltipProps> = ({ text, children, containerClassName, containerStyle }) => {
+const Tooltip: React.FC<TooltipProps> = ({ text, children, containerClassName }) => {
   return (
-    <View pointerEvents="none" className={containerClassName} style={containerStyle}>
-      <View style={{ width: '100%', position: 'relative', alignItems: 'flex-start' }}>
+    <View pointerEvents="none" className={containerClassName}>
+      <View className="relative self-center">
         {/* 위쪽 삼각형 화살표 (SVG로 꼭짓점 자체를 둥글게) */}
         <Svg
           width={12}
@@ -23,8 +22,8 @@ const Tooltip: React.FC<TooltipProps> = ({ text, children, containerClassName, c
           <Path d="M0 20 L5 5 Q6 4 7 5 L12 20 Z" fill="rgba(0,0,0,0.6)" />
         </Svg>
         <View
-          className="px-2 py-3 rounded-md bg-black/60"
-          style={{ marginTop: 12, maxWidth: 240 }}
+          className="px-2 py-3 rounded-md bg-black/60 mt-3"
+          style={{ maxWidth: 240 }}
         >
           {text ? (
             <Text className="text-white text-xs">{text}</Text>
