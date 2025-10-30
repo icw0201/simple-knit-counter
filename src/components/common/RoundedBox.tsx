@@ -9,30 +9,22 @@ import { getLucideIcon } from '@utils/iconUtils';
  * RoundedBox 컴포넌트의 Props 인터페이스
  * @param isButton - 터치 가능한 버튼으로 동작할지 여부 (기본값: false)
  * @param onPress - 버튼 클릭 시 실행될 콜백 함수 (isButton이 true일 때만 사용)
- * @param onLongPress - 버튼 길게 누르기 시 실행될 콜백 함수 (isButton이 true일 때만 사용)
  * @param title - 박스에 표시될 주요 텍스트
- * @param subtitle - title 아래에 표시될 부제목 (선택사항)
- * @param number - 숫자 값 (선택사항)
  * @param iconName - 표시할 Lucide 아이콘 이름 (기본값: 'star')
  * @param rounded - 모서리 둥글기 스타일 (기본값: 'xl')
  * @param colorStyle - 색상 테마 스타일 키 (기본값: 'A')
- * @param layoutStyle - 레이아웃 스타일 ('A' | 'B' | 'C' | 'D' | 'F')
+ * @param layoutStyle - 레이아웃 스타일 ('Icon' - 제목과 아이콘 좌우 배치, 미지정 시 기본 레이아웃)
  * @param containerClassName - 추가적인 컨테이너 스타일 클래스
- * @param progressPercentage - 프로그레스 바 비율 (0-100, 선택사항)
  */
 interface RoundedBoxProps {
   isButton?: boolean;
   onPress?: () => void;
-  onLongPress?: () => void;
   title?: string;
-  subtitle?: string;
-  number?: number;
   iconName?: string;
   rounded?: string;
   colorStyle?: ColorStyleKey;
-  layoutStyle?: 'A' | 'B' | 'C' | 'D' | 'F';
+  layoutStyle?: 'Icon';
   containerClassName?: string;
-  progressPercentage?: number;
 }
 
 /**
@@ -48,33 +40,9 @@ const getRoundedClass = (rounded?: string) => {
 };
 
 /**
- * 레이아웃 스타일 B: 중앙 정렬된 제목만 표시
+ * 레이아웃 스타일 Icon: 제목과 아이콘을 좌우로 배치
  */
-const renderLayoutB = (title: string, textColor: string) => (
-  <View className="items-center justify-center min-h-16">
-    <Text className={clsx('text-base font-semibold', textColor)}>{title}</Text>
-  </View>
-);
-
-/**
- * 레이아웃 스타일 C: 제목과 숫자를 좌우로 배치
- */
-const renderLayoutC = (title: string, subtitle: string | undefined, number: number | undefined, textColor: string, subtextColor: string) => (
-  <View className="flex-row items-center justify-between">
-    <View className="flex flex-col">
-      {subtitle && <Text className={clsx('text-xs', subtextColor)}>{subtitle}</Text>}
-      <Text className={clsx('text-lg font-semibold', textColor)}>{title}</Text>
-    </View>
-    {number !== undefined && (
-      <Text className={clsx('text-2xl font-bold', textColor)}>{number}</Text>
-    )}
-  </View>
-);
-
-/**
- * 레이아웃 스타일 F: 제목과 아이콘을 좌우로 배치
- */
-const renderLayoutF = (title: string, iconName: string, textColor: string, iconColor: string) => {
+const renderLayoutIcon = (title: string, iconName: string, textColor: string, iconColor: string) => {
     // 아이콘 이름을 PascalCase로 변환하고 Lucide 아이콘으로 렌더링
     const IconComponent = getLucideIcon(iconName);
 
@@ -103,59 +71,37 @@ const renderDefaultLayout = (title: string | undefined, textColor: string) => (
 const RoundedBox: React.FC<RoundedBoxProps> = ({
   isButton = false,
   onPress,
-  onLongPress,
   title,
-  subtitle,
-  number,
   iconName = 'star',
   rounded = 'xl',
   colorStyle = 'A',
   layoutStyle,
   containerClassName = '',
-  progressPercentage,
 }) => {
   // 선택된 색상 테마에서 색상 값들을 가져오기
-  const { container, text, subtext, icon } = colorStyles[colorStyle];
+  const { container, text, icon } = colorStyles[colorStyle];
 
   // 모서리 둥글기 클래스와 박스 전체 클래스 조합
   const roundedClass = getRoundedClass(rounded);
-  const hasProgress = progressPercentage !== undefined && progressPercentage !== null;
 
   // 레이아웃 스타일에 따라 다른 내용 구성
   const renderContent = () => {
-    switch (layoutStyle) {
-      case 'B':
-        return renderLayoutB(title || '', text);
-      case 'C':
-        return renderLayoutC(title || '', subtitle, number, text, subtext);
-      case 'F':
-        return renderLayoutF(title || '', iconName, text, icon);
-      default:
-        return renderDefaultLayout(title, text);
+    if (layoutStyle === 'Icon') {
+      return renderLayoutIcon(title || '', iconName, text, icon);
     }
+    return renderDefaultLayout(title, text);
   };
 
   // 박스 뷰 생성
   const boxView = (
-    <View className={clsx('p-4', container, roundedClass, containerClassName, 'relative overflow-hidden')}>
-      {/* 프로그레스 바 - 배경색으로 채우기 */}
-      {hasProgress && progressPercentage > 0 && (
-        <View
-          className={`absolute left-0 top-0 bottom-0 bg-red-orange-200 ${progressPercentage >= 100 ? 'right-0' : ''}`}
-          style={progressPercentage >= 100 ? undefined : { width: `${progressPercentage}%` }}
-          pointerEvents="none"
-        />
-      )}
-      {/* 콘텐츠 - 프로그레스 바 위에 표시 */}
-      <View className="relative z-10">
-        {renderContent()}
-      </View>
+    <View className={clsx('p-4', container, roundedClass, containerClassName)}>
+      {renderContent()}
     </View>
   );
 
   // isButton이 true면 TouchableOpacity로 감싸서 터치 가능하게, false면 단순 뷰 반환
   return isButton ? (
-    <TouchableOpacity onPress={onPress} onLongPress={onLongPress}>
+    <TouchableOpacity onPress={onPress}>
       {boxView}
     </TouchableOpacity>
   ) : (

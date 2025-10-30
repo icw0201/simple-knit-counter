@@ -7,4 +7,6 @@ export const activateIcons = {
 export const Images = {
   way_front: require('./way_front.png'),
   way_back: require('./way_back.png'),
+  complete_nomal: require('./complete_nomal.png'),
+  complete_reverse: require('./complete_reverse.png'),
 };

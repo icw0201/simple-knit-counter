@@ -1,0 +1,99 @@
+// src/components/list/ItemBox.tsx
+import React from 'react';
+import { Text, TouchableOpacity, View, Image } from 'react-native';
+import clsx from 'clsx';
+import { colorStyles } from '@styles/colorStyles';
+import { Images } from '@assets/images';
+
+interface ItemBoxProps {
+  title: string;
+  subtitle?: string;
+  number?: number;
+  onPress: () => void;
+  onLongPress?: () => void;
+  progressPercentage?: number;
+  isCompleted?: boolean;
+  isEditMode?: boolean;
+}
+
+/**
+ * ItemRow에서 사용하는 박스 컴포넌트
+ * 기존 RoundedBox의 레이아웃 스타일 C(제목과 숫자를 좌우로 배치)분리와 프로그레스 바 기능 포함
+ */
+const ItemBox: React.FC<ItemBoxProps> = ({
+  title,
+  subtitle,
+  number,
+  onPress,
+  onLongPress,
+  progressPercentage,
+  isCompleted = false,
+  isEditMode = false,
+}) => {
+  const { container, text, subtext } = colorStyles.A;
+  const hasProgress = progressPercentage !== undefined && progressPercentage !== null;
+
+  const boxView = (
+    <View className={clsx(
+      container,
+      isEditMode && 'bg-red-orange-300 border border-white',
+      'rounded-xl',
+      'relative overflow-hidden'
+    )}>
+      {/* 완료 상태일 때 전체 배경 채우기 */}
+      {isCompleted ? (
+        <View
+          className={isEditMode
+            ? 'absolute left-0 top-0 bottom-0 right-0 bg-red-orange-100'
+            : 'absolute left-0 top-0 bottom-0 right-0 bg-red-orange-400'}
+          pointerEvents="none"
+        />
+      ) : (
+        /* 미완료 상태일 때만 프로그레스 바 표시 */
+        hasProgress && progressPercentage > 0 && (
+          <View
+            className={isEditMode
+              ? `absolute left-0 top-0 bottom-0 bg-red-orange-100 ${progressPercentage >= 100 ? 'right-0' : ''}`
+              : `absolute left-0 top-0 bottom-0 bg-red-orange-200 ${progressPercentage >= 100 ? 'right-0' : ''}`}
+            style={progressPercentage >= 100 ? undefined : { width: `${progressPercentage}%` }}
+            pointerEvents="none"
+          />
+        )
+      )}
+      {/* 콘텐츠 - 프로그레스 바 위에 표시 (패딩 포함) */}
+      <View className="relative z-10 p-4">
+        <View className="flex-row items-center justify-between">
+          <View className="flex flex-col">
+            {subtitle && (
+              <Text className={clsx('text-xs', isEditMode ? 'text-darkgray' : (isCompleted ? 'text-white' : subtext))}>
+                {subtitle}
+              </Text>
+            )}
+            <Text className={clsx('text-lg font-semibold', isEditMode ? 'text-black' : text)}>{title}</Text>
+          </View>
+          {number !== undefined && (
+            <View className="relative items-center justify-center">
+              {isCompleted && (
+                <Image
+                  source={isEditMode ? Images.complete_reverse : Images.complete_nomal}
+                  className="absolute h-20 w-20 right-10 top-1/2 -mt-12"
+                  resizeMode="cover"
+                />
+              )}
+              <Text className={clsx('text-2xl font-bold', text)}>{number}</Text>
+            </View>
+          )}
+        </View>
+      </View>
+    </View>
+  );
+
+  return (
+    <TouchableOpacity onPress={onPress} onLongPress={onLongPress}>
+      {boxView}
+    </TouchableOpacity>
+  );
+};
+
+export default ItemBox;
+
