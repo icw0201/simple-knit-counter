@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated } from 'react-native';
+import { Animated, LayoutChangeEvent } from 'react-native';
 import { View, Text } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
@@ -7,13 +7,18 @@ interface TooltipProps {
   text?: string;
   children?: React.ReactNode;
   containerClassName?: string;
+  // 화면 기준 타겟 X좌표(px). 제공되면 화살표를 해당 타겟을 향해 정렬
+  targetAnchorX?: number;
 }
 
-const Tooltip: React.FC<TooltipProps> = ({ text, children, containerClassName }) => {
+const Tooltip: React.FC<TooltipProps> = ({ text, children, containerClassName, targetAnchorX }) => {
   const [visible, setVisible] = useState(true);
   const opacity = useRef(new Animated.Value(1)).current;
   const AUTO_HIDE_MS = 4000;
   const FADE_OUT_MS = 400;
+  const bodyRef = useRef<View | null>(null);
+  const [arrowLeftPx, setArrowLeftPx] = useState<number | null>(null);
+  const ARROW_HALF_WIDTH = 6; // Svg width 12 기준
 
   useEffect(() => {
     if (AUTO_HIDE_MS > 0) {
@@ -45,13 +50,26 @@ const Tooltip: React.FC<TooltipProps> = ({ text, children, containerClassName })
           <Svg
             width={12}
             height={20}
-            style={{ position: 'absolute', left: '50%', top: -8, transform: [{ translateX: -6 }] }}
+            style={{ position: 'absolute', left: arrowLeftPx ?? '50%', top: -8, transform: [{ translateX: -(arrowLeftPx != null ? ARROW_HALF_WIDTH : 6) }] }}
           >
             <Path d="M0 20 L5 5 Q6 4 7 5 L12 20 Z" fill="rgba(0,0,0,0.6)" />
           </Svg>
           <View
+            ref={(ref) => { bodyRef.current = ref; }}
             className="px-2 py-3 rounded-md bg-black/60 mt-3"
             style={{ maxWidth: 240 }}
+            onLayout={(_e: LayoutChangeEvent) => {
+              if (!targetAnchorX || !bodyRef.current) {
+                setArrowLeftPx(null); // 기본 중앙 정렬
+                return;
+              }
+              // 박스의 화면 기준 좌표를 가져와 타겟 X와의 차이로 화살표 위치(px) 계산
+              bodyRef.current.measureInWindow((x, _y, width) => {
+                const raw = targetAnchorX - x;
+                const clamped = Math.max(ARROW_HALF_WIDTH, Math.min(width - ARROW_HALF_WIDTH, raw));
+                setArrowLeftPx(clamped);
+              });
+            }}
           >
             {text ? (
               <Text className="text-white text-xs text-center">{text}</Text>
