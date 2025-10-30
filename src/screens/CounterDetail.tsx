@@ -12,6 +12,7 @@ import { getHeaderRightWithActivateInfoSettings } from '@navigation/HeaderOption
 import { getScreenAwakeSetting } from '@storage/settings';
 
 import { CounterTouchArea, CounterDirection, CounterActions, CounterModals, SubCounterModal, ProgressBar } from '@components/counter';
+import Tooltip from '@components/common/Tooltip';
 import { getScreenSize, getIconSize, getTextClass, getGapClass, getSubModalWidthRatio, getSubModalHeightRatio, getSubModalTop, ScreenSize } from '@constants/screenSizeConfig';
 import { useCounter } from '@hooks/useCounter';
 
@@ -194,6 +195,17 @@ const CounterDetail = () => {
           screenSize={screenSize}
           onPress={handleTargetCountOpen}
         />
+
+        {/* 프로그레스 바 아래 툴팁 (COMPACT 화면에서는 비표시) */}
+        {screenSize !== ScreenSize.COMPACT && (
+          <View
+            className="absolute left-0 right-0 items-center"
+            style={{ top: (screenSize === ScreenSize.SMALL ? 20 : 28) + 8 }}
+            pointerEvents="none"
+          >
+            <Tooltip text="바를 눌러 목표 단수 설정하기" />
+          </View>
+        )}
 
         {/* 방향 표시 이미지 영역 */}
         <CounterDirection
