@@ -7,30 +7,31 @@ interface TooltipProps {
   text?: string;
   children?: React.ReactNode;
   containerClassName?: string;
-  autoHideMs?: number; // 렌더 후 자동 숨김 시간(ms), 기본 4000
-  fadeOutDurationMs?: number; // 페이드아웃 지속시간(ms), 기본 400
 }
 
-const Tooltip: React.FC<TooltipProps> = ({ text, children, containerClassName, autoHideMs = 4000, fadeOutDurationMs = 400 }) => {
+const Tooltip: React.FC<TooltipProps> = ({ text, children, containerClassName }) => {
   const [visible, setVisible] = useState(true);
   const opacity = useRef(new Animated.Value(1)).current;
+  const AUTO_HIDE_MS = 4000;
+  const FADE_OUT_MS = 400;
 
   useEffect(() => {
-    if (autoHideMs > 0) {
+    if (AUTO_HIDE_MS > 0) {
       const t = setTimeout(() => {
+        // 페이드아웃: 지정 시간 동안 opacity를 1 → 0으로 감소시킵니다.
         Animated.timing(opacity, {
           toValue: 0,
-          duration: fadeOutDurationMs,
+          duration: FADE_OUT_MS,
           useNativeDriver: true,
         }).start(({ finished }) => {
           if (finished) {
             setVisible(false);
           }
         });
-      }, autoHideMs);
+      }, AUTO_HIDE_MS);
       return () => clearTimeout(t);
     }
-  }, [autoHideMs, fadeOutDurationMs, opacity]);
+  }, [AUTO_HIDE_MS, FADE_OUT_MS, opacity]);
 
   if (!visible) {
     return null;
