@@ -14,6 +14,7 @@ import { getScreenAwakeSetting } from '@storage/settings';
 import { CounterTouchArea, CounterDirection, CounterActions, CounterModals, SubCounterModal, ProgressBar } from '@components/counter';
 import Tooltip from '@components/common/Tooltip';
 import { getScreenSize, getIconSize, getTextClass, getGapClass, getSubModalWidthRatio, getSubModalHeightRatio, getSubModalTop, ScreenSize } from '@constants/screenSizeConfig';
+import { getTooltipEnabledSetting } from '@storage/settings';
 import { useCounter } from '@hooks/useCounter';
 
 
@@ -93,6 +94,7 @@ const CounterDetail = () => {
   const didInitPadding = useRef(false);
   const prevCounterId = useRef<string | null>(null);
   const [isPaddingReady, setPaddingReady] = useState(false);
+  const [tooltipEnabled, setTooltipEnabled] = useState(true);
   useEffect(() => {
     if (!counter) { return; }
 
@@ -132,6 +134,9 @@ const CounterDetail = () => {
       } else {
         deactivateKeepAwake();
       }
+
+      // 툴팁 표시 설정 로드
+      setTooltipEnabled(getTooltipEnabledSetting());
 
       // 정리 함수: 화면 켜짐 해제
       return () => {
@@ -197,7 +202,7 @@ const CounterDetail = () => {
         />
 
         {/* 프로그레스 바 아래 툴팁 (COMPACT 화면에서는 비표시) */}
-        {screenSize !== ScreenSize.COMPACT && (
+        {screenSize !== ScreenSize.COMPACT && tooltipEnabled && (
           <Tooltip
             text="바를 눌러 목표 단수 설정하기"
             containerClassName={`absolute left-0 right-0 items-center ${screenSize === ScreenSize.SMALL ? 'top-7' : 'top-9'}`}
@@ -205,7 +210,7 @@ const CounterDetail = () => {
         )}
 
         {/* 헤더 활성 아이콘 안내 툴팁 (헤더 대신 화면 위층에 표시) */}
-        {screenSize !== ScreenSize.COMPACT && (
+        {screenSize !== ScreenSize.COMPACT && tooltipEnabled && (
           <Tooltip
             text="편물 앞 뒤 체크하기"
             containerClassName="absolute right-3 top-2"
