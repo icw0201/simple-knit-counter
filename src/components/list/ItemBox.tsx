@@ -65,7 +65,7 @@ const ItemBox: React.FC<ItemBoxProps> = ({
             <View className="relative items-center justify-center">
               {isCompleted && (
                 <Image
-                  source={require('@assets/images/complete.png')}
+                  source={require('@assets/images/complete_nomal.png')}
                   className="absolute h-20 w-20 right-10 top-1/2 -mt-12"
                   resizeMode="cover"
                 />
