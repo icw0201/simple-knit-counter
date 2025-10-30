@@ -5,13 +5,12 @@ import Svg, { Path } from 'react-native-svg';
 
 interface TooltipProps {
   text?: string;
-  children?: React.ReactNode;
   containerClassName?: string;
   // 화면 기준 타겟 X좌표(px). 제공되면 화살표를 해당 타겟을 향해 정렬
   targetAnchorX?: number;
 }
 
-const Tooltip: React.FC<TooltipProps> = ({ text, children, containerClassName, targetAnchorX }) => {
+const Tooltip: React.FC<TooltipProps> = ({ text, containerClassName, targetAnchorX }) => {
   const [visible, setVisible] = useState(true);
   const opacity = useRef(new Animated.Value(1)).current;
   const AUTO_HIDE_MS = 4000;
@@ -73,9 +72,7 @@ const Tooltip: React.FC<TooltipProps> = ({ text, children, containerClassName, t
           >
             {text ? (
               <Text className="text-white text-xs text-center">{text}</Text>
-            ) : (
-              children
-            )}
+            ) : null}
           </View>
         </View>
       </View>
