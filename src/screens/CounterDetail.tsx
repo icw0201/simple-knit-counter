@@ -115,6 +115,7 @@ const CounterDetail = () => {
   // 방향 이미지 크기 계산 (원본 비율 87:134 유지)
   const imageWidth = iconSize;
   const imageHeight = iconSize * (87 / 134);
+  const hasParent = !!counter?.parentProjectId;
 
   // SubCounterModal 크기 및 위치 계산 (화면 크기별)
   const subModalWidth = width * getSubModalWidthRatio(screenSize);
@@ -214,7 +215,7 @@ const CounterDetail = () => {
           <Tooltip
             text="편물 앞 뒤 체크하기"
             containerClassName="absolute right-3 top-2 z-50"
-            targetAnchorX={width - 100}
+            targetAnchorX={hasParent ? width - 65 : width - 103}
           />
         )}
 

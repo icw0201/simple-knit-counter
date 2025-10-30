@@ -14,7 +14,7 @@ interface TooltipProps {
 const Tooltip: React.FC<TooltipProps> = ({ text, children, containerClassName, targetAnchorX }) => {
   const [visible, setVisible] = useState(true);
   const opacity = useRef(new Animated.Value(1)).current;
-  const AUTO_HIDE_MS = 4000;
+  const AUTO_HIDE_MS = 100000;
   const FADE_OUT_MS = 400;
   const bodyRef = useRef<View | null>(null);
   const [arrowLeftPx, setArrowLeftPx] = useState<number | null>(null);
