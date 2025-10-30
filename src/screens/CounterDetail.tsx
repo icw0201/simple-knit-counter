@@ -204,6 +204,14 @@ const CounterDetail = () => {
           />
         )}
 
+        {/* 헤더 활성 아이콘 안내 툴팁 (헤더 대신 화면 위층에 표시) */}
+        {screenSize !== ScreenSize.COMPACT && (
+          <Tooltip
+            text="편물 앞 뒤 체크하기"
+            containerClassName="absolute right-3 top-2"
+          />
+        )}
+
         {/* 방향 표시 이미지 영역 */}
         <CounterDirection
           mascotIsActive={mascotIsActive}
