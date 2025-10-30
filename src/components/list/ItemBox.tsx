@@ -2,14 +2,13 @@
 import React from 'react';
 import { Text, TouchableOpacity, View, Image } from 'react-native';
 import clsx from 'clsx';
-import { colorStyles, ColorStyleKey } from '@styles/colorStyles';
+import { colorStyles } from '@styles/colorStyles';
 import { Images } from '@assets/images';
 
 interface ItemBoxProps {
   title: string;
   subtitle?: string;
   number?: number;
-  colorStyle?: ColorStyleKey;
   onPress: () => void;
   onLongPress?: () => void;
   progressPercentage?: number;
@@ -25,14 +24,13 @@ const ItemBox: React.FC<ItemBoxProps> = ({
   title,
   subtitle,
   number,
-  colorStyle = 'A',
   onPress,
   onLongPress,
   progressPercentage,
   isCompleted = false,
   isEditMode = false,
 }) => {
-  const { container, text, subtext } = colorStyles[colorStyle];
+  const { container, text, subtext } = colorStyles.A;
   const hasProgress = progressPercentage !== undefined && progressPercentage !== null;
 
   const boxView = (
