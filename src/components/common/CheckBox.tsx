@@ -11,12 +11,14 @@ import clsx from 'clsx';
  * @param checked - 체크박스의 체크 상태 (true: 체크됨, false: 체크 안됨)
  * @param onToggle - 체크박스 클릭 시 실행될 콜백 함수
  * @param disabled - 체크박스 비활성화 여부 (기본값: false)
+ * @param size - 체크박스 크기 ('base' | 'xs'), 기본값: 'base'
  */
 interface CheckBoxProps {
   label?: string;
   checked: boolean;
   onToggle: () => void;
   disabled?: boolean;
+  size?: 'base' | 'xs';
 }
 
 /**
@@ -24,14 +26,22 @@ interface CheckBoxProps {
  * 라벨과 함께 표시되는 체크박스로, 클릭 시 상태를 토글할 수 있습니다.
  * 비활성화 상태일 때는 클릭이 불가능합니다.
  */
-const CheckBox: React.FC<CheckBoxProps> = ({ label, checked, onToggle, disabled = false }) => {
+const CheckBox: React.FC<CheckBoxProps> = ({ label, checked, onToggle, disabled = false, size = 'base' }) => {
   // 체크박스 색상 설정
   const activeColor = colorStyles.E.container; // 활성화 상태일 때의 배경색 (체크된 상태)
   const inactiveColor = 'bg-red-orange-100'; // 비활성화 상태일 때의 배경색 (체크되지 않은 상태)
 
+  // 사이즈에 따른 스타일 설정
+  const isXs = size === 'xs';
+  const checkboxSizeClass = isXs ? 'w-4 h-4' : 'w-6 h-6';
+  const textSizeClass = isXs ? 'text-xs' : 'text-base';
+  const iconSize = isXs ? 12 : 16;
+  const paddingClass = isXs ? 'px-3 py-2' : 'px-4 py-3';
+
   // 체크박스 컨테이너 스타일 클래스
   const checkboxClass = clsx(
-    'w-6 h-6 rounded-md items-center justify-center',
+    checkboxSizeClass,
+    'rounded-md items-center justify-center',
     checked ? activeColor : inactiveColor
   );
 
@@ -39,18 +49,20 @@ const CheckBox: React.FC<CheckBoxProps> = ({ label, checked, onToggle, disabled 
     <TouchableOpacity
       onPress={disabled ? undefined : onToggle} // 비활성화 상태일 때는 onPress 이벤트를 무시
       activeOpacity={0.7} // 터치 시 투명도 효과
-      className={label ? 'flex-row items-center justify-between px-4 py-3' : ''}
+      className={clsx(
+        label ? `flex-row items-center justify-between ${paddingClass}` : ''
+      )}
     >
       {/* 체크박스 라벨 텍스트 - label이 있을 때만 표시 */}
       {label && (
-        <Text className="text-base text-black">{label}</Text>
+        <Text className={`${textSizeClass} text-black`}>{label}</Text>
       )}
 
       {/* 체크박스 아이콘 컨테이너 */}
       <View className={checkboxClass}>
         {/* 체크된 상태일 때만 체크 아이콘 표시 */}
         {checked && (
-          <Check size={16} color="white" />
+          <Check size={iconSize} color="white" />
         )}
       </View>
     </TouchableOpacity>
