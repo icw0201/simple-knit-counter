@@ -96,7 +96,7 @@ const SortDropdown: React.FC<SortDropdownProps> = ({
         onPress={onClose}
       >
         <Pressable
-          className="absolute right-20 top-16 bg-white rounded-2xl w-40 p-4 shadow-lg"
+          className="absolute right-3 top-16 bg-white rounded-2xl w-40 p-4 shadow-lg"
           onPress={(e) => e.stopPropagation()}
         >
           <Text className="text-s font-bold text-black mb-2">정렬</Text>
