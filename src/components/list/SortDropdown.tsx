@@ -1,6 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, View, Text, Pressable, TouchableOpacity } from 'react-native';
 import CheckBox from '@components/common/CheckBox';
+import {
+  getSortCriteriaSetting,
+  setSortCriteriaSetting,
+  getSortOrderSetting,
+  setSortOrderSetting,
+  getMoveCompletedToBottomSetting,
+  setMoveCompletedToBottomSetting,
+} from '@storage/settings';
+import {
+  SORT_CRITERIA_MAP,
+  SORT_CRITERIA_REVERSE_MAP,
+  SORT_ORDER_MAP,
+  SORT_ORDER_REVERSE_MAP,
+  SORT_CRITERIA_OPTIONS,
+  SORT_ORDER_OPTIONS,
+} from '@constants/sortConfig';
 
 interface SortDropdownProps {
   visible: boolean;
@@ -13,23 +29,57 @@ const SortDropdown: React.FC<SortDropdownProps> = ({
   onClose,
   onSelect,
 }) => {
-  const [selectedSortBy, setSelectedSortBy] = useState<string>('이름');
-  const [selectedOrder, setSelectedOrder] = useState<string>('오름차순');
-  const [hideCompleted, setHideCompleted] = useState(false);
+  // storage에서 초기값 가져오기
+  const [selectedSortBy, setSelectedSortBy] = useState<string>(() => {
+    const criteria = getSortCriteriaSetting();
+    return SORT_CRITERIA_REVERSE_MAP[criteria] || '생성일';
+  });
+  const [selectedOrder, setSelectedOrder] = useState<string>(() => {
+    const order = getSortOrderSetting();
+    return SORT_ORDER_REVERSE_MAP[order] || '내림차순';
+  });
+  const [hideCompleted, setHideCompleted] = useState<boolean>(() => {
+    return getMoveCompletedToBottomSetting();
+  });
 
-  const sortByOptions = ['이름', '생성일', '시작일', '종료일', '진행률'];
-  const orderOptions = ['오름차순', '내림차순'];
+  // visible이 true가 될 때마다 storage에서 최신 값 가져오기
+  useEffect(() => {
+    if (visible) {
+      const criteria = getSortCriteriaSetting();
+      const order = getSortOrderSetting();
+      const moveCompleted = getMoveCompletedToBottomSetting();
+      setSelectedSortBy(SORT_CRITERIA_REVERSE_MAP[criteria] || '생성일');
+      setSelectedOrder(SORT_ORDER_REVERSE_MAP[order] || '내림차순');
+      setHideCompleted(moveCompleted);
+    }
+  }, [visible]);
+
 
   const handleSortBySelect = (option: string) => {
     setSelectedSortBy(option);
-    // TODO: 정렬 로직 구현
-    onSelect(`sortBy:${option}`);
+    // storage에 저장
+    const criteria = SORT_CRITERIA_MAP[option];
+    if (criteria) {
+      setSortCriteriaSetting(criteria);
+      onSelect(`sortBy:${option}`);
+    }
   };
 
   const handleOrderSelect = (option: string) => {
     setSelectedOrder(option);
-    // TODO: 정렬 로직 구현
-    onSelect(`order:${option}`);
+    // storage에 저장
+    const order = SORT_ORDER_MAP[option];
+    if (order) {
+      setSortOrderSetting(order);
+      onSelect(`order:${option}`);
+    }
+  };
+
+  const handleHideCompletedToggle = () => {
+    const newValue = !hideCompleted;
+    setHideCompleted(newValue);
+    // storage에 저장
+    setMoveCompletedToBottomSetting(newValue);
   };
 
   return (
@@ -54,7 +104,7 @@ const SortDropdown: React.FC<SortDropdownProps> = ({
 
           {/* 정렬 기준 옵션들 */}
           <View>
-            {sortByOptions.map((option) => (
+            {SORT_CRITERIA_OPTIONS.map((option) => (
               <TouchableOpacity
                 key={option}
                 onPress={() => handleSortBySelect(option)}
@@ -81,7 +131,7 @@ const SortDropdown: React.FC<SortDropdownProps> = ({
 
           {/* 정렬 순서 옵션들 */}
           <View>
-            {orderOptions.map((option) => (
+            {SORT_ORDER_OPTIONS.map((option) => (
               <TouchableOpacity
                 key={option}
                 onPress={() => handleOrderSelect(option)}
@@ -111,7 +161,7 @@ const SortDropdown: React.FC<SortDropdownProps> = ({
             <CheckBox
                 label="완성 편물 아래로"
                 checked={hideCompleted}
-                onToggle={() => setHideCompleted(!hideCompleted)}
+                onToggle={handleHideCompletedToggle}
                 size="xs"
             />
           </View>
