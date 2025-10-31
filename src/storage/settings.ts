@@ -78,7 +78,7 @@ export const getScreenAwakeSetting = (): boolean => {
 
 /**
  * 정렬 기준 설정을 저장합니다.
- * @param value 정렬 기준 ('name' | 'created' | 'startDate' | 'endDate' | 'progress')
+ * @param value 정렬 기준 ('name' | 'created' | 'startDate' | 'endDate' | 'progress' | 'elapsedTime')
  */
 export const setSortCriteriaSetting = (value: SortCriteria) => {
   storage.set(KEY_SORT_CRITERIA, JSON.stringify(value));
