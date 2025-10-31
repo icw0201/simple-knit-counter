@@ -25,6 +25,7 @@ interface UseItemListReturn {
 
   // 핸들러
   setItems: React.Dispatch<React.SetStateAction<Item[]>>;
+  setProject: React.Dispatch<React.SetStateAction<Project | null>>;
   setIsEditMode: React.Dispatch<React.SetStateAction<boolean>>;
   setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
   setDeleteModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
@@ -205,6 +206,7 @@ export const useItemList = ({ projectId, headerSetup }: UseItemListProps): UseIt
     pendingItem,
     // 상태 설정 함수들
     setItems,
+    setProject,
     setIsEditMode,
     setModalVisible,
     setDeleteModalVisible,
