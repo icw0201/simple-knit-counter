@@ -80,6 +80,8 @@ const SortDropdown: React.FC<SortDropdownProps> = ({
     setHideCompleted(newValue);
     // storage에 저장
     setMoveCompletedToBottomSetting(newValue);
+    // 정렬 변경 알림
+    onSelect('moveCompletedToBottom');
   };
 
   return (

@@ -6,6 +6,12 @@ import { RootStackParamList } from '@navigation/AppNavigator';
 
 import { Item, Counter, Project } from '@storage/types';
 import { getStoredItems, getAllProjects, getIndependentCounters } from '@storage/storage';
+import {
+  getSortCriteriaSetting,
+  getSortOrderSetting,
+  getMoveCompletedToBottomSetting,
+} from '@storage/settings';
+import { sortItems } from '@utils/sortUtils';
 
 interface UseItemListProps {
   projectId?: string; // ProjectDetail에서만 사용
@@ -65,13 +71,17 @@ export const useItemList = ({ projectId, headerSetup }: UseItemListProps): UseIt
     const projects = getAllProjects();
     const independentCounters = getIndependentCounters();
 
-    const filtered = [...projects, ...independentCounters].sort((a, b) => {
-      const aTime = parseInt(a.id.split('_')[1], 10);
-      const bTime = parseInt(b.id.split('_')[1], 10);
-      return bTime - aTime;
-    });
+    const allItems = [...projects, ...independentCounters];
 
-    setItems(filtered);
+    // storage에서 정렬 설정 가져오기
+    const criteria = getSortCriteriaSetting();
+    const order = getSortOrderSetting();
+    const moveCompletedToBottom = getMoveCompletedToBottomSetting();
+
+    // 정렬 적용
+    const sorted = sortItems(allItems, criteria, order, moveCompletedToBottom);
+
+    setItems(sorted);
   }, []);
 
   /**
@@ -92,11 +102,13 @@ export const useItemList = ({ projectId, headerSetup }: UseItemListProps): UseIt
           item.type === 'counter' && currentProject.counterIds.includes(item.id)
       );
 
-      const sorted = countersInProject.sort((a, b) => {
-        const aTime = parseInt(a.id.split('_')[1], 10);
-        const bTime = parseInt(b.id.split('_')[1], 10);
-        return bTime - aTime;
-      });
+      // storage에서 정렬 설정 가져오기
+      const criteria = getSortCriteriaSetting();
+      const order = getSortOrderSetting();
+      const moveCompletedToBottom = getMoveCompletedToBottomSetting();
+
+      // 정렬 적용
+      const sorted = sortItems(countersInProject, criteria, order, moveCompletedToBottom);
 
       setItems(sorted);
     }
@@ -159,7 +171,7 @@ export const useItemList = ({ projectId, headerSetup }: UseItemListProps): UseIt
     setPendingItem(null);
   }, []);
 
-  // 화면이 포커스될 때마다 데이터 새로고침
+  // 화면이 포커스될 때마다 데이터 새로고침 및 정렬 적용
   useFocusEffect(useCallback(() => {
     fetchData();
   }, [fetchData]));
