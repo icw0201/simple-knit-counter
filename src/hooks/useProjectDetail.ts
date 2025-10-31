@@ -28,6 +28,7 @@ export const useProjectDetail = () => {
     duplicateModalVisible,
     pendingItem,
     setItems,
+    setProject,
     setIsEditMode,
     setModalVisible,
     setDuplicateModalVisible,
@@ -104,19 +105,36 @@ export const useProjectDetail = () => {
    * 카운터 생성 완료 처리 (실제 저장 및 상태 업데이트)
    */
   const completeCounterCreation = useCallback((newCounter: Counter) => {
+    // 카운터 저장
     addItem(newCounter);
 
-    const updatedProject: Partial<Project> = {
-      counterIds: [newCounter.id, ...(project?.counterIds ?? [])],
-    };
+    // 저장소에서 최신 프로젝트 정보 가져오기 (메모리 상태가 아닌 실제 저장소 데이터)
+    const allItems = getStoredItems();
+    const latestProject = allItems.find(
+      (item): item is Project => item.id === projectId && item.type === 'project'
+    );
 
-    if (project) {
-      updateItem(project.id, updatedProject);
+    if (latestProject) {
+      const updatedCounterIds = [newCounter.id, ...latestProject.counterIds];
+
+      const updatedProject: Partial<Project> = {
+        counterIds: updatedCounterIds,
+      };
+
+      updateItem(latestProject.id, updatedProject);
+
+      // 로컬 상태도 업데이트
+      setProject({
+        ...latestProject,
+        counterIds: updatedCounterIds,
+      });
     }
 
+    // UI 상태 업데이트
     setItems((prev) => [newCounter, ...prev]);
+
     resetModalState();
-  }, [project, setItems, resetModalState]);
+  }, [projectId, setItems, setProject, resetModalState]);
 
   /**
    * 카운터 생성 모달에서 확인 시 카운터 생성 및 중복 체크
