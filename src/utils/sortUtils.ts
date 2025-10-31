@@ -4,17 +4,31 @@ import { getStoredItems } from '@storage/storage';
 //진행률 계산
 export const getProgressPercentage = (item: Item): number => {
   if (item.type === 'counter') {
-    // 카운터: count / targetCount * 100으로 계산 (targetCount가 0이면 0 반환)
+    // 카운터: endDate가 설정되어 있으면 완료 상태이므로 100% 반환
     const counter = item as Counter;
+    const hasEndDate = counter.info?.endDate !== undefined && counter.info.endDate !== '' && counter.info.endDate !== null;
+    if (hasEndDate) {
+      return 100;
+    }
+
+    // count / targetCount * 100으로 계산 (targetCount가 0이면 0 반환)
     if (counter.targetCount > 0) {
-      return (counter.count / counter.targetCount) * 100;
+      const progress = (counter.count / counter.targetCount) * 100;
+      // 100% 이상인 경우 100% 반환
+      return progress >= 100 ? 100 : progress;
     }
     return 0;
   } else if (item.type === 'project') {
-    // 프로젝트: 하위 카운터 중 완료된 카운터의 비율로 계산
+    // 프로젝트: endDate가 설정되어 있으면 완료 상태이므로 100% 반환
+    const project = item as Project;
+    const hasEndDate = project.info?.endDate !== undefined && project.info.endDate !== '' && project.info.endDate !== null;
+    if (hasEndDate) {
+      return 100;
+    }
+
+    // 하위 카운터 중 완료된 카운터의 비율로 계산
     //   - 완료 기준: 각 하위 카운터의 count / targetCount >= 100%
     //   - 진행률 = (완료된 카운터 수 / 전체 하위 카운터 수) * 100
-    const project = item as Project;
     const allItems = getStoredItems();
     const childCounters = allItems.filter(
       (i): i is Counter => i.type === 'counter' && project.counterIds.includes(i.id)
@@ -28,7 +42,9 @@ export const getProgressPercentage = (item: Item): number => {
         }
         return false;
       });
-      return (completedCounters.length / childCounters.length) * 100;
+      const progress = (completedCounters.length / childCounters.length) * 100;
+      // 모든 하위 카운터가 완료된 경우 100% 반환
+      return progress >= 100 ? 100 : progress;
     }
     return 0;
   }
@@ -36,44 +52,9 @@ export const getProgressPercentage = (item: Item): number => {
 };
 
 //아이템이 완료되었는지 확인합니다.
+//진행률이 100% 이상이면 완료된 것으로 간주합니다.
 export const isItemCompleted = (item: Item): boolean => {
-  const progressPercentage = getProgressPercentage(item);
-
-  if (item.type === 'counter') {
-    // 카운터: 진행률이 100% 이상이거나 endDate가 설정되어 있는 경우 완료로 간주
-    const counter = item as Counter;
-    return (
-      (progressPercentage >= 100) ||
-      (counter.info?.endDate !== undefined && counter.info.endDate !== '' && counter.info.endDate !== null)
-    );
-  } else if (item.type === 'project') {
-    // 프로젝트: endDate가 설정되어 있으면 완료
-    // 또는 모든 하위 카운터가 완료 상태인 경우 완료
-    //   (하위 카운터 완료 기준: 각 카운터의 count / targetCount >= 100%)
-    const project = item as Project;
-    const hasEndDate = project.info?.endDate !== undefined && project.info.endDate !== '' && project.info.endDate !== null;
-
-    if (hasEndDate) {
-      return true;
-    }
-
-    const allItems = getStoredItems();
-    const childCounters = allItems.filter(
-      (i): i is Counter => i.type === 'counter' && project.counterIds.includes(i.id)
-    );
-
-    if (childCounters.length > 0) {
-      return childCounters.every((counter) => {
-        if (counter.targetCount > 0) {
-          const counterProgress = (counter.count / counter.targetCount) * 100;
-          return counterProgress >= 100;
-        }
-        return false;
-      });
-    }
-    return false;
-  }
-  return false;
+  return getProgressPercentage(item) >= 100;
 };
 
 /**
