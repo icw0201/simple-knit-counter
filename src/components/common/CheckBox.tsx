@@ -55,7 +55,7 @@ const CheckBox: React.FC<CheckBoxProps> = ({ label, checked, onToggle, disabled 
     >
       {/* 체크박스 라벨 텍스트 - label이 있을 때만 표시 */}
       {label && (
-        <Text className={`${textSizeClass} text-black`}>{label}</Text>
+        <Text className={`${textSizeClass} text-black shrink flex-1`} numberOfLines={2}>{label}</Text>
       )}
 
       {/* 체크박스 아이콘 컨테이너 */}

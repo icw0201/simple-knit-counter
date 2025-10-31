@@ -157,7 +157,7 @@ const SortDropdown: React.FC<SortDropdownProps> = ({
           <View className="border-b border-lightgray -mx-4 my-2" />
 
           {/* 체크박스 */}
-          <View className="-mx-3">
+          <View className="-ml-3">
             <CheckBox
                 label="완성 편물 아래로"
                 checked={hideCompleted}
