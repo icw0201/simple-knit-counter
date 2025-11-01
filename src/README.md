@@ -2,14 +2,6 @@
 
 React Native로 개발된 간단하고 직관적인 뜨개질 카운터 앱입니다.
 
-## 📱 주요 기능
-
-- **프로젝트 관리**: 뜨개질 프로젝트별로 카운터 관리
-- **카운터 기능**: 증가/감소, 초기화, 편집
-- **활성 모드**: 비활성/활성/자동 모드 지원
-- **설정**: 사운드, 진동, 화면 켜짐 설정
-- **데이터 저장**: 로컬 스토리지로 데이터 저장장
-
 ## 🚀 시작하기
 
 ### 필수 요구사항
@@ -77,15 +69,12 @@ adb pair 000.00.0.00:00000
 #### Android
 ```bash
 # Debug APK 빌드
-cd android
-./gradlew assembleDebug
-
-# Release APK 빌드
 번들 파일 생성 npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res/
 파일 위치 : android/app/src/main/assets/index.android.bundle
 npx react-native run-android
 파일 위치 : android/app/build/outputs/apk/debug
 
+# Release APK 빌드
 cd android
 ./gradlew app:assembleRelease
 생성 위치 android/app/build/outputs/apk/release 
@@ -147,9 +136,6 @@ yarn prettier --write .
 
 ### 디버깅
 ```bash
-# React Native Doctor로 환경 진단
-npx react-native doctor
-
 # Metro 캐시 클리어
 npx react-native start --reset-cache
 ```
@@ -161,32 +147,45 @@ npx react-native start --reset-cache
 ```
 main (production)
 ├── develop (development)
-├── feature/기능명
-├── hotfix/긴급수정
-└── release/릴리즈준비
+├── feat/이슈번호-기능-명
+├── refactor/이슈번호-기능-명
+├── fix/이슈번호-수정정
+├── hotfix/이슈번호-긴급수정
+└── release/v0.0.0
 ```
 
 #### 브랜치 규칙
 
 1. **main**: 프로덕션 배포용 (직접 커밋 금지)
 2. **develop**: 개발 통합용 (기능 완성 후 merge)
-3. **feature/기능명**: 새로운 기능 개발
-4. **hotfix/긴급수정**: 프로덕션 긴급 수정
-5. **release/릴리즈준비**: 릴리즈 준비 및 테스트
+3. **feat/기능명**: 새로운 기능 개발
+4. **fix/수정**: 프로덕션 오류-수정
+4. **refactor/수정**: 프로덕션 수정
+5. **hotfix/긴급수정**: 프로덕션 긴급 수정
+6. **release/릴리즈준비**: 릴리즈 준비 및 테스트
 
 #### 커밋 메시지 규칙
 
-```
 type(scope): description
 
-# 예시
-feat(counter): 카운터 증가/감소 기능 추가
-fix(storage): 데이터 저장 오류 수정
-docs(readme): README 파일 업데이트
-style(ui): UI 컴포넌트 스타일 개선
-refactor(storage): 스토리지 함수 리팩토링
-test(counter): 카운터 컴포넌트 테스트 추가
-```
+**커밋 타입**
+
+| 타입     | 설명              |
+| -------- | ----------------- |
+| feat     | 새로운 기능 추가  |
+| fix      | 버그 수정         |
+| docs     | 문서 수정         |
+| style    | 코드 스타일 변경  |
+| design   | UI 디자인 변경    |
+| test     | 테스트 코드 작성  |
+| refactor | 코드 리팩토링     |
+| build    | 빌드 파일 수정    |
+| ci       | CI 설정 파일 수정 |
+| perf     | 성능 개선         |
+| chore    | 자잘한 수정       |
+| rename   | 파일/폴더명 수정  |
+| remove   | 파일 삭제         |
+
 
 #### 브랜치 생성 및 작업 흐름
 
@@ -194,19 +193,20 @@ test(counter): 카운터 컴포넌트 테스트 추가
 # 1. develop 브랜치에서 feature 브랜치 생성
 git checkout develop
 git pull origin develop
-git checkout -b feature/새로운기능
+git switch feat/새로운기능
 
 # 2. 기능 개발 및 커밋
 git add .
 git commit -m "feat(scope): description"
 
 # 3. develop 브랜치로 merge
-git checkout develop
-git merge feature/새로운기능
-git push origin develop
+PR 생성
 
 # 4. feature 브랜치 삭제
-git branch -d feature/새로운기능
+git branch -D feature/새로운기능
+
+# 5. 원격 브랜치 정리
+git remote prune origin
 ```
 
 ## 📦 주요 의존성
@@ -216,7 +216,7 @@ git branch -d feature/새로운기능
 - **React Navigation**: 7.x
 - **NativeWind**: 2.0.11 (Tailwind CSS)
 - **MMKV**: 로컬 스토리지
-- **React Native Vector Icons**: 아이콘
+- **Lucide React Native**: 아이콘
 
 ### 개발 도구
 - **TypeScript**: 5.0.4
@@ -227,16 +227,6 @@ git branch -d feature/새로운기능
 ## 🚨 문제 해결
 
 ### 일반적인 문제들
-
-#### Metro 서버 포트 충돌
-```bash
-# 포트 8081 사용 중인 프로세스 종료
-taskkill /f /im node.exe  # Windows
-killall node               # macOS/Linux
-
-# 다른 포트로 시작
-npx react-native start --port 8082
-```
 
 #### Android 빌드 오류
 ```bash
@@ -269,35 +259,6 @@ npx react-native run-ios
 - **CounterDetail**: 카운터 조작 및 설정
 - **Setting**: 앱 설정
 - **InfoScreen**: 프로젝트/카운터 정보
-
-### 데이터 모델
-```typescript
-interface Project {
-  id: string;
-  type: 'project';
-  title: string;
-  counterIds: string[];
-  info?: Info;
-}
-
-interface Counter {
-  id: string;
-  type: 'counter';
-  title: string;
-  count: number;
-  parentProjectId?: string | null;
-  info?: Info;
-  activateMode?: ActivateMode;
-}
-```
-
-## 📄 라이선스
-
-이 프로젝트는 MIT 라이선스 하에 배포됩니다.
-
-## 📞 지원
-
-문제가 있거나 질문이 있으시면 이슈를 생성해 주세요.
 
 ---
 
