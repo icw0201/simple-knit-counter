@@ -1,5 +1,6 @@
 <div align="center">
-<img width="1500" height="500" alt="간편단수카운터 그래픽 이미지 헤더" src="https://github.com/user-attachments/assets/f1e94b5b-4751-43aa-abc4-c0040d8371c9" />
+<img width="750" height="250" alt="헤더" src="https://github.com/user-attachments/assets/6ac810c9-0abf-4fcd-97ed-523af40bfbd8" />
+
 
 # 어쩜! 단수 카운터
 
@@ -92,7 +93,17 @@
 쉽고 직관적인 단수 카운터 앱을 경험해보세요!
 
 ## 화면 구성
-<img width="527" height="1037" alt="간편단수카운터 상세페이지 1" src="https://github.com/user-attachments/assets/e3f065eb-f175-441b-842d-35b9fe6184c6" /><img width="527" height="1037" alt="간편단수카운터 상세페이지2" src="https://github.com/user-attachments/assets/7a339b9d-eec2-476d-8ba2-449672161e57" />
-<img width="527" height="1037" alt="간편단수카운터 상세페이지3" src="https://github.com/user-attachments/assets/87cfaedb-776b-480e-af6f-4741f7fbdd03" /><img width="527" height="1037" alt="간편단수카운터 상세페이지4" src="https://github.com/user-attachments/assets/398121d2-47f8-4985-afad-b0524dc5a301" />
-<img width="527" height="1037" alt="간편단수카운터 상세페이지5" src="https://github.com/user-attachments/assets/fe229ce5-9cd8-410e-937d-4c069be48c37" /><img width="527" height="1037" alt="간편단수카운터 상세페이지6" src="https://github.com/user-attachments/assets/8046b6f9-2ed5-4e2d-874a-52f58073a1bd" />
 
+<div align="center">
+  <img width="50%" alt="상세 1 x1" src="https://github.com/user-attachments/assets/cf3ca745-640e-43a5-a3ed-e218ecd7a2d0" />
+</div>
+<p float="left">
+  <img width="32%" alt="상세 2 x1" src="https://github.com/user-attachments/assets/26a2cda4-9aba-4a31-bd54-f2bd61e7eda8" />
+  <img width="32%" alt="상세 3 x1" src="https://github.com/user-attachments/assets/07b5cf8f-de89-4688-8580-1ab2068440cf" />
+  <img width="32%" alt="상세 4 x1" src="https://github.com/user-attachments/assets/5ea94d48-b7e6-4c91-b6c4-11db5800afab" />
+</p>
+<p float="left">
+  <img width="32%" alt="상세 5 x1" src="https://github.com/user-attachments/assets/c142cef3-fb64-4f3d-9de4-da2d03bc5e6e" />
+  <img width="32%" alt="상세 6 x1" src="https://github.com/user-attachments/assets/dc106926-79ea-4ec0-adce-2a677b21c3e6" />
+  <img width="32%" alt="상세 7 x1" src="https://github.com/user-attachments/assets/f0ec4a13-8816-4de1-952b-c4073f0d129e" />
+</p>
