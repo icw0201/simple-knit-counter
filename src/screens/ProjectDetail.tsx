@@ -3,7 +3,7 @@ import React from 'react';
 import { ScrollView } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { ItemRow, FloatingAddButton, ItemModals } from '@components/list';
+import { ItemRow, FloatingAddButton, ItemModals, SortDropdown } from '@components/list';
 import { useProjectDetail } from '@hooks/useProjectDetail';
 import { Counter } from '@storage/types';
 
@@ -18,7 +18,9 @@ const ProjectDetail = () => {
     itemToDelete,
     duplicateModalVisible,
     pendingItem,
+    sortDropdownVisible,
     setModalVisible,
+    setSortDropdownVisible,
     handlePress,
     handleLongPress,
     handleDelete,
@@ -28,6 +30,7 @@ const ProjectDetail = () => {
     resetDeleteModalState,
     resetDuplicateModalState,
     completeCounterCreation,
+    handleSortSelect,
   } = useProjectDetail();
 
 
@@ -73,6 +76,13 @@ const ProjectDetail = () => {
           }
         }}
         duplicateDescription="같은 이름의 카운터가 이미 존재합니다. 생성하시겠습니까?"
+      />
+
+      {/* 정렬 드롭다운: 정렬 버튼 바로 아래 표시*/}
+      <SortDropdown
+        visible={sortDropdownVisible}
+        onClose={() => setSortDropdownVisible(false)}
+        onSelect={handleSortSelect}
       />
     </SafeAreaView>
   );
