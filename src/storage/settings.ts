@@ -21,7 +21,7 @@ const DEFAULT_VIBRATION = true;
 const DEFAULT_SCREEN_AWAKE = false;
 const DEFAULT_SORT_CRITERIA: SortCriteria = 'created';
 const DEFAULT_SORT_ORDER: SortOrder = 'desc';
-const DEFAULT_MOVE_COMPLETED_TO_BOTTOM = true;
+const DEFAULT_MOVE_COMPLETED_TO_BOTTOM = false;
 const DEFAULT_AUTO_PLAY_ELAPSED_TIME = true;
 const DEFAULT_TOOLTIP_ENABLED = true;
 
@@ -120,7 +120,7 @@ export const setMoveCompletedToBottomSetting = (value: boolean) => {
 
 /**
  * 완성된 편물을 하단으로 이동 설정을 가져옵니다.
- * @returns 완성된 편물을 하단으로 이동 여부 (기본값: true)
+ * @returns 완성된 편물을 하단으로 이동 여부 (기본값: false)
  */
 export const getMoveCompletedToBottomSetting = (): boolean => {
   const value = storage.getString(KEY_MOVE_COMPLETED_TO_BOTTOM);
