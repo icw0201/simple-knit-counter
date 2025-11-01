@@ -26,25 +26,35 @@ export const getProgressPercentage = (item: Item): number => {
       return 100;
     }
 
-    // 하위 카운터 중 완료된 카운터의 비율로 계산
-    //   - 완료 기준: 각 하위 카운터의 count / targetCount >= 100%
-    //   - 진행률 = (완료된 카운터 수 / 전체 하위 카운터 수) * 100
+    // 하위 카운터 중 targetCount가 지정된 카운터들의 진행률로 계산
+    //   - targetCount가 지정된 카운터들의 count 합 / targetCount 합으로 진행률 계산
+    //   - 전체 진행률 = (count 합 / targetCount 합) * 100 * (targetCount 지정된 카운터 수 / 전체 하위 카운터 수)
     const allItems = getStoredItems();
     const childCounters = allItems.filter(
       (i): i is Counter => i.type === 'counter' && project.counterIds.includes(i.id)
     );
 
     if (childCounters.length > 0) {
-      const completedCounters = childCounters.filter((counter) => {
-        if (counter.targetCount > 0) {
-          const counterProgress = (counter.count / counter.targetCount) * 100;
-          return counterProgress >= 100;
-        }
-        return false;
-      });
-      const progress = (completedCounters.length / childCounters.length) * 100;
-      // 모든 하위 카운터가 완료된 경우 100% 반환
-      return progress >= 100 ? 100 : progress;
+      // targetCount가 지정된 카운터들만 필터링
+      const countersWithTarget = childCounters.filter((counter) => counter.targetCount > 0);
+
+      if (countersWithTarget.length > 0) {
+        // count 합과 targetCount 합 계산
+        const totalCount = countersWithTarget.reduce((sum, counter) => sum + counter.count, 0);
+        const totalTargetCount = countersWithTarget.reduce((sum, counter) => sum + counter.targetCount, 0);
+
+        // targetCount 지정된 카운터들의 진행률 계산 (100% 제한)
+        const targetCountProgress = Math.min((totalCount / totalTargetCount) * 100, 100);
+
+        // 전체 진행률 = targetCount 진행률 * (targetCount 지정된 카운터 비율)
+        const progress = targetCountProgress * (countersWithTarget.length / childCounters.length);
+
+        // 100% 이상인 경우 100%로 제한
+        return progress >= 100 ? 100 : progress;
+      }
+
+      // targetCount가 지정된 카운터가 없는 경우 0% 반환
+      return 0;
     }
     return 0;
   }
