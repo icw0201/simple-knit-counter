@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '@navigation/AppNavigator';
@@ -7,6 +7,12 @@ import { getHeaderRightWithInfoEditAndSettings } from '@navigation/HeaderOptions
 
 import { Counter, Project } from '@storage/types';
 import { addItem, removeCounterFromProject, updateItem, getStoredItems } from '@storage/storage';
+import {
+  getSortCriteriaSetting,
+  getSortOrderSetting,
+  getMoveCompletedToBottomSetting,
+} from '@storage/settings';
+import { sortItems } from '@utils/sortUtils';
 import { useItemList } from './useItemList';
 
 /**
@@ -16,6 +22,8 @@ export const useProjectDetail = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const route = useRoute<RouteProp<RootStackParamList, 'ProjectDetail'>>();
   const { projectId } = route.params;
+  // 정렬 드롭다운 표시 여부 상태
+  const [sortDropdownVisible, setSortDropdownVisible] = useState(false);
 
   // useItemList 훅 사용
   const {
@@ -48,7 +56,8 @@ export const useProjectDetail = () => {
           getHeaderRightWithInfoEditAndSettings(
             navigation,
             () => navigation.navigate('InfoScreen', { itemId: project?.id ?? '' }),
-            () => setIsEditMode((prev) => !prev)
+            () => setIsEditMode((prev) => !prev),
+            () => setSortDropdownVisible(true)
           ),
       });
     },
@@ -171,6 +180,21 @@ export const useProjectDetail = () => {
     resetDeleteModalState();
   }, [itemToDelete, project, setItems, resetDeleteModalState]);
 
+  const handleSortSelect = useCallback((_option: string) => {
+    // 정렬 설정이 storage에 저장되었으므로, 현재 items를 다시 정렬하여 즉시 반영
+    setItems((prevItems) => {
+      if (prevItems.length === 0) {
+        return prevItems;
+      }
+
+      const criteria = getSortCriteriaSetting();
+      const order = getSortOrderSetting();
+      const moveCompletedToBottom = getMoveCompletedToBottomSetting();
+
+      return sortItems([...prevItems], criteria, order, moveCompletedToBottom);
+    });
+  }, [setItems]);
+
   return {
     // 상태
     items,
@@ -181,9 +205,11 @@ export const useProjectDetail = () => {
     itemToDelete,
     duplicateModalVisible,
     pendingItem,
+    sortDropdownVisible,
 
     // 상태 설정 함수들
     setModalVisible,
+    setSortDropdownVisible,
 
     // 액션 함수들
     handlePress,
@@ -195,5 +221,6 @@ export const useProjectDetail = () => {
     resetDeleteModalState,
     resetDuplicateModalState,
     completeCounterCreation,
+    handleSortSelect,
   };
 };
