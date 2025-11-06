@@ -18,7 +18,7 @@ interface ItemBoxProps {
 
 /**
  * ItemRow에서 사용하는 박스 컴포넌트
- * 기존 RoundedBox의 레이아웃 스타일 C(제목과 숫자를 좌우로 배치)분리와 프로그레스 바 기능 포함
+ * 제목과 숫자를 좌우로 배치하는 박스 컴포넌트로 프로그레스 바 기능 포함
  */
 const ItemBox: React.FC<ItemBoxProps> = ({
   title,

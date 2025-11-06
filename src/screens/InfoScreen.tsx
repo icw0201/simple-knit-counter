@@ -8,7 +8,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '@navigation/AppNavigator';
 
 import TextInputBox from '@components/common/TextInputBox';
-import RoundedBox from '@components/common/RoundedBox';
+import RoundedButton from '@components/common/RoundedButton';
 
 import { getStoredItems, updateItem } from '@storage/storage';
 import clsx from 'clsx';
@@ -195,22 +195,18 @@ const InfoScreen = () => {
           {/* 하단 액션 버튼들 */}
           <View className="flex-row justify-evenly mt-2">
             {/* 취소 버튼 */}
-            <RoundedBox
+            <RoundedButton
               title="취소"
               onPress={() => navigation.goBack()}
-              isButton
               colorStyle="light"
-              rounded="full"
               containerClassName="mx-1 py-3 px-8"
             />
 
             {/* 저장 버튼 */}
-            <RoundedBox
+            <RoundedButton
               title="저장"
               onPress={handleSave}
-              isButton
               colorStyle={getSaveButtonColorStyle()}
-              rounded="full"
               containerClassName={getSaveButtonBackgroundClass()}
             />
           </View>

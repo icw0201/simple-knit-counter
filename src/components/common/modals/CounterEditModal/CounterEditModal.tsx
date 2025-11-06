@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { View } from 'react-native';
 import { BaseModal } from '../BaseModal';
 import TextInputBox from '@components/common/TextInputBox';
-import RoundedBox from '@components/common/RoundedBox';
+import RoundedButton from '@components/common/RoundedButton';
 
 /**
  * CounterEditModal 컴포넌트의 Props 인터페이스
@@ -71,21 +71,17 @@ const CounterEditModal: React.FC<CounterEditModalProps> = ({
       {/* 버튼 섹션 - 버튼 타입에 따라 다른 버튼 조합 표시 */}
       <View className="flex-row justify-evenly">
         {/* 취소 버튼 */}
-        <RoundedBox
+        <RoundedButton
           title="취소"
           onPress={handleClose}
-          isButton
           colorStyle="light"
-          rounded="full"
           containerClassName="mx-1 py-3 px-8"
         />
         {/* 확인 버튼 */}
-        <RoundedBox
+        <RoundedButton
           title="확인"
           onPress={handleConfirm}
-          isButton
           colorStyle="vivid"
-          rounded="full"
           containerClassName="mx-1 py-3 px-8"
         />
       </View>
