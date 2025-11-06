@@ -79,13 +79,11 @@ const SubCounterRuleModal: React.FC<SubCounterRuleModalProps> = ({
             title="취소"
             onPress={onClose}
             colorStyle="light"
-            containerClassName="mx-1 py-3 px-8"
           />
           <RoundedButton
             title="확인"
             onPress={handleConfirm}
             colorStyle="vivid"
-            containerClassName="mx-1 py-3 px-8"
           />
         </View>
       </View>

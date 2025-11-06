@@ -75,14 +75,12 @@ const CounterEditModal: React.FC<CounterEditModalProps> = ({
           title="취소"
           onPress={handleClose}
           colorStyle="light"
-          containerClassName="mx-1 py-3 px-8"
         />
         {/* 확인 버튼 */}
         <RoundedButton
           title="확인"
           onPress={handleConfirm}
           colorStyle="vivid"
-          containerClassName="mx-1 py-3 px-8"
         />
       </View>
     </BaseModal>

@@ -69,7 +69,6 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
             title={cancelText}
             onPress={onClose}
             colorStyle="light"
-            containerClassName="mx-1 py-3 px-8"
           />
         )}
         {/* 확인 버튼 */}
@@ -77,7 +76,6 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
           title={confirmText}
           onPress={handleConfirm}
           colorStyle="vivid"
-          containerClassName="mx-1 py-3 px-8"
         />
       </View>
     </BaseModal>

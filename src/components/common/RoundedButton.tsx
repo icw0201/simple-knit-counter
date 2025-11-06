@@ -42,7 +42,7 @@ const RoundedButton: React.FC<RoundedButtonProps> = ({
 
   // 박스 뷰 생성 (rounded는 full로 고정)
   const boxView = (
-    <View className={clsx('p-4 rounded-full', container, containerClassName)}>
+    <View className={clsx('mx-1 py-3 px-8 rounded-full', container, containerClassName)}>
       {renderDefaultLayout(title, text)}
     </View>
   );

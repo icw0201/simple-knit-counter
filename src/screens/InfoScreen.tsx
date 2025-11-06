@@ -11,7 +11,6 @@ import TextInputBox from '@components/common/TextInputBox';
 import RoundedButton from '@components/common/RoundedButton';
 
 import { getStoredItems, updateItem } from '@storage/storage';
-import clsx from 'clsx';
 
 /**
  * 정보 화면 컴포넌트
@@ -98,25 +97,6 @@ const InfoScreen = () => {
    */
   const isSaveButtonActive = title.trim().length > 0;
 
-  /**
-   * 저장 버튼의 색상 스타일을 결정합니다.
-   * 활성화 상태에 따라 다른 색상을 적용합니다.
-   */
-  const getSaveButtonColorStyle = () => {
-    return isSaveButtonActive ? 'vivid' : undefined;
-  };
-
-  /**
-   * 저장 버튼의 배경색 클래스를 결정합니다.
-   * 비활성화 상태일 때는 회색 배경을 적용합니다.
-   */
-  const getSaveButtonBackgroundClass = () => {
-    return clsx(
-      'mx-1 py-3 px-8',
-      !isSaveButtonActive && 'bg-lightgray'
-    );
-  };
-
   return (
     <SafeAreaView style={{ flex: 1 }} edges={['left', 'right', 'bottom']}>
       <KeyboardAvoidingView
@@ -199,15 +179,14 @@ const InfoScreen = () => {
               title="취소"
               onPress={() => navigation.goBack()}
               colorStyle="light"
-              containerClassName="mx-1 py-3 px-8"
             />
 
             {/* 저장 버튼 */}
             <RoundedButton
               title="저장"
               onPress={handleSave}
-              colorStyle={getSaveButtonColorStyle()}
-              containerClassName={getSaveButtonBackgroundClass()}
+              colorStyle={isSaveButtonActive ? 'vivid' : undefined}
+              containerClassName={!isSaveButtonActive ? 'bg-lightgray' : undefined}
             />
           </View>
         </ScrollView>

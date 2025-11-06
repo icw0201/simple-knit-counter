@@ -92,7 +92,6 @@ const ProjectCreateModal: React.FC<ProjectCreateModalProps> = ({
           title="취소"
           onPress={handleClose}
           colorStyle="light"
-          containerClassName="mx-1 py-3 px-8"
         />
         {/* 생성 버튼 - 입력값이 있을 때만 활성화 */}
         <RoundedButton
@@ -103,10 +102,7 @@ const ProjectCreateModal: React.FC<ProjectCreateModalProps> = ({
             }
           }}
           colorStyle={textValue?.trim() ? 'vivid' : undefined}
-          containerClassName={clsx(
-            'mx-1 py-3 px-8',
-            !textValue?.trim() && 'bg-lightgray' // 입력값이 없으면 회색 배경
-          )}
+          containerClassName={!textValue?.trim() ? 'bg-lightgray' : undefined}
         />
       </View>
     </BaseModal>
