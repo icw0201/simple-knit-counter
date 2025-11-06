@@ -103,7 +103,7 @@ const RadioButtonGroup: React.FC<RadioButtonGroupProps> = ({
 
       {/* 선택된 옵션이 있고 해당 옵션에 툴팁이 있을 때만 표시 */}
       {selectedTooltip && (
-        <Text className="text-xs text-gray-500 mt-2 text-center">
+        <Text className="text-xs text-darkgray mt-2 text-center">
           {selectedTooltip}
         </Text>
       )}

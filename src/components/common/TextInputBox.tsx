@@ -140,7 +140,7 @@ const TextInputBox: React.FC<TextInputBoxProps> = ({
         <Text className="text-sm text-darkgray font-medium">{label}</Text>
         {/* 텍스트와 롱텍스트 타입일 때만 문자 수 카운터 표시 */}
         {shouldShowCounter && (
-          <Text className="text-xs text-gray-400">
+          <Text className="text-xs text-darkgray">
             {currentLength}/{maxLengthForType}
           </Text>
         )}
