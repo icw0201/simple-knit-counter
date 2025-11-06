@@ -160,7 +160,7 @@ const InfoScreen = () => {
         description="프로젝트명 또는 카운터명은 빈 칸으로 둘 수 없습니다"
         onConfirm={() => setShowTitleErrorModal(false)}
         confirmText="확인"
-        cancelText={undefined}
+        cancelText=""
       />
     </SafeAreaView>
   );
