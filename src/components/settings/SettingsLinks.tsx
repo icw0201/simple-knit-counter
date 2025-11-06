@@ -1,7 +1,7 @@
 // src/components/settings/SettingsLinks.tsx
 import React from 'react';
 import { View, Linking } from 'react-native';
-import IconBox from '@components/common/IconBox';
+import IconBox from './IconBox';
 
 interface SettingsLinksProps {}
 
@@ -34,16 +34,12 @@ const SettingsLinks: React.FC<SettingsLinksProps> = () => {
     <View className="mb-8">
       <IconBox
         title="별점 남기기"
-        colorStyle="light"
         iconName="star"
-        containerClassName="mb-4"
         onPress={() => handlePress('review')}
       />
       <IconBox
         title="문의하기"
-        colorStyle="light"
         iconName="mail"
-        containerClassName="mb-4"
         onPress={() => handlePress('contact')}
       />
     </View>
