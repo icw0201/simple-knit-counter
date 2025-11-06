@@ -4,6 +4,7 @@ import { ScrollView } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ItemRow, FloatingAddButton, ItemModals, SortDropdown } from '@components/list';
+import { screenStyles, safeAreaEdges } from '@styles/screenStyles';
 import { useMain } from '@hooks/useMain';
 
 const Main = () => {
@@ -34,9 +35,9 @@ const Main = () => {
 
 
   return (
-    <SafeAreaView style={{ flex: 1 }} className={isEditMode ? 'bg-red-orange-400' : undefined} edges={['left', 'right', 'bottom']}>
+    <SafeAreaView style={screenStyles.flex1} className={isEditMode ? 'bg-red-orange-400' : undefined} edges={safeAreaEdges}>
       {/* 아이템 목록 스크롤뷰 */}
-      <ScrollView contentContainerStyle={{ paddingBottom: 20 }} className="p-4">
+      <ScrollView contentContainerStyle={screenStyles.scrollViewContent}>
         {items.map((item) => (
           <ItemRow
             key={item.id}
