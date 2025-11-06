@@ -28,8 +28,9 @@ type TextInputType = 'number' | 'text' | 'date' | 'longText';
  * @param onChangeText - 입력 값 변경 시 실행될 콜백 함수
  * @param placeholder - 입력 필드에 표시될 플레이스홀더 텍스트
  * @param type - 입력 필드의 타입 (TextInputType)
- * @param maxLength - 최대 입력 길이 (기본값: longText는 70, 나머지는 15)
+ * @param maxLength - 최대 입력 길이 (기본값: longText는 500, 나머지는 15)
  * @param className - 추가적인 컨테이너 스타일 클래스
+ * @param required - 필수 필드 여부 (기본값: false)
  */
 interface TextInputBoxProps {
   label: string;
@@ -39,6 +40,7 @@ interface TextInputBoxProps {
   type: TextInputType;
   maxLength?: number;
   className?: string;
+  required?: boolean;
 }
 
 /**
@@ -54,6 +56,7 @@ const TextInputBox: React.FC<TextInputBoxProps> = ({
   type,
   maxLength = type === 'longText' ? INPUT_LIMITS.longText : INPUT_LIMITS.text,
   className = '',
+  required = false,
 }) => {
   // 입력 필드의 포커스 상태 관리
   const [isFocused, setIsFocused] = useState(false);
@@ -137,7 +140,10 @@ const TextInputBox: React.FC<TextInputBoxProps> = ({
     <View className={clsx('w-full mb-4', className)}>
       {/* 라벨과 문자 수 카운터를 표시하는 상단 영역 */}
       <View className="pl-1 mb-1 flex-row justify-between items-center">
-        <Text className="text-sm text-darkgray font-medium">{label}</Text>
+        <View className="flex-row items-center">
+          <Text className="text-sm text-darkgray font-medium">{label}</Text>
+          {required && <Text className="text-sm text-red-orange-500 ml-1">*</Text>}
+        </View>
         {/* 텍스트와 롱텍스트 타입일 때만 문자 수 카운터 표시 */}
         {shouldShowCounter && (
           <Text className="text-xs text-darkgray">

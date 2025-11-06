@@ -112,6 +112,7 @@ const InfoScreen = () => {
             onChangeText={setTitle}
             placeholder="프로젝트명 혹은 카운터명"
             type="text"
+            required
           />
 
           {/* 날짜 입력 필드들 (좌우 배치) */}
