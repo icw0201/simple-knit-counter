@@ -79,7 +79,7 @@ const SubCounterRuleModal: React.FC<SubCounterRuleModalProps> = ({
             title="취소"
             onPress={onClose}
             isButton
-            colorStyle="C"
+            colorStyle="light"
             rounded="full"
             containerClassName="mx-1 py-3 px-8"
           />
@@ -87,7 +87,7 @@ const SubCounterRuleModal: React.FC<SubCounterRuleModalProps> = ({
             title="확인"
             onPress={handleConfirm}
             isButton
-            colorStyle="E"
+            colorStyle="vivid"
             rounded="full"
             containerClassName="mx-1 py-3 px-8"
           />

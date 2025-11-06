@@ -92,7 +92,7 @@ const ProjectCreateModal: React.FC<ProjectCreateModalProps> = ({
           title="취소"
           onPress={handleClose}
           isButton
-          colorStyle="C"
+          colorStyle="light"
           rounded="full"
           containerClassName="mx-1 py-3 px-8"
         />
@@ -105,7 +105,7 @@ const ProjectCreateModal: React.FC<ProjectCreateModalProps> = ({
             }
           }}
           isButton
-          colorStyle={textValue?.trim() ? 'E' : undefined}
+          colorStyle={textValue?.trim() ? 'vivid' : undefined}
           rounded="full"
           containerClassName={clsx(
             'mx-1 py-3 px-8',

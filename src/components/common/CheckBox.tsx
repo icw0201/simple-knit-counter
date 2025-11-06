@@ -28,7 +28,7 @@ interface CheckBoxProps {
  */
 const CheckBox: React.FC<CheckBoxProps> = ({ label, checked, onToggle, disabled = false, size = 'base' }) => {
   // 체크박스 색상 설정
-  const activeColor = colorStyles.E.container; // 활성화 상태일 때의 배경색 (체크된 상태)
+  const activeColor = colorStyles.vivid.container; // 활성화 상태일 때의 배경색 (체크된 상태)
   const inactiveColor = 'bg-red-orange-100'; // 비활성화 상태일 때의 배경색 (체크되지 않은 상태)
 
   // 사이즈에 따른 스타일 설정

@@ -69,7 +69,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
             title={cancelText}
             onPress={onClose}
             isButton
-            colorStyle="C"
+            colorStyle="light"
             rounded="full"
             containerClassName="mx-1 py-3 px-8"
           />
@@ -79,7 +79,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
           title={confirmText}
           onPress={handleConfirm}
           isButton
-          colorStyle="E"
+          colorStyle="vivid"
           rounded="full"
           containerClassName="mx-1 py-3 px-8"
         />

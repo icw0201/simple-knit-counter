@@ -32,7 +32,7 @@ const CounterActions: React.FC<CounterActionsProps> = ({
       <CircleIcon
         size={iconSize}
         iconName="rotate-ccw"
-        colorStyle="D"
+        colorStyle="medium"
         isButton
         containerClassName="mx-2"
         onPress={onReset}
@@ -42,7 +42,7 @@ const CounterActions: React.FC<CounterActionsProps> = ({
       <CircleIcon
         size={iconSize}
         iconName="pencil"
-        colorStyle="D"
+        colorStyle="medium"
         isButton
         containerClassName="mx-2"
         onPress={onEdit}

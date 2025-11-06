@@ -24,7 +24,7 @@ const FloatingAddButton: React.FC<FloatingAddButtonProps> = ({
       <CircleIcon
         size={64}
         iconName="plus"
-        colorStyle="C"
+        colorStyle="light"
         isButton
         onPress={onPress}
       />

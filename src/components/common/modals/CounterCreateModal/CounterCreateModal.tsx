@@ -67,7 +67,7 @@ const CounterCreateModal: React.FC<CounterCreateModalProps> = ({
           title="취소"
           onPress={handleClose}
           isButton
-          colorStyle="C"
+          colorStyle="light"
           rounded="full"
           containerClassName="mx-1 py-3 px-8"
         />
@@ -80,7 +80,7 @@ const CounterCreateModal: React.FC<CounterCreateModalProps> = ({
             }
           }}
           isButton
-          colorStyle={textValue?.trim() ? 'E' : undefined}
+          colorStyle={textValue?.trim() ? 'vivid' : undefined}
           rounded="full"
           containerClassName={clsx(
             'mx-1 py-3 px-8',

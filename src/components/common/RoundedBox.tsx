@@ -12,7 +12,7 @@ import { getLucideIcon } from '@utils/iconUtils';
  * @param title - 박스에 표시될 주요 텍스트
  * @param iconName - 표시할 Lucide 아이콘 이름 (기본값: 'star')
  * @param rounded - 모서리 둥글기 스타일 (기본값: 'xl')
- * @param colorStyle - 색상 테마 스타일 키 (기본값: 'A')
+ * @param colorStyle - 색상 테마 스타일 키 (기본값: 'default')
  * @param layoutStyle - 레이아웃 스타일 ('Icon' - 제목과 아이콘 좌우 배치, 미지정 시 기본 레이아웃)
  * @param containerClassName - 추가적인 컨테이너 스타일 클래스
  */
@@ -74,7 +74,7 @@ const RoundedBox: React.FC<RoundedBoxProps> = ({
   title,
   iconName = 'star',
   rounded = 'xl',
-  colorStyle = 'A',
+  colorStyle = 'default',
   layoutStyle,
   containerClassName = '',
 }) => {

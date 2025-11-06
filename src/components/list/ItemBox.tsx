@@ -30,7 +30,7 @@ const ItemBox: React.FC<ItemBoxProps> = ({
   isCompleted = false,
   isEditMode = false,
 }) => {
-  const { container, text, subtext } = colorStyles.A;
+  const { container, text, subtext } = colorStyles.default;
   const hasProgress = progressPercentage !== undefined && progressPercentage !== null;
 
   const boxView = (

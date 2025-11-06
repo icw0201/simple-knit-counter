@@ -103,7 +103,7 @@ const InfoScreen = () => {
    * 활성화 상태에 따라 다른 색상을 적용합니다.
    */
   const getSaveButtonColorStyle = () => {
-    return isSaveButtonActive ? 'E' : undefined;
+    return isSaveButtonActive ? 'vivid' : undefined;
   };
 
   /**
@@ -199,7 +199,7 @@ const InfoScreen = () => {
               title="취소"
               onPress={() => navigation.goBack()}
               isButton
-              colorStyle="C"
+              colorStyle="light"
               rounded="full"
               containerClassName="mx-1 py-3 px-8"
             />
