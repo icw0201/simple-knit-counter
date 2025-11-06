@@ -14,7 +14,6 @@ import { modalStyles } from '@styles/modalStyle';
  * @param onConfirm - 확인 버튼 클릭 시 콜백 함수
  * @param confirmText - 확인 버튼 텍스트 (기본값: '확인')
  * @param cancelText - 취소 버튼 텍스트 (기본값: '취소')
- * @param confirmButtonStyle - 확인 버튼 스타일 (기본값: 'danger')
  */
 interface ConfirmModalProps {
   visible: boolean;
@@ -24,7 +23,6 @@ interface ConfirmModalProps {
   onConfirm: () => void;
   confirmText?: string;
   cancelText?: string;
-  confirmButtonStyle?: 'danger' | 'primary';
 }
 
 /**
