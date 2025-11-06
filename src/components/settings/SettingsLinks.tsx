@@ -1,7 +1,7 @@
 // src/components/settings/SettingsLinks.tsx
 import React from 'react';
 import { View, Linking } from 'react-native';
-import RoundedBox from '@components/common/RoundedBox';
+import IconBox from './IconBox';
 
 interface SettingsLinksProps {}
 
@@ -32,24 +32,14 @@ const SettingsLinks: React.FC<SettingsLinksProps> = () => {
   };
   return (
     <View className="mb-8">
-      <RoundedBox
+      <IconBox
         title="별점 남기기"
-        layoutStyle="Icon"
-        colorStyle="C"
         iconName="star"
-        isButton
-        rounded="2xl"
-        containerClassName="mb-4"
         onPress={() => handlePress('review')}
       />
-      <RoundedBox
+      <IconBox
         title="문의하기"
-        layoutStyle="Icon"
-        colorStyle="C"
         iconName="mail"
-        isButton
-        rounded="2xl"
-        containerClassName="mb-4"
         onPress={() => handlePress('contact')}
       />
     </View>

@@ -12,7 +12,7 @@ import { getLucideIcon } from '@utils/iconUtils';
  * @param onPress - 버튼 클릭 시 실행될 콜백 함수 (isButton이 true일 때만 사용)
  * @param iconName - 표시할 Lucide 아이콘 이름 (기본값: 'star')
  * @param iconColor - 아이콘 색상 (colorStyle보다 우선순위가 높음)
- * @param colorStyle - 색상 테마 스타일 키 (기본값: 'A')
+ * @param colorStyle - 색상 테마 스타일 키 (기본값: 'default')
  * @param containerClassName - 추가적인 컨테이너 스타일 클래스
  */
 interface CircleIconProps {
@@ -37,7 +37,7 @@ const CircleIcon: React.FC<CircleIconProps> = ({
   onPress,
   iconName = 'star',
   iconColor,
-  colorStyle = 'A',
+  colorStyle = 'default',
   containerClassName = '',
 }) => {
   // 선택된 색상 테마에서 컨테이너와 아이콘 색상 가져오기

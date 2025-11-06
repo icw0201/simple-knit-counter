@@ -65,7 +65,7 @@ const ItemRow: React.FC<ItemRowProps> = ({
           <CircleIcon
             size={48}
             iconName="trash-2"
-            colorStyle="F"
+            colorStyle="lightest"
             isButton
             onPress={() => onDelete(item)}
           />

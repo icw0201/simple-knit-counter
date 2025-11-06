@@ -8,10 +8,9 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '@navigation/AppNavigator';
 
 import TextInputBox from '@components/common/TextInputBox';
-import RoundedBox from '@components/common/RoundedBox';
+import RoundedButton from '@components/common/RoundedButton';
 
 import { getStoredItems, updateItem } from '@storage/storage';
-import clsx from 'clsx';
 
 /**
  * 정보 화면 컴포넌트
@@ -98,25 +97,6 @@ const InfoScreen = () => {
    */
   const isSaveButtonActive = title.trim().length > 0;
 
-  /**
-   * 저장 버튼의 색상 스타일을 결정합니다.
-   * 활성화 상태에 따라 다른 색상을 적용합니다.
-   */
-  const getSaveButtonColorStyle = () => {
-    return isSaveButtonActive ? 'E' : undefined;
-  };
-
-  /**
-   * 저장 버튼의 배경색 클래스를 결정합니다.
-   * 비활성화 상태일 때는 회색 배경을 적용합니다.
-   */
-  const getSaveButtonBackgroundClass = () => {
-    return clsx(
-      'mx-1 py-3 px-8',
-      !isSaveButtonActive && 'bg-lightgray'
-    );
-  };
-
   return (
     <SafeAreaView style={{ flex: 1 }} edges={['left', 'right', 'bottom']}>
       <KeyboardAvoidingView
@@ -132,6 +112,7 @@ const InfoScreen = () => {
             onChangeText={setTitle}
             placeholder="프로젝트명 혹은 카운터명"
             type="text"
+            required
           />
 
           {/* 날짜 입력 필드들 (좌우 배치) */}
@@ -195,23 +176,18 @@ const InfoScreen = () => {
           {/* 하단 액션 버튼들 */}
           <View className="flex-row justify-evenly mt-2">
             {/* 취소 버튼 */}
-            <RoundedBox
+            <RoundedButton
               title="취소"
               onPress={() => navigation.goBack()}
-              isButton
-              colorStyle="C"
-              rounded="full"
-              containerClassName="mx-1 py-3 px-8"
+              colorStyle="light"
             />
 
             {/* 저장 버튼 */}
-            <RoundedBox
+            <RoundedButton
               title="저장"
               onPress={handleSave}
-              isButton
-              colorStyle={getSaveButtonColorStyle()}
-              rounded="full"
-              containerClassName={getSaveButtonBackgroundClass()}
+              colorStyle={isSaveButtonActive ? 'vivid' : undefined}
+              containerClassName={!isSaveButtonActive ? 'bg-lightgray' : undefined}
             />
           </View>
         </ScrollView>

@@ -2,7 +2,7 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 import { BaseModal } from '../BaseModal';
-import RoundedBox from '@components/common/RoundedBox';
+import RoundedButton from '@components/common/RoundedButton';
 import { modalStyles } from '@styles/modalStyle';
 
 /**
@@ -65,23 +65,17 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
       <View className="flex-row justify-evenly">
         {/* 취소 버튼 */}
         {cancelText && (
-          <RoundedBox
+          <RoundedButton
             title={cancelText}
             onPress={onClose}
-            isButton
-            colorStyle="C"
-            rounded="full"
-            containerClassName="mx-1 py-3 px-8"
+            colorStyle="light"
           />
         )}
         {/* 확인 버튼 */}
-        <RoundedBox
+        <RoundedButton
           title={confirmText}
           onPress={handleConfirm}
-          isButton
-          colorStyle="E"
-          rounded="full"
-          containerClassName="mx-1 py-3 px-8"
+          colorStyle="vivid"
         />
       </View>
     </BaseModal>

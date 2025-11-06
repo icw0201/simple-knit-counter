@@ -3,8 +3,7 @@ import React, { useState } from 'react';
 import { View } from 'react-native';
 import { BaseModal } from '../BaseModal';
 import TextInputBox from '@components/common/TextInputBox';
-import RoundedBox from '@components/common/RoundedBox';
-import clsx from 'clsx';
+import RoundedButton from '@components/common/RoundedButton';
 
 /**
  * CounterCreateModal 컴포넌트의 Props 인터페이스
@@ -63,29 +62,21 @@ const CounterCreateModal: React.FC<CounterCreateModalProps> = ({
       {/* 버튼 섹션 - 버튼 타입에 따라 다른 버튼 조합 표시 */}
       <View className="flex-row justify-evenly">
         {/* 취소 버튼 */}
-        <RoundedBox
+        <RoundedButton
           title="취소"
           onPress={handleClose}
-          isButton
-          colorStyle="C"
-          rounded="full"
-          containerClassName="mx-1 py-3 px-8"
+          colorStyle="light"
         />
         {/* 생성 버튼 - 입력값이 있을 때만 활성화 */}
-        <RoundedBox
+        <RoundedButton
           title="생성"
           onPress={() => {
             if (textValue?.trim()) {
               handleConfirm();
             }
           }}
-          isButton
-          colorStyle={textValue?.trim() ? 'E' : undefined}
-          rounded="full"
-          containerClassName={clsx(
-            'mx-1 py-3 px-8',
-            !textValue?.trim() && 'bg-lightgray' // 입력값이 없으면 회색 배경
-          )}
+          colorStyle={textValue?.trim() ? 'vivid' : undefined}
+          containerClassName={!textValue?.trim() ? 'bg-lightgray' : undefined}
         />
       </View>
     </BaseModal>

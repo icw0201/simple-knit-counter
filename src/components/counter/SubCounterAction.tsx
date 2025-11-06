@@ -33,7 +33,7 @@ const SubCounterAction: React.FC<SubCounterActionProps> = ({
       <CircleIcon
         size={iconSize}
         iconName="rotate-ccw"
-        colorStyle="C"
+        colorStyle="light"
         isButton
         containerClassName="mx-2"
         onPress={onReset}
@@ -43,7 +43,7 @@ const SubCounterAction: React.FC<SubCounterActionProps> = ({
       <CircleIcon
         size={iconSize}
         iconName="pencil"
-        colorStyle="C"
+        colorStyle="light"
         isButton
         containerClassName="mx-2"
         onPress={onEdit}
@@ -53,7 +53,7 @@ const SubCounterAction: React.FC<SubCounterActionProps> = ({
       <CircleIcon
         size={iconSize}
         iconName="corner-down-left"
-        colorStyle="C"
+        colorStyle="light"
         isButton
         containerClassName="mx-2"
         onPress={onRule}

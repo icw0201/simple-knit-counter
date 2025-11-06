@@ -62,7 +62,7 @@ const renderRadioButton = (option: Option, isSelected: boolean, onSelect: (value
       className={clsx(
         'w-6 h-6 rounded-full items-center justify-center mb-1',
         isSelected
-          ? colorStyles.E.container // 선택된 상태: 테마 색상 사용
+          ? colorStyles.vivid.container // 선택된 상태: 테마 색상 사용
           : 'bg-red-orange-100 border border-red-orange-100' // 선택되지 않은 상태: 회색 배경과 테두리
       )}
     >
@@ -103,7 +103,7 @@ const RadioButtonGroup: React.FC<RadioButtonGroupProps> = ({
 
       {/* 선택된 옵션이 있고 해당 옵션에 툴팁이 있을 때만 표시 */}
       {selectedTooltip && (
-        <Text className="text-xs text-gray-500 mt-2 text-center">
+        <Text className="text-xs text-darkgray mt-2 text-center">
           {selectedTooltip}
         </Text>
       )}
