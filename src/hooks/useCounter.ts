@@ -44,6 +44,7 @@ interface UseCounterReturn {
   handleTargetCountConfirm: (value: string) => void;
   toggleMascotIsActive: () => void;
   toggleWay: () => void;
+  toggleTimerIsActive: () => void;
   showErrorModal: (message: string) => void;
   setErrorModalVisible: (visible: boolean) => void;
   setActiveModal: (modal: 'reset' | 'edit' | 'limit' | 'rule' | 'subReset' | 'subEdit' | 'subLimit' | 'targetCount' | null) => void;
@@ -370,6 +371,19 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
       });
     }
   }, [mascotIsActive, wayIsChange, counter]);
+
+  /**
+   * 타이머 활성화 토글 함수
+   */
+  const toggleTimerIsActive = useCallback(() => {
+    if (!counter) {
+      return;
+    }
+
+    const newTimerIsActive = !counter.timerIsActive;
+    updateItem(counter.id, { timerIsActive: newTimerIsActive });
+    setCounter({ ...counter, timerIsActive: newTimerIsActive });
+  }, [counter]);
 
   /**
    * 방향 토글 (wayIsChange가 true일 때만 동작)
@@ -748,6 +762,7 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     handleTargetCountConfirm,
     toggleMascotIsActive,
     toggleWay,
+    toggleTimerIsActive,
     showErrorModal,
     setErrorModalVisible,
     setActiveModal,

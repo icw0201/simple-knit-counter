@@ -69,6 +69,7 @@ const CounterDetail = () => {
     handleTargetCountConfirm,
     toggleMascotIsActive,
     toggleWay,
+    toggleTimerIsActive,
     setErrorModalVisible,
     setActiveModal,
     // 보조 카운터 관련
@@ -167,10 +168,12 @@ const CounterDetail = () => {
           navigation,
           mascotIsActive,
           toggleMascotIsActive,
+          counter.timerIsActive,
+          toggleTimerIsActive,
           hasParent ? undefined : () => navigation.navigate('InfoScreen', { itemId: counter.id })
         ),
     });
-  }, [navigation, counter, mascotIsActive, height, width, toggleMascotIsActive, hasParent]);
+  }, [navigation, counter, mascotIsActive, height, width, toggleMascotIsActive, toggleTimerIsActive, hasParent]);
 
 
   // 카운터 데이터가 없으면 렌더링하지 않음
@@ -222,7 +225,7 @@ const CounterDetail = () => {
         )}
 
         {/* 시간 표시 컴포넌트 */}
-        <TimeDisplay />
+        {counter.timerIsActive && <TimeDisplay />}
 
         {/* 방향 표시 이미지 영역 */}
         <CounterDirection
