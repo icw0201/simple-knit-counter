@@ -173,7 +173,6 @@ const SettingsCheckBoxes: React.FC<SettingsCheckBoxesProps> = () => {
         onConfirm={handleResetConfirm}
         confirmText="삭제"
         cancelText="취소"
-        confirmButtonStyle="danger"
       />
 
       {/* 에러 알림 모달 */}
@@ -185,7 +184,6 @@ const SettingsCheckBoxes: React.FC<SettingsCheckBoxesProps> = () => {
         onConfirm={() => setErrorModalVisible(false)}
         confirmText="확인"
         cancelText=""
-        confirmButtonStyle="primary"
       />
     </>
   );
