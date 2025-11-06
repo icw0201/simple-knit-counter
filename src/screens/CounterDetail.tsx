@@ -11,7 +11,7 @@ import { activateKeepAwake, deactivateKeepAwake } from '@sayem314/react-native-k
 import { getHeaderRightWithActivateInfoSettings } from '@navigation/HeaderOptions';
 import { getScreenAwakeSetting } from '@storage/settings';
 
-import { CounterTouchArea, CounterDirection, CounterActions, CounterModals, SubCounterModal, ProgressBar } from '@components/counter';
+import { CounterTouchArea, CounterDirection, CounterActions, CounterModals, SubCounterModal, ProgressBar, TimeDisplay } from '@components/counter';
 import Tooltip from '@components/common/Tooltip';
 import { getScreenSize, getIconSize, getTextClass, getGapClass, getSubModalWidthRatio, getSubModalHeightRatio, getSubModalTop, ScreenSize } from '@constants/screenSizeConfig';
 import { getTooltipEnabledSetting } from '@storage/settings';
@@ -220,6 +220,9 @@ const CounterDetail = () => {
             targetAnchorX={hasParent ? width - 65 : width - 103}
           />
         )}
+
+        {/* 시간 표시 컴포넌트 */}
+        <TimeDisplay />
 
         {/* 방향 표시 이미지 영역 */}
         <CounterDirection
