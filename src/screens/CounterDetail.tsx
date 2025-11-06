@@ -15,6 +15,7 @@ import { CounterTouchArea, CounterDirection, CounterActions, CounterModals, SubC
 import Tooltip from '@components/common/Tooltip';
 import { getScreenSize, getIconSize, getTextClass, getGapClass, getSubModalWidthRatio, getSubModalHeightRatio, getSubModalTop, ScreenSize } from '@constants/screenSizeConfig';
 import { getTooltipEnabledSetting } from '@storage/settings';
+import { screenStyles, safeAreaEdges } from '@styles/screenStyles';
 import { useCounter } from '@hooks/useCounter';
 
 
@@ -156,7 +157,6 @@ const CounterDetail = () => {
       return;
     }
 
-    const hasParent = !!counter.parentProjectId;
     const currentScreenSize = getScreenSize(height, width);
 
     navigation.setOptions({
@@ -170,7 +170,7 @@ const CounterDetail = () => {
           hasParent ? undefined : () => navigation.navigate('InfoScreen', { itemId: counter.id })
         ),
     });
-  }, [navigation, counter, mascotIsActive, height, width, toggleMascotIsActive]);
+  }, [navigation, counter, mascotIsActive, height, width, toggleMascotIsActive, hasParent]);
 
 
   // 카운터 데이터가 없으면 렌더링하지 않음
@@ -179,7 +179,7 @@ const CounterDetail = () => {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['left', 'right', 'bottom']}>
+    <SafeAreaView style={screenStyles.flex1} edges={safeAreaEdges}>
       <View className="flex-1 bg-white">
 
       {/* 좌우 터치 레이어 */}
@@ -188,11 +188,13 @@ const CounterDetail = () => {
       {/* 중앙 콘텐츠 영역 */}
       <Animated.View
         className="flex-1 items-center"
-        style={{
-          pointerEvents: 'box-none',
-          paddingTop: paddingTopAnim,
-          opacity: isPaddingReady ? 1 : 0,
-        }}
+        style={[
+          screenStyles.pointerEventsBoxNone,
+          {
+            paddingTop: paddingTopAnim,
+            opacity: isPaddingReady ? 1 : 0,
+          },
+        ]}
       >
         {/* 프로그레스 바 - 화면 최상단에 고정 */}
         <ProgressBar

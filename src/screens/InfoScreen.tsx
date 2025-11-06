@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import TextInputBox from '@components/common/TextInputBox';
 import RoundedButton from '@components/common/RoundedButton';
 import { ConfirmModal } from '@components/common/modals';
+import { screenStyles, safeAreaEdges } from '@styles/screenStyles';
 
 import { useItemInfo } from '@hooks/useItemInfo';
 
@@ -46,13 +47,13 @@ const InfoScreen = () => {
   } = useItemInfo();
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['left', 'right', 'bottom']}>
+    <SafeAreaView style={screenStyles.flex1} edges={safeAreaEdges}>
       <KeyboardAvoidingView
-        style={{ flex: 1 }}
+        style={screenStyles.flex1}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={80} // 헤더 높이 조정
       >
-        <ScrollView contentContainerStyle={{ paddingBottom: 32 }} className="p-4">
+        <ScrollView contentContainerStyle={screenStyles.scrollViewContent}>
           {/* 제목 입력 필드 */}
           <TextInputBox
             label="이름"
