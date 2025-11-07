@@ -13,7 +13,7 @@ import { getScreenAwakeSetting } from '@storage/settings';
 
 import { CounterTouchArea, CounterDirection, CounterActions, CounterModals, SubCounterModal, ProgressBar, TimeDisplay } from '@components/counter';
 import Tooltip from '@components/common/Tooltip';
-import { getScreenSize, getIconSize, getTextClass, getGapClass, getSubModalWidthRatio, getSubModalHeightRatio, getSubModalTop, getTimeDisplayMinHeight, ScreenSize } from '@constants/screenSizeConfig';
+import { getScreenSize, getIconSize, getTextClass, getGapClass, getSubModalWidthRatio, getSubModalHeightRatio, getSubModalTop, ScreenSize } from '@constants/screenSizeConfig';
 import { getTooltipEnabledSetting } from '@storage/settings';
 import { screenStyles, safeAreaEdges } from '@styles/screenStyles';
 import { useCounter } from '@hooks/useCounter';
@@ -70,6 +70,7 @@ const CounterDetail = () => {
     toggleMascotIsActive,
     toggleWay,
     toggleTimerIsActive,
+    toggleTimerIsPlaying,
     setErrorModalVisible,
     setActiveModal,
     // 보조 카운터 관련
@@ -190,11 +191,11 @@ const CounterDetail = () => {
 
       {/* 중앙 콘텐츠 영역 */}
       <Animated.View
-        className="flex-1 items-center"
+        className="flex-1 items-center justify-center"
         style={[
           screenStyles.pointerEventsBoxNone,
           {
-            paddingTop: paddingTopAnim,
+            paddingTop: -50,
             opacity: isPaddingReady ? 1 : 0,
           },
         ]}
@@ -225,9 +226,13 @@ const CounterDetail = () => {
         )}
 
         {/* 시간 표시 컴포넌트 */}
-        <View style={{ minHeight: getTimeDisplayMinHeight(screenSize) }}>
-          {counter.timerIsActive && <TimeDisplay screenSize={screenSize} />}
-        </View>
+        {counter.timerIsActive && (
+          <TimeDisplay
+            screenSize={screenSize}
+            timerIsPlaying={counter.timerIsPlaying ?? false}
+            onPress={toggleTimerIsPlaying}
+          />
+        )}
 
         {/* 방향 표시 이미지 영역 */}
         <CounterDirection
@@ -236,6 +241,7 @@ const CounterDetail = () => {
           way={way}
           imageWidth={imageWidth}
           imageHeight={imageHeight}
+          screenSize={screenSize}
           onToggleWay={toggleWay}
         />
 

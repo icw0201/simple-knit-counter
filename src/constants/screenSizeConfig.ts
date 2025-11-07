@@ -41,12 +41,12 @@ export const textClassConfig = {
 };
 
 /**
- * 화면 크기별 컴포넌트 간 세로 간격 설정 (margin-top)
+ * 화면 크기별 컴포넌트 간 세로 간격 설정 (margin-top, margin-bottom)
  */
 export const gapConfig = {
-  [ScreenSize.COMPACT]: 'mt-4',          // 컴팩트: 작은 간격
-  [ScreenSize.SMALL]: 'mt-6',            // 작음: 중간 간격
-  [ScreenSize.LARGE]: 'mt-16',            // 큼: 큰 간격
+  [ScreenSize.COMPACT]: 'mt-2 mb-2',          // 컴팩트: 작은 간격
+  [ScreenSize.SMALL]: 'mt-3 mb-3',            // 작음: 중간 간격
+  [ScreenSize.LARGE]: 'mt-8 mb-8',          // 큼: 큰 간격
 };
 
 /**
@@ -215,7 +215,7 @@ export const getSubModalTop = (screenSize: ScreenSize): DimensionValue => {
 /**
  * 패딩 탑 배수 (기본값)
  */
-export const PADDING_TOP_MULTIPLIER = 0.085;
+export const PADDING_TOP_MULTIPLIER = 0;
 
 /**
  * SubCounterModal 열릴 때 패딩 탑 배수 (2배)
