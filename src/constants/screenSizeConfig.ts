@@ -50,6 +50,24 @@ export const gapConfig = {
 };
 
 /**
+ * 화면 크기별 TimeDisplay 텍스트 크기 설정
+ */
+export const timeDisplayTextClassConfig = {
+  [ScreenSize.COMPACT]: 'text-lg',      // 컴팩트: 사용 안 함 (숨김)
+  [ScreenSize.SMALL]: 'text-xl',        // 작음: 작은 글씨
+  [ScreenSize.LARGE]: 'text-2xl',       // 큼: 큰 글씨
+};
+
+/**
+ * 화면 크기별 TimeDisplay 최소 높이 설정
+ */
+export const timeDisplayMinHeightConfig = {
+  [ScreenSize.COMPACT]: 0,              // 컴팩트: 사용 안 함
+  [ScreenSize.SMALL]: 20,                // 작음: 작은 높이
+  [ScreenSize.LARGE]: 20,                // 큼: 기본 높이
+};
+
+/**
  * 화면 크기별 서브 모달 텍스트 마진 설정
  */
 export const subModalTextMarginConfig = {
@@ -136,6 +154,24 @@ export const getTextClass = (screenSize: ScreenSize): string => {
  */
 export const getGapClass = (screenSize: ScreenSize): string => {
   return gapConfig[screenSize];
+};
+
+/**
+ * 화면 크기에 따른 TimeDisplay 텍스트 클래스를 반환합니다.
+ * @param screenSize - 화면 크기
+ * @returns 텍스트 클래스
+ */
+export const getTimeDisplayTextClass = (screenSize: ScreenSize): string => {
+  return timeDisplayTextClassConfig[screenSize];
+};
+
+/**
+ * 화면 크기에 따른 TimeDisplay 최소 높이를 반환합니다.
+ * @param screenSize - 화면 크기
+ * @returns 최소 높이 (픽셀)
+ */
+export const getTimeDisplayMinHeight = (screenSize: ScreenSize): number => {
+  return timeDisplayMinHeightConfig[screenSize];
 };
 
 /**

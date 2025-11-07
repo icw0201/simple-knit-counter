@@ -13,7 +13,7 @@ import { getScreenAwakeSetting } from '@storage/settings';
 
 import { CounterTouchArea, CounterDirection, CounterActions, CounterModals, SubCounterModal, ProgressBar, TimeDisplay } from '@components/counter';
 import Tooltip from '@components/common/Tooltip';
-import { getScreenSize, getIconSize, getTextClass, getGapClass, getSubModalWidthRatio, getSubModalHeightRatio, getSubModalTop, ScreenSize } from '@constants/screenSizeConfig';
+import { getScreenSize, getIconSize, getTextClass, getGapClass, getSubModalWidthRatio, getSubModalHeightRatio, getSubModalTop, getTimeDisplayMinHeight, ScreenSize } from '@constants/screenSizeConfig';
 import { getTooltipEnabledSetting } from '@storage/settings';
 import { screenStyles, safeAreaEdges } from '@styles/screenStyles';
 import { useCounter } from '@hooks/useCounter';
@@ -225,7 +225,9 @@ const CounterDetail = () => {
         )}
 
         {/* 시간 표시 컴포넌트 */}
-        {counter.timerIsActive && <TimeDisplay />}
+        <View style={{ minHeight: getTimeDisplayMinHeight(screenSize) }}>
+          {counter.timerIsActive && <TimeDisplay screenSize={screenSize} />}
+        </View>
 
         {/* 방향 표시 이미지 영역 */}
         <CounterDirection
