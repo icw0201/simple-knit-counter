@@ -8,7 +8,7 @@ import Sound from 'react-native-sound';
 
 import { getStoredItems, updateItem } from '@storage/storage';
 import { Way, Counter } from '@storage/types';
-import { getSoundSetting, getVibrationSetting } from '@storage/settings';
+import { getSoundSetting, getVibrationSetting, getAutoPlayElapsedTimeSetting } from '@storage/settings';
 import { PADDING_TOP_MULTIPLIER, PADDING_TOP_RATIO } from '@constants/screenSizeConfig';
 
 interface UseCounterProps {
@@ -45,6 +45,7 @@ interface UseCounterReturn {
   toggleMascotIsActive: () => void;
   toggleWay: () => void;
   toggleTimerIsActive: () => void;
+  toggleTimerIsPlaying: () => void;
   showErrorModal: (message: string) => void;
   setErrorModalVisible: (visible: boolean) => void;
   setActiveModal: (modal: 'reset' | 'edit' | 'limit' | 'rule' | 'subReset' | 'subEdit' | 'subLimit' | 'targetCount' | null) => void;
@@ -166,6 +167,22 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
           };
         });
         setWay(latest.info?.way ?? 'front');
+
+        // 카운터 진입 시 타이머 재생 상태 설정
+        // 카운터가 활성화된 상태 & 설정에서 자동재생 켜짐 -> true, 꺼짐 -> false
+        if (latest.timerIsActive) {
+          const autoPlaySetting = getAutoPlayElapsedTimeSetting();
+          const shouldPlay = autoPlaySetting;
+          if (latest.timerIsPlaying !== shouldPlay) {
+            updateItem(latest.id, { timerIsPlaying: shouldPlay });
+            setCounter(prev => {
+              if (!prev) {
+                return prev;
+              }
+              return { ...prev, timerIsPlaying: shouldPlay };
+            });
+          }
+        }
       }
     }, [counterId, loadSettings]) // counter 의존성 제거
   );
@@ -381,8 +398,27 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     }
 
     const newTimerIsActive = !counter.timerIsActive;
-    updateItem(counter.id, { timerIsActive: newTimerIsActive });
-    setCounter({ ...counter, timerIsActive: newTimerIsActive });
+    // 타이머 활성화 시 설정의 "타이머 자동 재생" 설정값을 따름, 비활성화 시는 기존 값 유지
+    let newTimerIsPlaying = counter.timerIsPlaying;
+    if (newTimerIsActive) {
+      const autoPlaySetting = getAutoPlayElapsedTimeSetting();
+      newTimerIsPlaying = autoPlaySetting;
+    }
+    updateItem(counter.id, { timerIsActive: newTimerIsActive, timerIsPlaying: newTimerIsPlaying });
+    setCounter({ ...counter, timerIsActive: newTimerIsActive, timerIsPlaying: newTimerIsPlaying });
+  }, [counter]);
+
+  /**
+   * 타이머 재생 상태 토글 함수
+   */
+  const toggleTimerIsPlaying = useCallback(() => {
+    if (!counter) {
+      return;
+    }
+
+    const newTimerIsPlaying = !counter.timerIsPlaying;
+    updateItem(counter.id, { timerIsPlaying: newTimerIsPlaying });
+    setCounter({ ...counter, timerIsPlaying: newTimerIsPlaying });
   }, [counter]);
 
   /**
@@ -763,6 +799,7 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     toggleMascotIsActive,
     toggleWay,
     toggleTimerIsActive,
+    toggleTimerIsPlaying,
     showErrorModal,
     setErrorModalVisible,
     setActiveModal,

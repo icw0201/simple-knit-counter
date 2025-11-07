@@ -1,18 +1,20 @@
 import React, { useState } from 'react';
-import { Text, View, LayoutChangeEvent } from 'react-native';
+import { Text, View, LayoutChangeEvent, Pressable } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
-import { ScreenSize, getTimeDisplayTextClass } from '@constants/screenSizeConfig';
+import { ScreenSize, getTimeDisplayTextClass, getGapClass } from '@constants/screenSizeConfig';
 import { timeDisplayStyles } from './TimeDisplayStyles';
 
 interface TimeDisplayProps {
   screenSize: ScreenSize;
+  timerIsPlaying: boolean;
+  onPress: () => void;
 }
 
 /**
  * 시간 표시 컴포넌트
  * DSEG7Classic 폰트를 사용하여 시간을 표시합니다.
  */
-const TimeDisplay: React.FC<TimeDisplayProps> = ({ screenSize }) => {
+const TimeDisplay: React.FC<TimeDisplayProps> = ({ screenSize, timerIsPlaying, onPress }) => {
   // 깎인 모서리 크기 (픽셀 단위)
   const cornerSize = 8;
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
@@ -34,9 +36,13 @@ const TimeDisplay: React.FC<TimeDisplayProps> = ({ screenSize }) => {
   // 화면 크기에 따른 패딩 클래스
   const paddingClass = screenSize === ScreenSize.SMALL ? 'px-3 py-1.5' : 'px-4 py-2';
 
+  // 배경색 결정: timerIsPlaying이 false면 light gray, true면 red-orange-300
+  const backgroundColor = timerIsPlaying ? '#ffa09e' : '#DBDBDB'; // lightgray from tailwind config
+
   return (
-    <View
-      className={`items-center justify-center mb-2 ${paddingClass} relative -mt-14`}
+    <Pressable
+      onPress={onPress}
+      className={`items-center justify-center ${getGapClass(screenSize)} ${paddingClass} relative`}
       onLayout={onLayout}
     >
       {/* 배경 - SVG path로 깎인 모양 구현 */}
@@ -45,7 +51,7 @@ const TimeDisplay: React.FC<TimeDisplayProps> = ({ screenSize }) => {
           <Svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
             <Path
               d={`M ${cornerX},0 L ${100 - cornerX},0 L 100,${cornerY} L 100,${100 - cornerY} L ${100 - cornerX},100 L ${cornerX},100 L 0,${100 - cornerY} L 0,${cornerY} Z`}
-              fill="#ffa09e"
+              fill={backgroundColor}
             />
           </Svg>
         </View>
@@ -53,7 +59,7 @@ const TimeDisplay: React.FC<TimeDisplayProps> = ({ screenSize }) => {
       <Text style={timeDisplayStyles.dseg7Bold} className={`${getTimeDisplayTextClass(screenSize)} relative z-10`}>
         88:88:88
       </Text>
-    </View>
+    </Pressable>
   );
 };
 
