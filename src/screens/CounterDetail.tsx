@@ -230,6 +230,7 @@ const CounterDetail = () => {
           <TimeDisplay
             screenSize={screenSize}
             timerIsPlaying={counter.timerIsPlaying ?? false}
+            elapsedTime={counter.elapsedTime ?? 0}
             onPress={toggleTimerIsPlaying}
           />
         )}

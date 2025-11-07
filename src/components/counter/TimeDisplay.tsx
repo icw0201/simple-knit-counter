@@ -3,10 +3,12 @@ import { Text, View, LayoutChangeEvent, Pressable } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { ScreenSize, getTimeDisplayTextClass, getGapClass } from '@constants/screenSizeConfig';
 import { timeDisplayStyles } from './TimeDisplayStyles';
+import { formatElapsedTime } from '@utils/timeUtils';
 
 interface TimeDisplayProps {
   screenSize: ScreenSize;
   timerIsPlaying: boolean;
+  elapsedTime: number; // 소요 시간 (초 단위, 0 ~ 359999)
   onPress: () => void;
 }
 
@@ -14,7 +16,7 @@ interface TimeDisplayProps {
  * 시간 표시 컴포넌트
  * DSEG7Classic 폰트를 사용하여 시간을 표시합니다.
  */
-const TimeDisplay: React.FC<TimeDisplayProps> = ({ screenSize, timerIsPlaying, onPress }) => {
+const TimeDisplay: React.FC<TimeDisplayProps> = ({ screenSize, timerIsPlaying, elapsedTime, onPress }) => {
   // 깎인 모서리 크기 (픽셀 단위)
   const cornerSize = 8;
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
@@ -39,6 +41,9 @@ const TimeDisplay: React.FC<TimeDisplayProps> = ({ screenSize, timerIsPlaying, o
   // 배경색 결정: timerIsPlaying이 false면 light gray, true면 red-orange-300
   const backgroundColor = timerIsPlaying ? '#ffa09e' : '#DBDBDB'; // lightgray from tailwind config
 
+  // 시간 포맷팅
+  const formattedTime = formatElapsedTime(elapsedTime);
+
   return (
     <Pressable
       onPress={onPress}
@@ -57,7 +62,7 @@ const TimeDisplay: React.FC<TimeDisplayProps> = ({ screenSize, timerIsPlaying, o
         </View>
       )}
       <Text style={timeDisplayStyles.dseg7Bold} className={`${getTimeDisplayTextClass(screenSize)} relative z-10`}>
-        88:88:88
+        {formattedTime}
       </Text>
     </Pressable>
   );

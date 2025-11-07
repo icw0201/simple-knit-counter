@@ -313,6 +313,36 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
   }, [counter]);
 
   /**
+   * 타이머 재생 중 소요 시간 증가
+   * timerIsActive가 true이고 timerIsPlaying이 true일 때만 동작
+   */
+  useEffect(() => {
+    if (!counter || !counter.timerIsActive || !counter.timerIsPlaying) {
+      return;
+    }
+
+    const intervalId = setInterval(() => {
+      // 최신 counter 값을 가져오기 위해 함수형 업데이트 사용
+      setCounter(prev => {
+        if (!prev || !prev.timerIsActive || !prev.timerIsPlaying) {
+          return prev;
+        }
+
+        // 최대값: 9999시간 59분 59초 = 35999999초
+        const MAX_ELAPSED_TIME = 35999999;
+        const newElapsedTime = Math.min(prev.elapsedTime + 1, MAX_ELAPSED_TIME);
+        updateItem(prev.id, { elapsedTime: newElapsedTime });
+        return { ...prev, elapsedTime: newElapsedTime };
+      });
+    }, 1000); // 1초마다 실행
+
+    return () => {
+      clearInterval(intervalId);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [counter?.timerIsActive, counter?.timerIsPlaying, counter?.id]);
+
+  /**
    * 에러 모달 표시
    */
   const showErrorModal = useCallback((message: string) => {
