@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Text, View, LayoutChangeEvent, Pressable } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { ScreenSize, getTimeDisplayTextClass, getGapClass } from '@constants/screenSizeConfig';
@@ -8,7 +8,7 @@ import { formatElapsedTime } from '@utils/timeUtils';
 interface TimeDisplayProps {
   screenSize: ScreenSize;
   timerIsPlaying: boolean;
-  elapsedTime: number; // 소요 시간 (초 단위, 0 ~ 359999)
+  elapsedTime: number; // 소요 시간 (초 단위, 0 ~ 35999999, 최대 9999:59:59)
   onPress: () => void;
 }
 
@@ -20,6 +20,23 @@ const TimeDisplay: React.FC<TimeDisplayProps> = ({ screenSize, timerIsPlaying, e
   // 깎인 모서리 크기 (픽셀 단위)
   const cornerSize = 8;
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const [showColon, setShowColon] = useState(true);
+
+  useEffect(() => {
+    if (!timerIsPlaying) {
+      setShowColon(true);
+      return;
+    }
+
+    const BLINK_INTERVAL_MS = 750;
+    const intervalId = setInterval(() => {
+      setShowColon(prev => !prev);
+    }, BLINK_INTERVAL_MS);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [timerIsPlaying]);
 
   // COMPACT일 때는 렌더링하지 않음
   if (screenSize === ScreenSize.COMPACT) {
@@ -42,7 +59,8 @@ const TimeDisplay: React.FC<TimeDisplayProps> = ({ screenSize, timerIsPlaying, e
   const backgroundColor = timerIsPlaying ? '#ffa09e' : '#DBDBDB'; // lightgray from tailwind config
 
   // 시간 포맷팅
-  const formattedTime = formatElapsedTime(elapsedTime);
+  const { hours, minutes, seconds } = formatElapsedTime(elapsedTime);
+  const colonStyle = timerIsPlaying && !showColon ? timeDisplayStyles.colonHidden : undefined;
 
   return (
     <Pressable
@@ -62,7 +80,11 @@ const TimeDisplay: React.FC<TimeDisplayProps> = ({ screenSize, timerIsPlaying, e
         </View>
       )}
       <Text style={timeDisplayStyles.dseg7Bold} className={`${getTimeDisplayTextClass(screenSize)} relative z-10`}>
-        {formattedTime}
+        {hours}
+        <Text style={colonStyle}>:</Text>
+        {minutes}
+        <Text style={colonStyle}>:</Text>
+        {seconds}
       </Text>
     </Pressable>
   );
