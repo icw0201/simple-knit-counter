@@ -9,6 +9,7 @@ interface ItemBoxProps {
   title: string;
   subtitle?: string;
   number?: number;
+  elapsedTimeText?: string;
   onPress: () => void;
   onLongPress?: () => void;
   progressPercentage?: number;
@@ -24,6 +25,7 @@ const ItemBox: React.FC<ItemBoxProps> = ({
   title,
   subtitle,
   number,
+  elapsedTimeText,
   onPress,
   onLongPress,
   progressPercentage,
@@ -32,6 +34,7 @@ const ItemBox: React.FC<ItemBoxProps> = ({
 }) => {
   const { container, text, subtext } = colorStyles.default;
   const hasProgress = progressPercentage !== undefined && progressPercentage !== null;
+  const hasElapsedTime = !!elapsedTimeText;
 
   const boxView = (
     <View className={clsx(
@@ -72,7 +75,7 @@ const ItemBox: React.FC<ItemBoxProps> = ({
             <Text className={clsx('text-lg font-semibold', isEditMode ? 'text-black' : text)}>{title}</Text>
           </View>
           {number !== undefined && (
-            <View className="relative items-center justify-center">
+            <View className="relative items-end justify-center">
               {isCompleted && (
                 <Image
                   source={isEditMode ? Images.complete_reverse : Images.complete_nomal}
@@ -80,7 +83,18 @@ const ItemBox: React.FC<ItemBoxProps> = ({
                   resizeMode="cover"
                 />
               )}
-              <Text className={clsx('text-2xl font-bold', text)}>{number}</Text>
+              <View className="items-end justify-center h-10">
+                {hasElapsedTime ? (
+                  <>
+                    <Text className={clsx('text-2xl font-bold', text)}>{number}</Text>
+                    <Text className={clsx('text-xs font-bold', text)}>
+                      {elapsedTimeText}
+                    </Text>
+                  </>
+                ) : (
+                  <Text className={clsx('text-2xl font-bold', text)}>{number}</Text>
+                )}
+              </View>
             </View>
           )}
         </View>
