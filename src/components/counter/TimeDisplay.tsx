@@ -28,15 +28,20 @@ const TimeDisplay: React.FC<TimeDisplayProps> = ({ screenSize, timerIsPlaying, e
       return;
     }
 
-    const BLINK_INTERVAL_MS = 750;
-    const intervalId = setInterval(() => {
-      setShowColon(prev => !prev);
-    }, BLINK_INTERVAL_MS);
+    const VISIBLE_DURATION_MS = 600;
+
+    // 초가 바뀌는(elapsedTime 변경) 순간 콜론을 켜고,
+    // 600ms 동안 켜져 있다가 나머지 400ms는 꺼진 상태 유지
+    setShowColon(true);
+
+    const timeoutId = setTimeout(() => {
+      setShowColon(false);
+    }, VISIBLE_DURATION_MS);
 
     return () => {
-      clearInterval(intervalId);
+      clearTimeout(timeoutId);
     };
-  }, [timerIsPlaying]);
+  }, [timerIsPlaying, elapsedTime]);
 
   // COMPACT일 때는 렌더링하지 않음
   if (screenSize === ScreenSize.COMPACT) {
