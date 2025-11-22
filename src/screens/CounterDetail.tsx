@@ -11,9 +11,9 @@ import { activateKeepAwake, deactivateKeepAwake } from '@sayem314/react-native-k
 import { getHeaderRightWithActivateInfoSettings } from '@navigation/HeaderOptions';
 import { getScreenAwakeSetting } from '@storage/settings';
 
-import { CounterTouchArea, CounterDirection, CounterActions, CounterModals, SubCounterModal, ProgressBar, TimeDisplay } from '@components/counter';
+import { CounterTouchArea, CounterDirection, CounterActions, CounterModals, SubCounterModal, ProgressBar, TimeDisplay, SegmentRecordModal } from '@components/counter';
 import Tooltip from '@components/common/Tooltip';
-import { getScreenSize, getIconSize, getTextClass, getGapClass, getSubModalWidthRatio, getSubModalHeightRatio, getSubModalTop, ScreenSize } from '@constants/screenSizeConfig';
+import { getScreenSize, getIconSize, getTextClass, getGapClass, getSubModalWidthRatio, getSubModalHeightRatio, getSubModalTop, getSegmentModalHeightRatio, getSegmentModalTop, ScreenSize } from '@constants/screenSizeConfig';
 import { getTooltipEnabledSetting } from '@storage/settings';
 import { screenStyles, safeAreaEdges } from '@styles/screenStyles';
 import { useCounter } from '@hooks/useCounter';
@@ -42,7 +42,7 @@ const CounterDetail = () => {
 
   // 화면 크기 정보
   const { height, width } = useWindowDimensions();
-  const screenSize = getScreenSize(height, width);
+  const screenSize = getScreenSize(height);
   const iconSize = getIconSize(screenSize);
   const textClass = getTextClass(screenSize);
   const gapClass = getGapClass(screenSize);
@@ -87,6 +87,9 @@ const CounterDetail = () => {
     handleSubEditConfirm,
     handleSubRuleConfirm,
     handleSubModalToggle,
+    // 구간 기록 모달
+    handleSectionModalToggle,
+    handleSectionUndo,
     // 패딩 탑 애니메이션
     paddingTopAnim,
     updatePaddingTopAnimation,
@@ -125,6 +128,11 @@ const CounterDetail = () => {
   const subModalHeight = height * getSubModalHeightRatio(screenSize);
   const subModalTop = getSubModalTop(screenSize);
 
+  // 구간 기록 모달 크기 및 위치 계산 (LARGE 화면에서만 사용)
+  const segmentModalWidth = subModalWidth;
+  const segmentModalHeight = height * getSegmentModalHeightRatio(screenSize);
+  const segmentModalTop = getSegmentModalTop(screenSize);
+
   /**
    * 화면 포커스 시 실행되는 효과
    * 화면 켜짐 상태 관리만 담당합니다.
@@ -159,7 +167,7 @@ const CounterDetail = () => {
       return;
     }
 
-    const currentScreenSize = getScreenSize(height, width);
+    const currentScreenSize = getScreenSize(height);
 
     navigation.setOptions({
       title: counter.title,
@@ -268,6 +276,19 @@ const CounterDetail = () => {
         )}
       </Animated.View>
 
+      {/* 구간 기록 모달 - LARGE 화면에서만 표시 */}
+      {screenSize === ScreenSize.LARGE && (
+        <SegmentRecordModal
+          isOpen={counter.sectionModalIsOpen ?? false}
+          onToggle={handleSectionModalToggle}
+          onUndo={handleSectionUndo}
+          screenSize={screenSize}
+          width={segmentModalWidth}
+          height={segmentModalHeight}
+          top={segmentModalTop}
+          sectionRecords={counter.sectionRecords}
+        />
+      )}
 
       {/* 보조 카운터 모달 */}
       <SubCounterModal

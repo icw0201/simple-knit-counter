@@ -23,7 +23,10 @@ export type EditLogType =
   | 'sub_count_decrease' // 코수 감
   | 'sub_count_reset'    // 코수 초기화
   | 'sub_count_edit'     // 코수 편집
-  | 'sub_rule_activate'; // 코수 규칙 활성화
+  | 'sub_rule_activate'  // 코수 규칙 활성화
+  | 'sub_rule_deactivate' // 코수 규칙 비활성화
+  | 'way_change_front'   // 방향 변경 (앞)
+  | 'way_change_back';   // 방향 변경 (뒤)
 
 // ===== 공통 정보 타입 =====
 
@@ -42,7 +45,13 @@ export type Info = {
 export type SectionRecord = {
   time: string;          // 시간 (HH:MM:SS 형식)
   editedCount: number;   // 편집 후 코수
+  editedMainCount?: number; // 편집 후 단수 (단수 관련 편집 시에만 저장)
   editContent: EditLogType; // 편집 내용
+  // 실행 취소를 위한 이전 상태 정보
+  previousCount?: number;      // 이전 단수
+  previousSubCount?: number;   // 이전 코수
+  previousWay?: Way;           // 이전 way
+  previousSubRuleIsActive?: boolean; // 이전 보조 카운터 규칙 활성화 여부
 };
 
 // ===== 아이템 타입들 =====

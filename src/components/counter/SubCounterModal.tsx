@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text } from 'react-native';
-import { SlideModal } from '../common/modals/SlideModal/SlideModal';
+import { SlideModal } from '@components/common/modals/SlideModal/SlideModal';
 import SubCounterAction from './SubCounterAction';
 import SubCounterTouchArea from './SubCounterTouchArea';
 import { getSubIconSize, getSubModalTextMarginClass, ScreenSize } from '@constants/screenSizeConfig';

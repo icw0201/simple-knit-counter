@@ -33,3 +33,15 @@ export const formatElapsedTime = (seconds: number): FormattedElapsedTime => {
   };
 };
 
+/**
+ * 현재 시간을 HH:MM:SS 형식으로 반환합니다.
+ * @returns 현재 시간 문자열 (HH:MM:SS 형식)
+ */
+export const getCurrentTime = (): string => {
+  const now = new Date();
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const seconds = String(now.getSeconds()).padStart(2, '0');
+  return `${hours}:${minutes}:${seconds}`;
+};
+
