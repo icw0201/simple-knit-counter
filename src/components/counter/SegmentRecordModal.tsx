@@ -1,11 +1,10 @@
 import React from 'react';
 import { View, Text, DimensionValue } from 'react-native';
 import { SlideModal } from '@components/common/modals/SlideModal/SlideModal';
-import { ScreenSize } from '@constants/screenSizeConfig';
+import { ScreenSize, SEGMENT_UNDO_ICON_SIZE } from '@constants/screenSizeConfig';
 import { SectionRecord } from '@storage/types';
 import { getEditContentText } from '@utils/sectionRecordUtils';
 import CircleIcon from '@components/common/CircleIcon';
-import { SEGMENT_UNDO_ICON_SIZE } from '@utils/iconUtils';
 
 // ===== 타입 정의 =====
 interface SegmentRecordModalProps {

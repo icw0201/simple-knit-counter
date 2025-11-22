@@ -202,6 +202,12 @@ export const getSegmentModalTop = (screenSize: ScreenSize): DimensionValue => {
 // ===== 패딩 탑 애니메이션 상수 =====
 
 /**
+ * 구간 기록 모달 실행 취소 버튼 아이콘 크기
+ * 서브 아이콘 LARGE 크기와 동일 (44)
+ */
+export const SEGMENT_UNDO_ICON_SIZE = 44;
+
+/**
  * 패딩 탑 배수 (기본값)
  */
 export const PADDING_TOP_MULTIPLIER = 0;
