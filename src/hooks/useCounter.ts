@@ -62,6 +62,9 @@ interface UseCounterReturn {
   handleSubRuleConfirm: (rule: number, isRuleActive: boolean) => void;
   handleSubModalToggle: () => void;
 
+  // 구간 기록 모달 액션 함수
+  handleSectionModalToggle: () => void;
+
   // 패딩 탑 애니메이션
   paddingTopAnim: Animated.Value;
   updatePaddingTopAnimation: (height: number, subModalIsOpen: boolean, options?: { animate?: boolean }) => void;
@@ -863,6 +866,21 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     setCounter(updatedCounter);
   }, [counter]);
 
+  // 구간 기록 모달 토글
+  const handleSectionModalToggle = useCallback(async () => {
+    if (!counter) {
+      return;
+    }
+
+    const updatedCounter = {
+      ...counter,
+      sectionModalIsOpen: !counter.sectionModalIsOpen,
+    };
+
+    await updateItem(counter.id, updatedCounter);
+    setCounter(updatedCounter);
+  }, [counter]);
+
   return {
     // 상태
     counter,
@@ -908,6 +926,9 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     handleSubEditConfirm,
     handleSubRuleConfirm,
     handleSubModalToggle,
+
+    // 구간 기록 모달 액션 함수
+    handleSectionModalToggle,
 
     // 패딩 탑 애니메이션
     paddingTopAnim,

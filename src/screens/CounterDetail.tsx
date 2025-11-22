@@ -87,6 +87,8 @@ const CounterDetail = () => {
     handleSubEditConfirm,
     handleSubRuleConfirm,
     handleSubModalToggle,
+    // 구간 기록 모달
+    handleSectionModalToggle,
     // 패딩 탑 애니메이션
     paddingTopAnim,
     updatePaddingTopAnimation,
@@ -124,9 +126,6 @@ const CounterDetail = () => {
   const subModalWidth = width * getSubModalWidthRatio(screenSize);
   const subModalHeight = height * getSubModalHeightRatio(screenSize);
   const subModalTop = getSubModalTop(screenSize);
-
-  // 구간 기록 모달 상태
-  const [segmentModalIsOpen, setSegmentModalIsOpen] = useState(false);
 
   // 구간 기록 모달 크기 및 위치 계산 (LARGE 화면에서만 사용)
   const segmentModalWidth = subModalWidth;
@@ -279,8 +278,8 @@ const CounterDetail = () => {
       {/* 구간 기록 모달 - LARGE 화면에서만 표시 */}
       {screenSize === ScreenSize.LARGE && (
         <SegmentRecordModal
-          isOpen={segmentModalIsOpen}
-          onToggle={() => setSegmentModalIsOpen(!segmentModalIsOpen)}
+          isOpen={counter.sectionModalIsOpen ?? false}
+          onToggle={handleSectionModalToggle}
           screenSize={screenSize}
           width={segmentModalWidth}
           height={segmentModalHeight}
