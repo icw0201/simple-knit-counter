@@ -64,6 +64,7 @@ interface UseCounterReturn {
 
   // 구간 기록 모달 액션 함수
   handleSectionModalToggle: () => void;
+  handleSectionUndo: () => void;
 
   // 패딩 탑 애니메이션
   paddingTopAnim: Animated.Value;
@@ -457,13 +458,23 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
 
   /**
    * 구간 기록 추가 (최신 3개만 유지)
+   * 실행 취소를 위해 이전 상태 정보도 함께 저장
    */
   const addSectionRecord = useCallback((editContent: EditLogType, editedCount: number, editedMainCount?: number): SectionRecord[] => {
+    if (!counter) {
+      return [];
+    }
+
     const newRecord: SectionRecord = {
       time: getCurrentTime(),
       editedCount,
       editedMainCount,
       editContent,
+      // 실행 취소를 위한 이전 상태 저장
+      previousCount: counter.count,
+      previousSubCount: counter.subCount,
+      previousWay: counter.info?.way,
+      previousSubRuleIsActive: counter.subRuleIsActive,
     };
     const currentRecords = counter?.sectionRecords ?? [];
     // 최신 기록을 앞에 추가하고 최신 3개만 유지
@@ -886,6 +897,44 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     setCounter(updatedCounter);
   }, [counter]);
 
+  // 구간 기록 실행 취소 (최신 기록 제거 및 이전 상태로 복원)
+  const handleSectionUndo = useCallback(async () => {
+    if (!counter || !counter.sectionRecords || counter.sectionRecords.length === 0) {
+      return;
+    }
+
+    // 최신 기록 가져오기 (첫 번째 항목)
+    const latestRecord = counter.sectionRecords[0];
+
+    // 이전 상태로 복원
+    const restoredCount = latestRecord.previousCount ?? counter.count;
+    const restoredSubCount = latestRecord.previousSubCount ?? counter.subCount;
+    const restoredWay = latestRecord.previousWay ?? counter.info?.way;
+    const restoredSubRuleIsActive = latestRecord.previousSubRuleIsActive ?? counter.subRuleIsActive;
+
+    // 최신 기록 제거 (첫 번째 항목 제거)
+    const updatedSectionRecords = counter.sectionRecords.slice(1);
+
+    // 카운터 상태 업데이트
+    const updatedInfo = counter.info ? { ...counter.info, way: restoredWay } : undefined;
+    const updatedCounter = {
+      ...counter,
+      count: restoredCount,
+      subCount: restoredSubCount,
+      info: updatedInfo,
+      subRuleIsActive: restoredSubRuleIsActive,
+      sectionRecords: updatedSectionRecords,
+    };
+
+    await updateItem(counter.id, updatedCounter);
+    setCounter(updatedCounter);
+
+    // way 상태도 업데이트
+    if (restoredWay) {
+      setWay(restoredWay);
+    }
+  }, [counter, setWay]);
+
   return {
     // 상태
     counter,
@@ -934,6 +983,7 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
 
     // 구간 기록 모달 액션 함수
     handleSectionModalToggle,
+    handleSectionUndo,
 
     // 패딩 탑 애니메이션
     paddingTopAnim,

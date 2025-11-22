@@ -89,6 +89,7 @@ const CounterDetail = () => {
     handleSubModalToggle,
     // 구간 기록 모달
     handleSectionModalToggle,
+    handleSectionUndo,
     // 패딩 탑 애니메이션
     paddingTopAnim,
     updatePaddingTopAnimation,
@@ -280,6 +281,7 @@ const CounterDetail = () => {
         <SegmentRecordModal
           isOpen={counter.sectionModalIsOpen ?? false}
           onToggle={handleSectionModalToggle}
+          onUndo={handleSectionUndo}
           screenSize={screenSize}
           width={segmentModalWidth}
           height={segmentModalHeight}

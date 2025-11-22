@@ -15,3 +15,9 @@ export const getLucideIcon = (iconName: string) => {
   // Lucide 아이콘 컴포넌트 반환 (없으면 Star 아이콘을 기본값으로)
   return (LucideIcons as any)[pascalCaseName] || LucideIcons.Star;
 };
+
+/**
+ * 구간 기록 모달 실행 취소 버튼 아이콘 크기
+ * 서브 아이콘 LARGE 크기와 동일 (44)
+ */
+export const SEGMENT_UNDO_ICON_SIZE = 44;

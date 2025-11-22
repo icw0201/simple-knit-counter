@@ -1,4 +1,3 @@
-// src/components/CircleIcon.tsx
 import React from 'react';
 import { View, TouchableOpacity } from 'react-native';
 import clsx from 'clsx';

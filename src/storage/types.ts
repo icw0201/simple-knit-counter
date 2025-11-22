@@ -47,6 +47,11 @@ export type SectionRecord = {
   editedCount: number;   // 편집 후 코수
   editedMainCount?: number; // 편집 후 단수 (단수 관련 편집 시에만 저장)
   editContent: EditLogType; // 편집 내용
+  // 실행 취소를 위한 이전 상태 정보
+  previousCount?: number;      // 이전 단수
+  previousSubCount?: number;   // 이전 코수
+  previousWay?: Way;           // 이전 way
+  previousSubRuleIsActive?: boolean; // 이전 보조 카운터 규칙 활성화 여부
 };
 
 // ===== 아이템 타입들 =====

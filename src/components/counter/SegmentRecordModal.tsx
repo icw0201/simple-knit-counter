@@ -4,11 +4,14 @@ import { SlideModal } from '@components/common/modals/SlideModal/SlideModal';
 import { ScreenSize } from '@constants/screenSizeConfig';
 import { SectionRecord } from '@storage/types';
 import { getEditContentText } from '@utils/sectionRecordUtils';
+import CircleIcon from '@components/common/CircleIcon';
+import { SEGMENT_UNDO_ICON_SIZE } from '@utils/iconUtils';
 
 // ===== 타입 정의 =====
 interface SegmentRecordModalProps {
   isOpen: boolean;
   onToggle: () => void;
+  onUndo: () => void;
   handleWidth?: number;
   screenSize: ScreenSize;
   width: number;
@@ -21,6 +24,7 @@ interface SegmentRecordModalProps {
 export const SegmentRecordModal: React.FC<SegmentRecordModalProps> = ({
   isOpen,
   onToggle,
+  onUndo,
   handleWidth = 30,
   screenSize: _screenSize,
   width,
@@ -45,17 +49,31 @@ export const SegmentRecordModal: React.FC<SegmentRecordModalProps> = ({
       {/* 콘텐츠 영역 */}
       <View className="flex-1 justify-center px-4" style={{ paddingLeft: handleWidth + 16 }}>
         {displayRecords.length > 0 ? (
-          displayRecords.map((record, index) => {
-            // 첫 번째: black, 두 번째: darkgray, 세 번째: mediumgray
-            const textColorClass = index === 0 ? 'text-black' : index === 1 ? 'text-darkgray' : 'text-mediumgray';
-            return (
-              <View key={index} className="py-1">
-                <Text className={`text-sm font-semibold ${textColorClass}`}>
-                  {record.time} {getEditContentText(record)}
-                </Text>
-              </View>
-            );
-          })
+          <View className="flex-row items-center justify-between">
+            {/* 3개 기록 묶음 */}
+            <View>
+              {displayRecords.map((record, index) => {
+                // 첫 번째: black, 두 번째: darkgray, 세 번째: mediumgray
+                const textColorClass = index === 0 ? 'text-black' : index === 1 ? 'text-darkgray' : 'text-mediumgray';
+                return (
+                  <View key={index} className="py-1">
+                    <Text className={`text-sm font-semibold ${textColorClass}`}>
+                      {record.time} {getEditContentText(record)}
+                    </Text>
+                  </View>
+                );
+              })}
+            </View>
+            {/* 실행 취소 버튼 */}
+            <CircleIcon
+              size={SEGMENT_UNDO_ICON_SIZE}
+              isButton={true}
+              onPress={onUndo}
+              iconName="eraser"
+              iconColor="black"
+              containerClassName="bg-red-orange-200 border-0"
+            />
+          </View>
         ) : (
           <View className="items-center justify-center">
             <Text className="text-sm text-darkgray">구간 기록이 없습니다</Text>
