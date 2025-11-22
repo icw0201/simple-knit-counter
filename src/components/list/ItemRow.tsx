@@ -4,7 +4,9 @@ import { View } from 'react-native';
 import ItemBox from './ItemBox';
 import CircleIcon from '@components/common/CircleIcon';
 import { Item } from '@storage/types';
-import { getProgressPercentage, isItemCompleted } from '@utils/sortUtils';
+import { getProgressPercentage, isItemCompleted, getElapsedTimeValue } from '@utils/sortUtils';
+import { getShowElapsedTimeInListSetting } from '@storage/settings';
+import { formatElapsedTime } from '@utils/timeUtils';
 
 interface ItemRowProps {
   item: Item;
@@ -37,6 +39,17 @@ const ItemRow: React.FC<ItemRowProps> = ({
     return item.count;
   };
 
+  const getElapsedTimeText = () => {
+    const showElapsed = getShowElapsedTimeInListSetting();
+    if (!showElapsed) {
+      return undefined;
+    }
+
+    const seconds = getElapsedTimeValue(item);
+    const { formatted } = formatElapsedTime(seconds);
+    return formatted;
+  };
+
   // util 함수를 사용하여 진행률 계산
   const progressValue = getProgressPercentage(item);
   const progressPercentage = progressValue > 0 ? progressValue : undefined;
@@ -51,6 +64,7 @@ const ItemRow: React.FC<ItemRowProps> = ({
           title={item.title}
           subtitle={getSubtitle()}
           number={getNumber()}
+          elapsedTimeText={getElapsedTimeText()}
           onPress={() => onPress(item)}
           onLongPress={() => onLongPress(item)}
           progressPercentage={progressPercentage}

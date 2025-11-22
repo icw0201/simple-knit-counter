@@ -8,7 +8,7 @@ import Sound from 'react-native-sound';
 
 import { getStoredItems, updateItem } from '@storage/storage';
 import { Way, Counter } from '@storage/types';
-import { getSoundSetting, getVibrationSetting } from '@storage/settings';
+import { getSoundSetting, getVibrationSetting, getAutoPlayElapsedTimeSetting } from '@storage/settings';
 import { PADDING_TOP_MULTIPLIER, PADDING_TOP_RATIO } from '@constants/screenSizeConfig';
 
 interface UseCounterProps {
@@ -44,6 +44,8 @@ interface UseCounterReturn {
   handleTargetCountConfirm: (value: string) => void;
   toggleMascotIsActive: () => void;
   toggleWay: () => void;
+  toggleTimerIsActive: () => void;
+  toggleTimerIsPlaying: () => void;
   showErrorModal: (message: string) => void;
   setErrorModalVisible: (visible: boolean) => void;
   setActiveModal: (modal: 'reset' | 'edit' | 'limit' | 'rule' | 'subReset' | 'subEdit' | 'subLimit' | 'targetCount' | null) => void;
@@ -165,6 +167,22 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
           };
         });
         setWay(latest.info?.way ?? 'front');
+
+        // 카운터 진입 시 타이머 재생 상태 설정
+        // 카운터가 활성화된 상태 & 설정에서 자동재생 켜짐 -> true, 꺼짐 -> false
+        if (latest.timerIsActive) {
+          const autoPlaySetting = getAutoPlayElapsedTimeSetting();
+          const shouldPlay = autoPlaySetting;
+          if (latest.timerIsPlaying !== shouldPlay) {
+            updateItem(latest.id, { timerIsPlaying: shouldPlay });
+            setCounter(prev => {
+              if (!prev) {
+                return prev;
+              }
+              return { ...prev, timerIsPlaying: shouldPlay };
+            });
+          }
+        }
       }
     }, [counterId, loadSettings]) // counter 의존성 제거
   );
@@ -295,6 +313,36 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
   }, [counter]);
 
   /**
+   * 타이머 재생 중 소요 시간 증가
+   * timerIsActive가 true이고 timerIsPlaying이 true일 때만 동작
+   */
+  useEffect(() => {
+    if (!counter || !counter.timerIsActive || !counter.timerIsPlaying) {
+      return;
+    }
+
+    const intervalId = setInterval(() => {
+      // 최신 counter 값을 가져오기 위해 함수형 업데이트 사용
+      setCounter(prev => {
+        if (!prev || !prev.timerIsActive || !prev.timerIsPlaying) {
+          return prev;
+        }
+
+        // 최대값: 9999시간 59분 59초 = 35999999초
+        const MAX_ELAPSED_TIME = 35999999;
+        const newElapsedTime = Math.min(prev.elapsedTime + 1, MAX_ELAPSED_TIME);
+        updateItem(prev.id, { elapsedTime: newElapsedTime });
+        return { ...prev, elapsedTime: newElapsedTime };
+      });
+    }, 1000); // 1초마다 실행
+
+    return () => {
+      clearInterval(intervalId);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [counter?.timerIsActive, counter?.timerIsPlaying, counter?.id]);
+
+  /**
    * 에러 모달 표시
    */
   const showErrorModal = useCallback((message: string) => {
@@ -370,6 +418,38 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
       });
     }
   }, [mascotIsActive, wayIsChange, counter]);
+
+  /**
+   * 타이머 활성화 토글 함수
+   */
+  const toggleTimerIsActive = useCallback(() => {
+    if (!counter) {
+      return;
+    }
+
+    const newTimerIsActive = !counter.timerIsActive;
+    // 타이머 활성화 시 설정의 "타이머 자동 재생" 설정값을 따름, 비활성화 시는 기존 값 유지
+    let newTimerIsPlaying = counter.timerIsPlaying;
+    if (newTimerIsActive) {
+      const autoPlaySetting = getAutoPlayElapsedTimeSetting();
+      newTimerIsPlaying = autoPlaySetting;
+    }
+    updateItem(counter.id, { timerIsActive: newTimerIsActive, timerIsPlaying: newTimerIsPlaying });
+    setCounter({ ...counter, timerIsActive: newTimerIsActive, timerIsPlaying: newTimerIsPlaying });
+  }, [counter]);
+
+  /**
+   * 타이머 재생 상태 토글 함수
+   */
+  const toggleTimerIsPlaying = useCallback(() => {
+    if (!counter) {
+      return;
+    }
+
+    const newTimerIsPlaying = !counter.timerIsPlaying;
+    updateItem(counter.id, { timerIsPlaying: newTimerIsPlaying });
+    setCounter({ ...counter, timerIsPlaying: newTimerIsPlaying });
+  }, [counter]);
 
   /**
    * 방향 토글 (wayIsChange가 true일 때만 동작)
@@ -748,6 +828,8 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     handleTargetCountConfirm,
     toggleMascotIsActive,
     toggleWay,
+    toggleTimerIsActive,
+    toggleTimerIsPlaying,
     showErrorModal,
     setErrorModalVisible,
     setActiveModal,

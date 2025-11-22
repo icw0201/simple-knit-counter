@@ -8,7 +8,7 @@ const STORAGE_KEY = 'knit_items';
 const DATA_VERSION_KEY = 'data_version';
 
 // 데이터 버전 관리
-export const CURRENT_DATA_VERSION = 3; // 새 프로퍼티 추가 마이그레이션
+export const CURRENT_DATA_VERSION = 4; // timerIsPlaying 추가 마이그레이션
 
 /**
  * 버전 1: 기존 'active' 상태를 'auto'로 마이그레이션
@@ -51,6 +51,7 @@ const migrateV2_ActivateModeToWayIsChangeAndMascotIsActive = (items: Item[]): It
  * - targetCount: 0 (목표 없음)
  * - elapsedTime: 0 (초 단위, 0 ~ 359999)
  * - timerIsActive: false
+ * - timerIsPlaying: false (V4에서 추가)
  * - subCount, subRule, subRuleIsActive, subModalIsOpen (보조 카운터 필드)
  * - repeatRuleIsActive, repeatRuleNumber, repeatRuleStartNumber, repeatRuleEndNumber (반복 규칙 필드)
  * - sectionRecords, sectionModalIsOpen (구간 기록 필드)
@@ -69,6 +70,7 @@ const migrateV3_AddNewProperties = (items: Item[]): Item[] => {
         targetCount: counter.targetCount ?? 0,
         elapsedTime: counter.elapsedTime ?? 0,
         timerIsActive: counter.timerIsActive ?? false,
+        timerIsPlaying: counter.timerIsPlaying ?? false,
 
         // 보조 카운터 필드들 (필수 프로퍼티)
         subCount: counter.subCount ?? 0,
@@ -112,6 +114,10 @@ const runMigrations = (items: Item[], fromVersion: number, toVersion: number): I
 
   if (fromVersion < 3 && toVersion >= 3) {
     migratedItems = migrateV3_AddNewProperties(migratedItems);
+  }
+
+  if (fromVersion < 4 && toVersion >= 4) {
+    migratedItems = migrateV3_AddNewProperties(migratedItems); // V4도 같은 마이그레이션 함수 사용 (timerIsPlaying 추가)
   }
 
   return migratedItems;

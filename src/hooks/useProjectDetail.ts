@@ -76,6 +76,7 @@ export const useProjectDetail = () => {
       targetCount: 0,
       elapsedTime: 0,
       timerIsActive: false,
+      timerIsPlaying: false,
       parentProjectId: project?.id ?? '',
       subCount: 0,
       subRule: 0,

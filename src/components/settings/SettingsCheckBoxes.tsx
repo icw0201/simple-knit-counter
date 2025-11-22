@@ -16,6 +16,8 @@ import {
   setScreenAwakeSetting,
   getTooltipEnabledSetting,
   setTooltipEnabledSetting,
+  getAutoPlayElapsedTimeSetting,
+  setAutoPlayElapsedTimeSetting,
 } from '@storage/settings';
 
 interface SettingsCheckBoxesProps {}
@@ -32,6 +34,7 @@ const SettingsCheckBoxes: React.FC<SettingsCheckBoxesProps> = () => {
   const [vibration, setVibration] = useState(true);
   const [screenAwake, setScreenAwake] = useState(true);
   const [tooltipEnabled, setTooltipEnabled] = useState(true);
+  const [autoPlayElapsedTime, setAutoPlayElapsedTime] = useState(true);
   const [resetConfirm, setResetConfirm] = useState(false);
   const [resetModalVisible, setResetModalVisible] = useState(false);
   const [errorModalVisible, setErrorModalVisible] = useState(false);
@@ -44,6 +47,7 @@ const SettingsCheckBoxes: React.FC<SettingsCheckBoxesProps> = () => {
     const currentSetting = getScreenAwakeSetting();
     setScreenAwake(currentSetting);
     setTooltipEnabled(getTooltipEnabledSetting());
+    setAutoPlayElapsedTime(getAutoPlayElapsedTimeSetting());
   }, []);
 
   /**
@@ -86,6 +90,15 @@ const SettingsCheckBoxes: React.FC<SettingsCheckBoxesProps> = () => {
     const newValue = !tooltipEnabled;
     setTooltipEnabled(newValue);
     setTooltipEnabledSetting(newValue);
+  };
+
+  /**
+   * 타이머 자동 재생 설정 토글 처리
+   */
+  const handleAutoPlayElapsedTimeToggle = () => {
+    const newValue = !autoPlayElapsedTime;
+    setAutoPlayElapsedTime(newValue);
+    setAutoPlayElapsedTimeSetting(newValue);
   };
 
   /**
@@ -156,6 +169,11 @@ const SettingsCheckBoxes: React.FC<SettingsCheckBoxesProps> = () => {
           label="툴팁 표시하기"
           checked={tooltipEnabled}
           onToggle={handleTooltipToggle}
+        />
+        <CheckBox
+          label="타이머 자동 재생"
+          checked={autoPlayElapsedTime}
+          onToggle={handleAutoPlayElapsedTimeToggle}
         />
         <CheckBox
           label="초기화하기"

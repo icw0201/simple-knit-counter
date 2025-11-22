@@ -78,6 +78,7 @@ export const useMain = () => {
       targetCount: 0,
       elapsedTime: 0,
       timerIsActive: false,
+      timerIsPlaying: false,
       parentProjectId: null,
       subCount: 0,
       subRule: 0,

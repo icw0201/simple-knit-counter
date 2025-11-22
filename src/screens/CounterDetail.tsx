@@ -11,7 +11,7 @@ import { activateKeepAwake, deactivateKeepAwake } from '@sayem314/react-native-k
 import { getHeaderRightWithActivateInfoSettings } from '@navigation/HeaderOptions';
 import { getScreenAwakeSetting } from '@storage/settings';
 
-import { CounterTouchArea, CounterDirection, CounterActions, CounterModals, SubCounterModal, ProgressBar } from '@components/counter';
+import { CounterTouchArea, CounterDirection, CounterActions, CounterModals, SubCounterModal, ProgressBar, TimeDisplay } from '@components/counter';
 import Tooltip from '@components/common/Tooltip';
 import { getScreenSize, getIconSize, getTextClass, getGapClass, getSubModalWidthRatio, getSubModalHeightRatio, getSubModalTop, ScreenSize } from '@constants/screenSizeConfig';
 import { getTooltipEnabledSetting } from '@storage/settings';
@@ -69,6 +69,8 @@ const CounterDetail = () => {
     handleTargetCountConfirm,
     toggleMascotIsActive,
     toggleWay,
+    toggleTimerIsActive,
+    toggleTimerIsPlaying,
     setErrorModalVisible,
     setActiveModal,
     // 보조 카운터 관련
@@ -167,10 +169,12 @@ const CounterDetail = () => {
           navigation,
           mascotIsActive,
           toggleMascotIsActive,
+          counter.timerIsActive,
+          toggleTimerIsActive,
           hasParent ? undefined : () => navigation.navigate('InfoScreen', { itemId: counter.id })
         ),
     });
-  }, [navigation, counter, mascotIsActive, height, width, toggleMascotIsActive, hasParent]);
+  }, [navigation, counter, mascotIsActive, height, width, toggleMascotIsActive, toggleTimerIsActive, hasParent]);
 
 
   // 카운터 데이터가 없으면 렌더링하지 않음
@@ -187,11 +191,11 @@ const CounterDetail = () => {
 
       {/* 중앙 콘텐츠 영역 */}
       <Animated.View
-        className="flex-1 items-center"
+        className="flex-1 items-center justify-center"
         style={[
           screenStyles.pointerEventsBoxNone,
           {
-            paddingTop: paddingTopAnim,
+            paddingTop: -50,
             opacity: isPaddingReady ? 1 : 0,
           },
         ]}
@@ -221,6 +225,16 @@ const CounterDetail = () => {
           />
         )}
 
+        {/* 시간 표시 컴포넌트 */}
+        {counter.timerIsActive && screenSize !== ScreenSize.COMPACT && !(screenSize === ScreenSize.SMALL && (counter.subModalIsOpen ?? false)) && (
+          <TimeDisplay
+            screenSize={screenSize}
+            timerIsPlaying={counter.timerIsPlaying ?? false}
+            elapsedTime={counter.elapsedTime ?? 0}
+            onPress={toggleTimerIsPlaying}
+          />
+        )}
+
         {/* 방향 표시 이미지 영역 */}
         <CounterDirection
           mascotIsActive={mascotIsActive}
@@ -228,6 +242,7 @@ const CounterDetail = () => {
           way={way}
           imageWidth={imageWidth}
           imageHeight={imageHeight}
+          screenSize={screenSize}
           onToggleWay={toggleWay}
         />
 

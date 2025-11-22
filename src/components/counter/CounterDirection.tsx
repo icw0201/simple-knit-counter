@@ -3,6 +3,7 @@ import React from 'react';
 import { View, Image, Pressable } from 'react-native';
 import { Way } from '@storage/types';
 import { Images } from '@assets/images';
+import { ScreenSize, getGapClass } from '@constants/screenSizeConfig';
 
 interface CounterDirectionProps {
   mascotIsActive: boolean;
@@ -10,6 +11,7 @@ interface CounterDirectionProps {
   way: Way;
   imageWidth: number;
   imageHeight: number;
+  screenSize: ScreenSize;
   onToggleWay: () => void;
 }
 
@@ -23,18 +25,21 @@ const CounterDirection: React.FC<CounterDirectionProps> = ({
   way,
   imageWidth,
   imageHeight,
+  screenSize,
   onToggleWay,
 }) => {
+  if (!mascotIsActive) {
+    return null;
+  }
+
   return (
-    <View className="mb-2" style={{ height: imageHeight }}>
-      {mascotIsActive && (
-        <Pressable onPress={wayIsChange ? onToggleWay : undefined}>
-          <Image
-            source={way === 'front' ? Images.way_front : Images.way_back}
-            style={{ width: imageWidth, height: imageHeight, resizeMode: 'contain' }}
-          />
-        </Pressable>
-      )}
+    <View className={getGapClass(screenSize)} style={{ height: imageHeight }}>
+      <Pressable onPress={wayIsChange ? onToggleWay : undefined}>
+        <Image
+          source={way === 'front' ? Images.way_front : Images.way_back}
+          style={{ width: imageWidth, height: imageHeight, resizeMode: 'contain' }}
+        />
+      </Pressable>
     </View>
   );
 };

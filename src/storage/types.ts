@@ -54,8 +54,9 @@ export type Counter = {
   title: string;                 // 카운터 제목
   count: number;                 // 현재 카운트 수
   targetCount: number;           // 목표 단수 (0 = 목표 없음)
-  elapsedTime: number;           // 소요 시간 (초 단위, 0 ~ 359999)
+  elapsedTime: number;           // 소요 시간 (초 단위, 0 ~ 35999999, 최대 9999:59:59)
   timerIsActive: boolean;        // 타이머 활성화 상태
+  timerIsPlaying: boolean;       // 타이머 재생 상태
   parentProjectId?: string | null; // 상위 프로젝트 ID (독립 카운터는 null)
   info?: Info;                   // 카운터 정보 (독립 카운터만 사용)
   // 보조 카운터 필드들
