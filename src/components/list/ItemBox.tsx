@@ -79,7 +79,7 @@ const ItemBox: React.FC<ItemBoxProps> = ({
               {isCompleted && (
                 <Image
                   source={isEditMode ? Images.complete_reverse : Images.complete_nomal}
-                  className="absolute h-20 w-20 right-10 top-1/2 -mt-12"
+                  className="absolute h-20 w-20 right-10 top-1/2 -mt-11"
                   resizeMode="cover"
                 />
               )}
