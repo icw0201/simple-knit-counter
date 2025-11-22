@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Text, View, LayoutChangeEvent, Pressable } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { ScreenSize, getTimeDisplayTextClass, getGapClass } from '@constants/screenSizeConfig';
-import { timeDisplayStyles } from './TimeDisplayStyles';
 import { formatElapsedTime } from '@utils/timeUtils';
 
 interface TimeDisplayProps {
@@ -22,6 +21,11 @@ const TimeDisplay: React.FC<TimeDisplayProps> = ({ screenSize, timerIsPlaying, e
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [showColon, setShowColon] = useState(true);
 
+  /**
+   * 콜론 깜빡임 효과
+   * timerIsPlaying이 true일 때, 초가 바뀔 때마다 콜론을 600ms 동안 표시하고 400ms 동안 숨깁니다.
+   * timerIsPlaying이 false일 때는 콜론을 항상 표시합니다.
+   */
   useEffect(() => {
     if (!timerIsPlaying) {
       setShowColon(true);
@@ -43,11 +47,6 @@ const TimeDisplay: React.FC<TimeDisplayProps> = ({ screenSize, timerIsPlaying, e
     };
   }, [timerIsPlaying, elapsedTime]);
 
-  // COMPACT일 때는 렌더링하지 않음
-  if (screenSize === ScreenSize.COMPACT) {
-    return null;
-  }
-
   const onLayout = (event: LayoutChangeEvent) => {
     const { width, height } = event.nativeEvent.layout;
     setDimensions({ width, height });
@@ -61,11 +60,11 @@ const TimeDisplay: React.FC<TimeDisplayProps> = ({ screenSize, timerIsPlaying, e
   const paddingClass = screenSize === ScreenSize.SMALL ? 'px-3 py-1.5' : 'px-4 py-2';
 
   // 배경색 결정: timerIsPlaying이 false면 light gray, true면 red-orange-300
-  const backgroundColor = timerIsPlaying ? '#ffa09e' : '#DBDBDB'; // lightgray from tailwind config
+  const backgroundColor = timerIsPlaying ? '#ffa09e' : '#DBDBDB';
 
   // 시간 포맷팅
   const { hours, minutes, seconds } = formatElapsedTime(elapsedTime);
-  const colonStyle = timerIsPlaying && !showColon ? timeDisplayStyles.colonHidden : undefined;
+  const colonStyle = timerIsPlaying && !showColon ? { color: 'transparent' } : undefined;
 
   return (
     <Pressable
@@ -84,7 +83,7 @@ const TimeDisplay: React.FC<TimeDisplayProps> = ({ screenSize, timerIsPlaying, e
           </Svg>
         </View>
       )}
-      <Text style={timeDisplayStyles.dseg7Bold} className={`${getTimeDisplayTextClass(screenSize)} relative z-10`}>
+      <Text style={{ fontFamily: 'DSEG7Classic-Bold' }} className={`${getTimeDisplayTextClass(screenSize)} relative z-10`}>
         {hours}
         <Text style={colonStyle}>:</Text>
         {minutes}

@@ -226,7 +226,7 @@ const CounterDetail = () => {
         )}
 
         {/* 시간 표시 컴포넌트 */}
-        {counter.timerIsActive && !(screenSize === ScreenSize.SMALL && (counter.subModalIsOpen ?? false)) && (
+        {counter.timerIsActive && screenSize !== ScreenSize.COMPACT && !(screenSize === ScreenSize.SMALL && (counter.subModalIsOpen ?? false)) && (
           <TimeDisplay
             screenSize={screenSize}
             timerIsPlaying={counter.timerIsPlaying ?? false}
