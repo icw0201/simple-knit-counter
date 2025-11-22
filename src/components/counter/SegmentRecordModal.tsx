@@ -47,36 +47,48 @@ export const SegmentRecordModal: React.FC<SegmentRecordModalProps> = ({
       top={top}
     >
       {/* 콘텐츠 영역 */}
-      <View className="flex-1 justify-center px-4" style={{ paddingLeft: handleWidth + 16 }}>
+      <View
+        className="flex-1 justify-center px-4"
+        style={{ paddingLeft: handleWidth + 16 }}
+      >
         {displayRecords.length > 0 ? (
           <View className="flex-row items-center justify-between">
-            {/* 3개 기록 묶음 */}
-            <View>
+            {/* 3개 기록 묶음 - 80% 너비 */}
+            <View className="flex-[0.8] mr-2">
               {displayRecords.map((record, index) => {
                 // 첫 번째: black, 두 번째: darkgray, 세 번째: mediumgray
                 const textColorClass = index === 0 ? 'text-black' : index === 1 ? 'text-darkgray' : 'text-mediumgray';
                 return (
                   <View key={index} className="py-1">
-                    <Text className={`text-sm font-semibold ${textColorClass}`}>
+                    <Text
+                      className={`text-sm font-semibold ${textColorClass}`}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                      allowFontScaling={false}
+                    >
                       {record.time} {getEditContentText(record)}
                     </Text>
                   </View>
                 );
               })}
             </View>
-            {/* 실행 취소 버튼 */}
-            <CircleIcon
-              size={SEGMENT_UNDO_ICON_SIZE}
-              isButton={true}
-              onPress={onUndo}
-              iconName="eraser"
-              iconColor="black"
-              containerClassName="bg-red-orange-200 border-0"
-            />
+            {/* 실행 취소 버튼 - 20% 너비 */}
+            <View className="flex-[0.2] items-end">
+              <CircleIcon
+                size={SEGMENT_UNDO_ICON_SIZE}
+                isButton={true}
+                onPress={onUndo}
+                iconName="eraser"
+                iconColor="black"
+                containerClassName="bg-red-orange-200 border-0"
+              />
+            </View>
           </View>
         ) : (
           <View className="items-center justify-center">
-            <Text className="text-sm text-darkgray">구간 기록이 없습니다</Text>
+            <Text className="text-sm text-darkgray" allowFontScaling={false}>
+              구간 기록이 없습니다
+            </Text>
           </View>
         )}
       </View>
