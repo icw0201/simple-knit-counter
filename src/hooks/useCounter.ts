@@ -830,6 +830,10 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
       return;
     }
 
+    // way 변경 로직 적용 (본 카운터가 증가할 때)
+    const newWay = newMainCount > counter.count ? getReversedWayIfWayIsChange() : null;
+    const updatedInfo = newWay ? { ...counter.info, way: newWay as Way } : counter.info;
+
     // 규칙 활성화/비활성화에 따라 구간 기록 추가
     // 단수/코수가 바뀌는 경우에만 숫자 정보 전달 (표시 형식이 달라짐)
     const hasCountChange = newSubCount !== counter.subCount || newMainCount !== counter.count;
@@ -843,13 +847,14 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
       subRuleIsActive: isRuleActive,
       subCount: newSubCount,
       count: newMainCount,
+      info: updatedInfo,
       sectionRecords: updatedSectionRecords,
     };
 
     updateItem(counter.id, updatedCounter);
     setCounter(updatedCounter);
     handleClose();
-  }, [counter, handleClose, showErrorModal, addSectionRecord]);
+  }, [counter, handleClose, showErrorModal, addSectionRecord, getReversedWayIfWayIsChange]);
 
   // 보조 카운터 모달 토글
   const handleSubModalToggle = useCallback(async () => {
