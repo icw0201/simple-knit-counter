@@ -285,6 +285,7 @@ const CounterDetail = () => {
           width={segmentModalWidth}
           height={segmentModalHeight}
           top={segmentModalTop}
+          sectionRecords={counter.sectionRecords}
         />
       )}
 

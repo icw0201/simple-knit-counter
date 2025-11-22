@@ -179,7 +179,7 @@ export const getSegmentModalHeightRatio = (screenSize: ScreenSize): number => {
   const segmentModalHeightRatioConfig = {
     [ScreenSize.COMPACT]: 0,      // 컴팩트: 사용 안 함
     [ScreenSize.SMALL]: 0,        // 작음: 사용 안 함
-    [ScreenSize.LARGE]: 0.15,     // 큼: 15%
+    [ScreenSize.LARGE]: 0.13,     // 큼: 15%
   };
   return segmentModalHeightRatioConfig[screenSize];
 };
