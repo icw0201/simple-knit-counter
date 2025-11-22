@@ -179,7 +179,7 @@ export const getSegmentModalHeightRatio = (screenSize: ScreenSize): number => {
   const segmentModalHeightRatioConfig = {
     [ScreenSize.COMPACT]: 0,      // 컴팩트: 사용 안 함
     [ScreenSize.SMALL]: 0,        // 작음: 사용 안 함
-    [ScreenSize.LARGE]: 0.13,     // 큼: 15%
+    [ScreenSize.LARGE]: 0.13,     // 큼: 13%
   };
   return segmentModalHeightRatioConfig[screenSize];
 };
@@ -194,7 +194,7 @@ export const getSegmentModalTop = (screenSize: ScreenSize): DimensionValue => {
   const segmentModalTopConfig: Record<ScreenSize, DimensionValue> = {
     [ScreenSize.COMPACT]: 0,      // 컴팩트: 사용 안 함
     [ScreenSize.SMALL]: 0,        // 작음: 사용 안 함
-    [ScreenSize.LARGE]: '53%',   // 큼: 53% (80% - 15% - 12%)
+    [ScreenSize.LARGE]: '53%',   // 큼: 53% (80% - 13% - 14%)
   };
   return segmentModalTopConfig[screenSize];
 };
