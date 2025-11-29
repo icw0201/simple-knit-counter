@@ -38,7 +38,14 @@ export type Info = {
   yarn?: string;      // 실 정보 (최대 500자)
   needle?: string;    // 바늘 정보 (최대 500자)
   notes?: string;     // 메모 (최대 500자)
-  way?: Way;          // 진행 방향
+};
+
+// 반복 규칙 타입
+export type RepeatRule = {
+  message: string;      // 메시지
+  startNumber: number;  // 시작단
+  endNumber: number;   // 종료단
+  ruleNumber: number;   // 룰넘버 (몇 단마다)
 };
 
 // 구간 기록 타입
@@ -68,6 +75,7 @@ export type Counter = {
   timerIsPlaying: boolean;       // 타이머 재생 상태
   parentProjectId?: string | null; // 상위 프로젝트 ID (독립 카운터는 null)
   info?: Info;                   // 카운터 정보 (독립 카운터만 사용)
+  way?: Way;                     // 진행 방향
   // 보조 카운터 필드들
   subCount: number;              // 보조 카운터의 현재 카운트 수
   subRule: number;               // 보조 카운터의 규칙 번호
@@ -76,10 +84,7 @@ export type Counter = {
   // 마스코트 반복 규칙 필드들
   mascotIsActive: boolean;       // 마스코트 활성화 여부
   wayIsChange: boolean;          // 마스코트 앞뒤 변경 여부
-  repeatRuleIsActive: boolean;   // 반복 규칙 활성화 여부
-  repeatRuleNumber: number;      // 반복 규칙 숫자
-  repeatRuleStartNumber: number; // 반복 규칙 시작 숫자
-  repeatRuleEndNumber: number;   // 반복 규칙 종료 숫자
+  repeatRules: RepeatRule[];     // 반복 규칙 배열 (여러 개 가능)
   // 구간 기록 필드 (최신 3개만 저장)
   sectionRecords: SectionRecord[]; // 구간 기록 배열
   sectionModalIsOpen: boolean;     // 구간 기록 모달 열림 여부

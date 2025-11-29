@@ -8,7 +8,7 @@ const STORAGE_KEY = 'knit_items';
 const DATA_VERSION_KEY = 'data_version';
 
 // 데이터 버전 관리
-export const CURRENT_DATA_VERSION = 4; // timerIsPlaying 추가 마이그레이션
+export const CURRENT_DATA_VERSION = 4; // repeatRules 배열로 변경 및 way를 Counter로 이동 마이그레이션
 
 /**
  * 버전 1: 기존 'active' 상태를 'auto'로 마이그레이션
@@ -47,13 +47,57 @@ const migrateV2_ActivateModeToWayIsChangeAndMascotIsActive = (items: Item[]): It
 };
 
 /**
+ * 버전 4: 반복 규칙을 배열로 변경 및 way를 Counter로 이동
+ * 1. 기존: repeatRuleIsActive, repeatRuleNumber, repeatRuleStartNumber, repeatRuleEndNumber
+ *    신규: repeatRules: RepeatRule[]
+ * 2. way를 info.way에서 counter.way로 이동
+ * @param items 마이그레이션할 아이템 배열
+ * @returns 마이그레이션된 아이템 배열
+ */
+const migrateV4_RepeatRulesToArrayAndMoveWay = (items: Item[]): Item[] => {
+  return items.map((item) => {
+    if (item.type === 'counter') {
+      const counter = item as any;
+      const { repeatRuleIsActive, repeatRuleNumber, repeatRuleStartNumber, repeatRuleEndNumber, info, ...rest } = counter;
+
+      // 1. 반복 규칙을 배열로 변환
+      const repeatRules: any[] = [];
+      if (repeatRuleIsActive && repeatRuleNumber > 0 && repeatRuleStartNumber !== undefined && repeatRuleEndNumber !== undefined) {
+        repeatRules.push({
+          message: '', // 기존 데이터에는 메시지가 없으므로 빈 문자열
+          startNumber: repeatRuleStartNumber ?? 0,
+          endNumber: repeatRuleEndNumber ?? 0,
+          ruleNumber: repeatRuleNumber ?? 0,
+        });
+      }
+
+      // 2. way를 info에서 counter로 이동
+      const way = info?.way;
+      const updatedInfo = info ? { ...info } : undefined;
+      if (updatedInfo && 'way' in updatedInfo) {
+        delete updatedInfo.way;
+      }
+
+      return {
+        ...rest,
+        repeatRules,
+        way,
+        info: updatedInfo,
+      };
+    }
+    return item;
+  });
+};
+
+/**
  * 버전 3: 새로 추가된 프로퍼티들에 기본값 설정
  * - targetCount: 0 (목표 없음)
  * - elapsedTime: 0 (초 단위, 0 ~ 359999)
  * - timerIsActive: false
  * - timerIsPlaying: false (V4에서 추가)
  * - subCount, subRule, subRuleIsActive, subModalIsOpen (보조 카운터 필드)
- * - repeatRuleIsActive, repeatRuleNumber, repeatRuleStartNumber, repeatRuleEndNumber (반복 규칙 필드)
+ * - repeatRules (반복 규칙 필드 - V4에서 배열로 변경됨)
+ * - way (V4에서 info.way에서 counter.way로 이동)
  * - sectionRecords, sectionModalIsOpen (구간 기록 필드)
  * @param items 마이그레이션할 아이템 배열
  * @returns 마이그레이션된 아이템 배열
@@ -79,10 +123,7 @@ const migrateV3_AddNewProperties = (items: Item[]): Item[] => {
         subModalIsOpen: counter.subModalIsOpen ?? false,
 
         // 마스코트 반복 규칙 필드들 (필수 프로퍼티)
-        repeatRuleIsActive: counter.repeatRuleIsActive ?? false,
-        repeatRuleNumber: counter.repeatRuleNumber ?? 0,
-        repeatRuleStartNumber: counter.repeatRuleStartNumber ?? 0,
-        repeatRuleEndNumber: counter.repeatRuleEndNumber ?? 0,
+        repeatRules: counter.repeatRules ?? [],
 
         // 구간 기록 필드들 (필수 프로퍼티)
         sectionRecords: counter.sectionRecords ?? [],
@@ -117,7 +158,8 @@ const runMigrations = (items: Item[], fromVersion: number, toVersion: number): I
   }
 
   if (fromVersion < 4 && toVersion >= 4) {
-    migratedItems = migrateV3_AddNewProperties(migratedItems); // V4도 같은 마이그레이션 함수 사용 (timerIsPlaying 추가)
+    migratedItems = migrateV3_AddNewProperties(migratedItems); // 기본값 설정
+    migratedItems = migrateV4_RepeatRulesToArrayAndMoveWay(migratedItems); // repeatRules 배열 및 way 이동
   }
 
   return migratedItems;
