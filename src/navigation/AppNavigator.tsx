@@ -11,6 +11,7 @@ import Main from '@screens/Main';
 import ProjectDetail from '@screens/ProjectDetail';
 import Setting from '@screens/Setting';
 import InfoScreen from '@screens/InfoScreen';
+import WaySetting from '@screens/WaySetting';
 
 // 네비게이션 파라미터 타입 정의
 export type RootStackParamList = {
@@ -21,6 +22,7 @@ export type RootStackParamList = {
   ProjectDetail: { projectId: string };
   CounterDetail: { counterId: string };
   InfoScreen: { itemId: string };
+  WaySetting: { counterId: string };
 };
 
 // 네비게이션 스택 생성
@@ -86,6 +88,16 @@ const AppNavigator = () => (
           ...getDefaultHeaderLeft(navigation),
           ...getDefaultHeaderRight(navigation),
           ...getDefaultTitle(''),
+        })}
+      />
+
+      {/* Way 설정 화면 */}
+      <Stack.Screen
+        name="WaySetting"
+        component={WaySetting}
+        options={({ navigation, route: _route }) => ({
+          ...getDefaultHeaderLeft(navigation),
+          ...getDefaultTitle('어쩌미 옵션 설정'),
         })}
       />
     </Stack.Navigator>

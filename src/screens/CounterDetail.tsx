@@ -179,6 +179,7 @@ const CounterDetail = () => {
           toggleMascotIsActive,
           counter.timerIsActive,
           toggleTimerIsActive,
+          counter.id,
           hasParent ? undefined : () => navigation.navigate('InfoScreen', { itemId: counter.id })
         ),
     });

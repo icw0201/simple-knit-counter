@@ -82,6 +82,7 @@ export const getHeaderRightWithActivateInfoSettings = (
   onActivatePress: () => void,
   timerIsActive: boolean,
   onTimerPress: () => void,
+  counterId: string,
   onInfoPress?: () => void
 ): React.JSX.Element => {
   return (
@@ -92,7 +93,11 @@ export const getHeaderRightWithActivateInfoSettings = (
       </TouchableOpacity>
 
       {/* 활성 아이콘 */}
-      <TouchableOpacity onPress={onActivatePress} style={{ marginRight: 13 }}>
+      <TouchableOpacity
+        onPress={onActivatePress}
+        onLongPress={() => navigation.navigate('WaySetting', { counterId })}
+        style={{ marginRight: 13 }}
+      >
         <Image
           source={activateIcons[mascotIsActive ? 'active' : 'inactive']}
           style={{ width: 23, height: 23 }}
