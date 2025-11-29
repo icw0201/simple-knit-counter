@@ -1,13 +1,17 @@
-import React, { useState, useLayoutEffect } from 'react';
+import React, { useState, useLayoutEffect, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { CircleQuestionMark, Pencil, Trash2, Check, Plus } from 'lucide-react-native';
+import { CircleQuestionMark, Plus } from 'lucide-react-native';
 
 import CheckBox from '@components/common/CheckBox';
-import { screenStyles } from '@styles/screenStyles';
+import ActivateToggle from '@components/common/ActivateToggle';
+import RuleCard from '@components/counter/RuleCard';
+import { screenStyles, safeAreaEdges } from '@styles/screenStyles';
 import { RootStackParamList } from '@navigation/AppNavigator';
-import { getStoredItems } from '@storage/storage';
+import { getStoredItems, updateItem } from '@storage/storage';
+import { Counter } from '@storage/types';
 
 /**
  * Way 설정 화면 컴포넌트
@@ -32,17 +36,58 @@ const WaySetting = () => {
   }, [counterId, navigation]);
 
   // 상태 관리
-  const [_mascotIsActive, _setMascotIsActive] = useState(false);
+  const [mascotIsActive, setMascotIsActive] = useState(false);
   const [wayIsChange, setWayIsChange] = useState(false);
 
+  // 카운터 데이터 로드
+  useEffect(() => {
+    if (!counterId) {
+      return;
+    }
+
+    const allItems = getStoredItems();
+    const counter = allItems.find(
+      (item): item is Counter => item.id === counterId && item.type === 'counter'
+    );
+
+    if (counter) {
+      setMascotIsActive(counter.mascotIsActive ?? false);
+      setWayIsChange(counter.wayIsChange ?? false);
+    }
+  }, [counterId]);
+
+  // 마스코트 활성화 토글
+  const handleToggleMascotIsActive = () => {
+    if (!counterId) {
+      return;
+    }
+
+    const newMascotIsActive = !mascotIsActive;
+    setMascotIsActive(newMascotIsActive);
+
+    const allItems = getStoredItems();
+    const counter = allItems.find(
+      (item): item is Counter => item.id === counterId && item.type === 'counter'
+    );
+
+    if (counter) {
+      updateItem(counter.id, {
+        mascotIsActive: newMascotIsActive,
+      });
+    }
+  };
+
   return (
-    <View className="flex-1 bg-white">
-      <ScrollView contentContainerStyle={screenStyles.scrollViewContent}>
-        {/* 활성화 체크박스 */}
+    <SafeAreaView style={screenStyles.flex1} edges={safeAreaEdges}>
+      <ScrollView contentContainerStyle={screenStyles.scrollViewContentCentered}>
+        {/* 활성화 토글 */}
         <View className="mb-6">
           <View className="flex-row items-center justify-between mb-4">
             <Text className="text-base text-black">활성화</Text>
-            <View className="w-8 h-8 bg-red-orange-200 rounded-full" />
+            <ActivateToggle
+              mascotIsActive={mascotIsActive}
+              onToggle={handleToggleMascotIsActive}
+            />
           </View>
         </View>
 
@@ -59,60 +104,25 @@ const WaySetting = () => {
         </View>
 
         {/* 줄임단 규칙 카드 */}
-        <View className="mb-4 bg-red-orange-50 border border-lightgray rounded-xl p-4">
-          <View className="flex-row items-center justify-between mb-2">
-            <Text className="text-base font-extrabold text-black">줄임단</Text>
-            <TouchableOpacity className="w-12 h-12 bg-red-orange-200 rounded-full items-center justify-center">
-              <Pencil size={15} color="black" />
-            </TouchableOpacity>
-          </View>
-          <Text className="text-base text-black">0단부터 100단까지 3단마다</Text>
-        </View>
+        <RuleCard
+          title="줄임단"
+          message=""
+          startNumber={0}
+          endNumber={100}
+          ruleNumber={3}
+          isEditable={false}
+        />
 
         {/* 늘림단 규칙 카드 */}
-        <View className="mb-4 bg-red-orange-50 border border-lightgray rounded-xl p-4">
-          <View className="flex-row items-center justify-between mb-2">
-            <Text className="text-base font-extrabold text-black">늘림단</Text>
-          </View>
-
-          {/* 메시지 섹션 */}
-          <View className="mb-3">
-            <Text className="text-base font-extrabold text-black mb-2">메시지 :</Text>
-            <View className="bg-white border border-lightgray rounded-xl px-3 py-2">
-              <Text className="text-base text-black">늘림단</Text>
-            </View>
-          </View>
-
-          {/* 규칙 섹션 */}
-          <View className="mb-3">
-            <Text className="text-base font-extrabold text-black mb-2">규칙 :</Text>
-            <View className="flex-row items-center mb-2">
-              <View className="bg-white border border-lightgray rounded-xl w-9 h-11 items-center justify-center mr-2">
-                <Text className="text-base text-black">16</Text>
-              </View>
-              <Text className="text-base text-black mr-2">단부터</Text>
-              <View className="bg-white border border-lightgray rounded-xl w-9 h-11 items-center justify-center mr-2" />
-              <Text className="text-base text-black">단까지</Text>
-            </View>
-            <View className="flex-row items-center mb-2">
-              <View className="bg-white border border-lightgray rounded-xl w-9 h-11 items-center justify-center mr-2">
-                <Text className="text-base text-black">3</Text>
-              </View>
-              <Text className="text-base text-black">단마다 반복 규칙</Text>
-            </View>
-            <Text className="text-sm text-darkgray">16, 19, 21, 24, 27 ...</Text>
-          </View>
-
-          {/* 삭제/확인 버튼 */}
-          <View className="flex-row justify-end gap-2">
-            <TouchableOpacity className="w-11 h-11 bg-red-orange-200 rounded-full items-center justify-center">
-              <Trash2 size={24} color="black" />
-            </TouchableOpacity>
-            <TouchableOpacity className="w-11 h-11 bg-red-orange-200 rounded-full items-center justify-center">
-              <Check size={24} color="white" />
-            </TouchableOpacity>
-          </View>
-        </View>
+        <RuleCard
+          title="늘림단"
+          message="늘림단"
+          startNumber={16}
+          endNumber={0}
+          ruleNumber={3}
+          exampleText="16, 19, 21, 24, 27 ..."
+          isEditable={true}
+        />
 
         {/* 규칙 추가 버튼 */}
         <View className="flex-row items-center justify-center mb-6">
@@ -125,7 +135,7 @@ const WaySetting = () => {
           </View>
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 

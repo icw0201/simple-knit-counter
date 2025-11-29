@@ -160,7 +160,7 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
       );
 
       if (latest) {
-        // title과 info만 업데이트(헤더/표시용), 조작 가능한 필드들은 유지
+        // title, info, mascotIsActive, wayIsChange 등 메타데이터 업데이트(헤더/표시용), 조작 가능한 필드들은 유지
         setCounter(prevCounter => {
           if (!prevCounter) {
             return latest;
@@ -169,9 +169,13 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
             ...prevCounter,
             title: latest.title,
             info: latest.info,
+            mascotIsActive: latest.mascotIsActive ?? false,
+            wayIsChange: latest.wayIsChange ?? false,
           };
         });
         setWay(latest.way ?? 'front');
+        setMascotIsActive(latest.mascotIsActive ?? false);
+        setWayIsChange(latest.wayIsChange ?? false);
 
         // 카운터 진입 시 타이머 재생 상태 설정
         // 카운터가 활성화된 상태 & 설정에서 자동재생 켜짐 -> true, 꺼짐 -> false
