@@ -402,27 +402,23 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
   }, [wayIsChange, way]);
 
   /**
-   * mascotIsActive 토글 (wayIsChange도 함께 토글)
+   * mascotIsActive 토글
    */
   const toggleMascotIsActive = useCallback(() => {
     const newMascotIsActive = !mascotIsActive;
-    const newWayIsChange = !wayIsChange;
 
     setMascotIsActive(newMascotIsActive);
-    setWayIsChange(newWayIsChange);
 
     if (counter) {
       updateItem(counter.id, {
         mascotIsActive: newMascotIsActive,
-        wayIsChange: newWayIsChange,
       });
       setCounter({
         ...counter,
         mascotIsActive: newMascotIsActive,
-        wayIsChange: newWayIsChange,
       });
     }
-  }, [mascotIsActive, wayIsChange, counter]);
+  }, [mascotIsActive, counter]);
 
   /**
    * 타이머 활성화 토글 함수
