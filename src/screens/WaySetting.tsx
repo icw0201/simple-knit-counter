@@ -8,10 +8,11 @@ import { CircleQuestionMark, Plus } from 'lucide-react-native';
 import CheckBox from '@components/common/CheckBox';
 import ActivateToggle from '@components/common/ActivateToggle';
 import RuleCard from '@components/counter/RuleCard';
+import { ConfirmModal } from '@components/common/modals';
 import { screenStyles, safeAreaEdges } from '@styles/screenStyles';
 import { RootStackParamList } from '@navigation/AppNavigator';
 import { getStoredItems, updateItem } from '@storage/storage';
-import { Counter } from '@storage/types';
+import { Counter, RepeatRule } from '@storage/types';
 
 /**
  * Way 설정 화면 컴포넌트
@@ -38,6 +39,11 @@ const WaySetting = () => {
   // 상태 관리
   const [mascotIsActive, setMascotIsActive] = useState(false);
   const [wayIsChange, setWayIsChange] = useState(false);
+  const [repeatRules, setRepeatRules] = useState<RepeatRule[]>([]);
+  const [isAddingNewRule, setIsAddingNewRule] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteRuleIndex, setDeleteRuleIndex] = useState<number | null>(null);
+  const [deleteRuleMessage, setDeleteRuleMessage] = useState<string>('');
 
   // 카운터 데이터 로드
   useEffect(() => {
@@ -53,6 +59,7 @@ const WaySetting = () => {
     if (counter) {
       setMascotIsActive(counter.mascotIsActive ?? false);
       setWayIsChange(counter.wayIsChange ?? false);
+      setRepeatRules(counter.repeatRules ?? []);
     }
   }, [counterId]);
 
@@ -77,18 +84,96 @@ const WaySetting = () => {
     }
   };
 
+  // 규칙 추가 버튼 클릭
+  const handleAddRule = () => {
+    setIsAddingNewRule(true);
+  };
+
+  // 규칙 확인 (추가 또는 수정)
+  const handleRuleConfirm = (index: number | null, data: { message: string; startNumber: number; endNumber: number; ruleNumber: number }) => {
+    if (!counterId) {
+      return;
+    }
+
+    const allItems = getStoredItems();
+    const counter = allItems.find(
+      (item): item is Counter => item.id === counterId && item.type === 'counter'
+    );
+
+    if (!counter) {
+      return;
+    }
+
+    const newRule: RepeatRule = {
+      message: data.message,
+      startNumber: data.startNumber,
+      endNumber: data.endNumber,
+      ruleNumber: data.ruleNumber,
+    };
+
+    let updatedRules: RepeatRule[];
+    if (index === null) {
+      // 새 규칙 추가
+      updatedRules = [...(counter.repeatRules ?? []), newRule];
+      setIsAddingNewRule(false);
+    } else {
+      // 기존 규칙 수정
+      updatedRules = [...(counter.repeatRules ?? [])];
+      updatedRules[index] = newRule;
+    }
+
+    setRepeatRules(updatedRules);
+    updateItem(counter.id, {
+      repeatRules: updatedRules,
+    });
+  };
+
+  // 규칙 삭제 확인 모달 열기
+  const handleRuleDeleteClick = (index: number) => {
+    const rule = repeatRules[index];
+    setDeleteRuleIndex(index);
+    setDeleteRuleMessage(rule.message || '');
+    setShowDeleteModal(true);
+  };
+
+  // 규칙 삭제 실행
+  const handleRuleDeleteConfirm = () => {
+    if (!counterId || deleteRuleIndex === null) {
+      return;
+    }
+
+    const allItems = getStoredItems();
+    const counter = allItems.find(
+      (item): item is Counter => item.id === counterId && item.type === 'counter'
+    );
+
+    if (!counter) {
+      return;
+    }
+
+    const updatedRules = [...(counter.repeatRules ?? [])];
+    updatedRules.splice(deleteRuleIndex, 1);
+
+    setRepeatRules(updatedRules);
+    updateItem(counter.id, {
+      repeatRules: updatedRules,
+    });
+
+    setShowDeleteModal(false);
+    setDeleteRuleIndex(null);
+    setDeleteRuleMessage('');
+  };
+
   return (
     <SafeAreaView style={screenStyles.flex1} edges={safeAreaEdges}>
       <ScrollView contentContainerStyle={screenStyles.scrollViewContentCentered}>
         {/* 활성화 토글 */}
-        <View className="mb-6">
-          <View className="flex-row items-center justify-between mb-4">
-            <Text className="text-base text-black">활성화</Text>
-            <ActivateToggle
-              mascotIsActive={mascotIsActive}
-              onToggle={handleToggleMascotIsActive}
-            />
-          </View>
+        <View className="flex-row items-center justify-between px-4 py-3">
+          <Text className="text-base text-black">활성화</Text>
+          <ActivateToggle
+            mascotIsActive={mascotIsActive}
+            onToggle={handleToggleMascotIsActive}
+          />
         </View>
 
         {/* 단마다 앞/뒤 방향 표시하기 체크박스 */}
@@ -96,45 +181,88 @@ const WaySetting = () => {
           <CheckBox
             label="단마다 앞/뒤 방향 표시하기"
             checked={wayIsChange}
-            onToggle={() => setWayIsChange(!wayIsChange)}
+            onToggle={() => {
+              if (!counterId) {
+                return;
+              }
+              const newWayIsChange = !wayIsChange;
+              setWayIsChange(newWayIsChange);
+              const allItems = getStoredItems();
+              const counter = allItems.find(
+                (item): item is Counter => item.id === counterId && item.type === 'counter'
+              );
+              if (counter) {
+                updateItem(counter.id, {
+                  wayIsChange: newWayIsChange,
+                });
+              }
+            }}
           />
           <View className="absolute right-12 top-3">
             <CircleQuestionMark size={24} color="#767676" />
           </View>
         </View>
 
-        {/* 줄임단 규칙 카드 */}
-        <RuleCard
-          title="줄임단"
-          message=""
-          startNumber={0}
-          endNumber={100}
-          ruleNumber={3}
-          isEditable={false}
-        />
+        {/* 규칙 카드들 */}
+        {repeatRules.map((rule, index) => (
+          <RuleCard
+            key={index}
+            message={rule.message}
+            startNumber={rule.startNumber}
+            endNumber={rule.endNumber}
+            ruleNumber={rule.ruleNumber}
+            isEditable={false}
+            onConfirm={(data) => handleRuleConfirm(index, data)}
+            onDelete={() => handleRuleDeleteClick(index)}
+          />
+        ))}
 
-        {/* 늘림단 규칙 카드 */}
-        <RuleCard
-          title="늘림단"
-          message="늘림단"
-          startNumber={16}
-          endNumber={0}
-          ruleNumber={3}
-          exampleText="16, 19, 21, 24, 27 ..."
-          isEditable={true}
-        />
+        {/* 새 규칙 추가 카드 */}
+        {isAddingNewRule && (
+          <RuleCard
+            message=""
+            startNumber={0}
+            endNumber={0}
+            ruleNumber={0}
+            isEditable={true}
+            onConfirm={(data) => handleRuleConfirm(null, data)}
+            onDelete={() => setIsAddingNewRule(false)}
+          />
+        )}
 
         {/* 규칙 추가 버튼 */}
-        <View className="flex-row items-center justify-center mb-6">
-          <TouchableOpacity className="bg-red-orange-100 rounded-xl px-6 py-3 flex-row items-center">
-            <Plus size={22} color="#490806" />
-            <Text className="text-base text-black ml-2">규칙 추가</Text>
-          </TouchableOpacity>
-          <View className="ml-2">
-            <CircleQuestionMark size={24} color="#767676" />
+        {!isAddingNewRule && (
+          <View className="w-full items-center mb-6">
+            <View className="relative">
+              <TouchableOpacity
+                className="bg-red-orange-100 rounded-xl px-6 py-3 flex-row items-center"
+                onPress={handleAddRule}
+              >
+                <Plus size={22} color="#490806" />
+                <Text className="text-base text-black ml-2">규칙 추가</Text>
+              </TouchableOpacity>
+              <View className="absolute -right-8 top-1/2 -mt-3">
+                <CircleQuestionMark size={24} color="#767676" />
+              </View>
+            </View>
           </View>
-        </View>
+        )}
       </ScrollView>
+
+      {/* 규칙 삭제 확인 모달 */}
+      <ConfirmModal
+        visible={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setDeleteRuleIndex(null);
+          setDeleteRuleMessage('');
+        }}
+        title="규칙 삭제"
+        description={`"${deleteRuleMessage}" 규칙을 정말 삭제하시겠습니까?`}
+        onConfirm={handleRuleDeleteConfirm}
+        confirmText="삭제"
+        cancelText="취소"
+      />
     </SafeAreaView>
   );
 };
