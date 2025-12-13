@@ -29,7 +29,7 @@ type TextInputType = 'number' | 'text' | 'date' | 'longText';
  * @param placeholder - 입력 필드에 표시될 플레이스홀더 텍스트
  * @param type - 입력 필드의 타입 (TextInputType)
  * @param maxLength - 최대 입력 길이 (기본값: longText는 500, 나머지는 15)
- * @param className - 추가적인 컨테이너 스타일 클래스
+ * @param containerClassName - 추가적인 컨테이너 스타일 클래스
  * @param required - 필수 필드 여부 (기본값: false)
  */
 interface TextInputBoxProps {
@@ -39,7 +39,7 @@ interface TextInputBoxProps {
   placeholder?: string;
   type: TextInputType;
   maxLength?: number;
-  className?: string;
+  containerClassName?: string;
   required?: boolean;
 }
 
@@ -55,7 +55,7 @@ const TextInputBox: React.FC<TextInputBoxProps> = ({
   placeholder,
   type,
   maxLength = type === 'longText' ? INPUT_LIMITS.longText : INPUT_LIMITS.text,
-  className = '',
+  containerClassName = '',
   required = false,
 }) => {
   // 입력 필드의 포커스 상태 관리
@@ -126,7 +126,7 @@ const TextInputBox: React.FC<TextInputBoxProps> = ({
 
   // 입력 필드 스타일 클래스
   const inputFieldClass = clsx(
-    'px-3 border rounded-xl bg-white text-black',
+    'w-full px-3 border rounded-xl bg-white text-black',
     type === 'longText' ? 'text-sm min-h-[54px]' : 'h-[54px]',
     isFocused ? 'border-red-orange-400' : 'border-lightgray'
   );
@@ -136,21 +136,31 @@ const TextInputBox: React.FC<TextInputBoxProps> = ({
   const currentLength = (value ?? '').length;
   const maxLengthForType = type === 'longText' ? INPUT_LIMITS.longText : maxLength;
 
+  // NativeWind 환경에서 같은 속성(예: mb-*)이 한 번에 여러 개 섞일 때 override가
+  // 기대대로 동작하지 않는 케이스가 있어, 기본값을 조건부로 넣어 충돌 자체를 피한다.
+  const hasMbOverride = /\bmb-/.test(containerClassName);
+
+  // label이 비어있을 때는 라벨 영역을 숨기고, 같은 행에 배치할 때 y축 중앙 정렬을 위해 입력 필드만 중앙 정렬
+  const hasLabel = label.trim().length > 0;
+  const shouldShowLabelArea = hasLabel || shouldShowCounter;
+
   return (
-    <View className={clsx('w-full mb-4', className)}>
+    <View className={clsx('w-full', !hasMbOverride && 'mb-4', !hasLabel && 'self-center', containerClassName)}>
       {/* 라벨과 문자 수 카운터를 표시하는 상단 영역 */}
-      <View className="pl-1 mb-1 flex-row justify-between items-center">
-        <View className="flex-row items-center">
-          <Text className="text-sm text-darkgray font-medium">{label}</Text>
-          {required && <Text className="text-sm text-red-orange-500 ml-1">*</Text>}
+      {shouldShowLabelArea && (
+        <View className="pl-1 mb-1 flex-row justify-between items-center">
+          <View className="flex-row items-center">
+            {hasLabel && <Text className="text-sm text-darkgray font-medium">{label}</Text>}
+            {required && <Text className="text-sm text-red-orange-500 ml-1">*</Text>}
+          </View>
+          {/* 텍스트와 롱텍스트 타입일 때만 문자 수 카운터 표시 */}
+          {shouldShowCounter && (
+            <Text className="text-xs text-darkgray">
+              {currentLength}/{maxLengthForType}
+            </Text>
+          )}
         </View>
-        {/* 텍스트와 롱텍스트 타입일 때만 문자 수 카운터 표시 */}
-        {shouldShowCounter && (
-          <Text className="text-xs text-darkgray">
-            {currentLength}/{maxLengthForType}
-          </Text>
-        )}
-      </View>
+      )}
 
       {/* 실제 텍스트 입력 필드 */}
       <RNTextInput

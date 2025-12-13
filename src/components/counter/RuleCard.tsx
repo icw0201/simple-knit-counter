@@ -198,7 +198,7 @@ const RuleCard: React.FC<RuleCardProps> = ({
               setValidationError('');
             }}
             type="text"
-            className="mb-0"
+            containerClassName="mt-1"
           />
         </View>
       </View>
@@ -217,7 +217,7 @@ const RuleCard: React.FC<RuleCardProps> = ({
                 setValidationError('');
               }}
               type="number"
-              className="mb-0"
+              containerClassName="mb-2"
             />
           </View>
           <Text className="text-base text-black mr-2">단부터</Text>
@@ -230,7 +230,7 @@ const RuleCard: React.FC<RuleCardProps> = ({
                 setValidationError('');
               }}
               type="number"
-              className="mb-0"
+              containerClassName="mb-2"
             />
           </View>
           <Text className="text-base text-black">단까지</Text>
@@ -248,7 +248,7 @@ const RuleCard: React.FC<RuleCardProps> = ({
                 setValidationError('');
               }}
               type="number"
-              className="mb-0"
+              containerClassName="mb-0"
             />
           </View>
           <Text className="text-base text-black">단마다 반복 규칙</Text>
