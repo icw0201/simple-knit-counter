@@ -58,6 +58,8 @@ const QuestionMarkIcon: React.FC<QuestionMarkIconProps> = ({
       <Modal
         transparent
         visible={showTooltip}
+        statusBarTranslucent
+        navigationBarTranslucent
         onRequestClose={() => setShowTooltip(false)}
       >
         <Pressable style={styles.modalOverlay} onPress={() => setShowTooltip(false)}>
