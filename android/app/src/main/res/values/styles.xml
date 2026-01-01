@@ -4,10 +4,6 @@
     <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="android:editTextBackground">@drawable/rn_edit_text_material</item>
-        <!-- 툴팁 Modal 등 새 Window가 떠도 하단 네비게이션 바가 검게 변하지 않도록 고정 -->
-        <item name="android:navigationBarColor">@android:color/white</item>
-        <!-- 아이콘을 어두운 색으로(=라이트 네비게이션 바) -->
-        <item name="android:windowLightNavigationBar">true</item>
     </style>
 
 </resources>

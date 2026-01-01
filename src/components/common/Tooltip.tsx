@@ -1,19 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, LayoutChangeEvent, StyleProp, ViewStyle } from 'react-native';
+import { Animated, LayoutChangeEvent } from 'react-native';
 import { View, Text } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
 interface TooltipProps {
   text?: string;
   containerClassName?: string;
-  containerStyle?: StyleProp<ViewStyle>;
   // 화면 기준 타겟 X좌표(px). 제공되면 화살표를 해당 타겟을 향해 정렬
   targetAnchorX?: number;
-  // 툴팁이 사라질 때 호출되는 콜백
-  onHide?: () => void;
 }
 
-const Tooltip: React.FC<TooltipProps> = ({ text, containerClassName, containerStyle, targetAnchorX, onHide }) => {
+const Tooltip: React.FC<TooltipProps> = ({ text, containerClassName, targetAnchorX }) => {
   const [visible, setVisible] = useState(true);
   const opacity = useRef(new Animated.Value(1)).current;
   const AUTO_HIDE_MS = 4000;
@@ -33,24 +30,19 @@ const Tooltip: React.FC<TooltipProps> = ({ text, containerClassName, containerSt
         }).start(({ finished }) => {
           if (finished) {
             setVisible(false);
-            onHide?.();
           }
         });
       }, AUTO_HIDE_MS);
       return () => clearTimeout(t);
     }
-  }, [AUTO_HIDE_MS, FADE_OUT_MS, opacity, onHide]);
+  }, [AUTO_HIDE_MS, FADE_OUT_MS, opacity]);
 
   if (!visible) {
     return null;
   }
 
   return (
-    <Animated.View
-      pointerEvents="none"
-      className={containerClassName}
-      style={[{ opacity }, containerStyle]}
-    >
+    <Animated.View pointerEvents="none" className={containerClassName} style={{ opacity }}>
       <View className="relative self-center">
         <View className="relative">
           {/* 위쪽 삼각형 화살표 (SVG로 꼭짓점 자체를 둥글게) - 바로 아래 박스의 정확한 중앙에 정렬 */}
@@ -89,5 +81,4 @@ const Tooltip: React.FC<TooltipProps> = ({ text, containerClassName, containerSt
 };
 
 export default Tooltip;
-
 

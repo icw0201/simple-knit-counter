@@ -3,11 +3,10 @@ import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { Plus } from 'lucide-react-native';
+import { CircleQuestionMark, Plus } from 'lucide-react-native';
 
 import CheckBox from '@components/common/CheckBox';
 import ActivateToggle from '@components/common/ActivateToggle';
-import QuestionMarkIcon from '@components/common/QuestionMarkIcon';
 import RuleCard from '@components/counter/RuleCard';
 import { ConfirmModal } from '@components/common/modals';
 import { screenStyles, safeAreaEdges } from '@styles/screenStyles';
@@ -201,9 +200,7 @@ const WaySetting = () => {
             }}
           />
           <View className="absolute right-12 top-3">
-            <QuestionMarkIcon
-              tooltipText="각 단마다 앞/뒤 방향을 표시할지 여부를 설정합니다."
-            />
+            <CircleQuestionMark size={24} color="#767676" />
           </View>
         </View>
 
@@ -246,9 +243,7 @@ const WaySetting = () => {
                 <Plus size={22} color={colorStyles.lightest.icon} strokeWidth={2.5} />
               </TouchableOpacity>
               <View className="absolute -right-8 top-1/2 -mt-3">
-                <QuestionMarkIcon
-                  tooltipText="몇 단마다 규칙(꽈배기나 늘림 등)이 있을 때 이 기능을 활용해 보세요!"
-                />
+                <CircleQuestionMark size={24} color="#767676" />
               </View>
             </View>
           </View>
