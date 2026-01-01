@@ -36,7 +36,13 @@ const CounterDirection: React.FC<CounterDirectionProps> = ({
     <View className={getGapClass(screenSize)} style={{ height: imageHeight }}>
       <Pressable onPress={wayIsChange ? onToggleWay : undefined}>
         <Image
-          source={way === 'front' ? Images.way_front : Images.way_back}
+          source={
+            wayIsChange
+              ? way === 'front'
+                ? Images.way_front
+                : Images.way_back
+              : Images.way_plain
+          }
           style={{ width: imageWidth, height: imageHeight, resizeMode: 'contain' }}
         />
       </Pressable>
