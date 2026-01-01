@@ -200,7 +200,7 @@ const WaySetting = () => {
               }
             }}
           />
-          <View className="absolute right-12 top-3">
+          <View className="absolute right-12 top-2">
             <QuestionMarkTooltip tooltipText="어쩌미가 단마다 앞/뒤, 도안 읽는 방향을 표시해줍니다." />
           </View>
         </View>
@@ -243,7 +243,7 @@ const WaySetting = () => {
                 <Text className={`text-base ${colorStyles.lightest.icon} mr-2`}>규칙 추가</Text>
                 <Plus size={22} color={colorStyles.lightest.icon} strokeWidth={2.5} />
               </TouchableOpacity>
-              <View className="absolute -right-8 top-1/2 -mt-3">
+              <View className="absolute -right-8 top-5 -mt-3">
                 <QuestionMarkTooltip tooltipText="몇 단마다 규칙(꽈배기나 늘림 등)이 있을 때 이 기능을 활용해 보세요!" />
               </View>
             </View>
