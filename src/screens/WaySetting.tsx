@@ -1,5 +1,5 @@
 import React, { useState, useLayoutEffect, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -168,7 +168,15 @@ const WaySetting = () => {
 
   return (
     <SafeAreaView style={screenStyles.flex1} edges={safeAreaEdges}>
-      <ScrollView contentContainerStyle={screenStyles.scrollViewContentCentered}>
+      <KeyboardAvoidingView
+        style={screenStyles.flex1}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={80}
+      >
+        <ScrollView 
+          contentContainerStyle={screenStyles.scrollViewContentCentered}
+          keyboardShouldPersistTaps="handled"
+        >
         {/* 활성화 토글 */}
         <View className="flex-row items-center justify-between px-4 py-3">
           <Text className="text-base text-black">활성화</Text>
@@ -249,7 +257,8 @@ const WaySetting = () => {
             </View>
           </View>
         )}
-      </ScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
 
       {/* 규칙 삭제 확인 모달 */}
       <ConfirmModal
