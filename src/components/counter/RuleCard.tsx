@@ -133,25 +133,21 @@ const RuleCard: React.FC<RuleCardProps> = ({
   };
 
   // 규칙 오류 체크
-  const checkRuleError = () => {
-    const parsedStartNumber = parseInt(editStartNumber, 10) || 0;
-    const parsedEndNumber = parseInt(editEndNumber, 10) || 0;
-    const parsedRuleNumber = parseInt(editRuleNumber, 10) || 0;
-
+  const checkRuleError = (start: number, end: number, rule: number): string | null => {
     // 규칙이 입력되지 않았으면 오류 없음
-    if (parsedRuleNumber === 0) {
+    if (rule === 0) {
       return null;
     }
 
     // 시작단과 종료단 둘 다 있는 경우
-    if (parsedStartNumber > 0 && parsedEndNumber > 0) {
+    if (start > 0 && end > 0) {
       // 시작단이 종료단보다 큰 경우
-      if (parsedStartNumber >= parsedEndNumber) {
+      if (start >= end) {
         return '시작단이 종료단 이상일 수 없습니다.';
       }
       // 규칙이 적용되지 않는 경우
-      if (parsedStartNumber + parsedRuleNumber > parsedEndNumber) {
-        return '규칙이 적용되지 않습니다.';
+      if (start + rule > end) {
+        return '구간 내에 규칙이 적용되지 않습니다.';
       }
     }
 
@@ -160,12 +156,15 @@ const RuleCard: React.FC<RuleCardProps> = ({
 
   // 보기 모드
   if (!isEditMode) {
+    const hasError = checkRuleError(startNumber, endNumber, ruleNumber) !== null;
     return (
       <View className="mb-4 bg-white border border-lightgray rounded-xl p-4">
         <View className="flex-row items-start">
           <View className="flex-1">
             {message && (
-              <Text className="text-base font-extrabold text-black mb-2">{message}</Text>
+              <Text className={`text-base font-extrabold mb-2 ${hasError ? 'text-red-orange-500' : 'text-black'}`}>
+                {message}
+              </Text>
             )}
             <Text className="text-base text-black">
               {startNumber}단부터 {endNumber}단까지 {ruleNumber}단마다
@@ -261,7 +260,7 @@ const RuleCard: React.FC<RuleCardProps> = ({
           const parsedRuleNumber = parseInt(editRuleNumber, 10) || 0;
           const hasRuleInput = (parsedStartNumber > 0 || parsedEndNumber > 0) && parsedRuleNumber > 0;
           const rulePreview = calculateRulePreview();
-          const ruleError = checkRuleError();
+          const ruleError = checkRuleError(parsedStartNumber, parsedEndNumber, parsedRuleNumber);
 
           if (!hasRuleInput) {
             return null;

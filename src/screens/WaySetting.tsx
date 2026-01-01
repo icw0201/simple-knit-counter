@@ -173,7 +173,7 @@ const WaySetting = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={80}
       >
-        <ScrollView 
+        <ScrollView
           contentContainerStyle={screenStyles.scrollViewContentCentered}
           keyboardShouldPersistTaps="handled"
         >
