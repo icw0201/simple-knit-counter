@@ -3,13 +3,15 @@ import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { CircleQuestionMark, Plus } from 'lucide-react-native';
+import { Plus } from 'lucide-react-native';
 
 import CheckBox from '@components/common/CheckBox';
 import ActivateToggle from '@components/common/ActivateToggle';
+import QuestionMarkIcon from '@components/common/QuestionMarkIcon';
 import RuleCard from '@components/counter/RuleCard';
 import { ConfirmModal } from '@components/common/modals';
 import { screenStyles, safeAreaEdges } from '@styles/screenStyles';
+import { colorStyles } from '@styles/colorStyles';
 import { RootStackParamList } from '@navigation/AppNavigator';
 import { getStoredItems, updateItem } from '@storage/storage';
 import { Counter, RepeatRule } from '@storage/types';
@@ -199,7 +201,9 @@ const WaySetting = () => {
             }}
           />
           <View className="absolute right-12 top-3">
-            <CircleQuestionMark size={24} color="#767676" />
+            <QuestionMarkIcon
+              tooltipText="각 단마다 앞/뒤 방향을 표시할지 여부를 설정합니다."
+            />
           </View>
         </View>
 
@@ -235,14 +239,16 @@ const WaySetting = () => {
           <View className="w-full items-center mb-6">
             <View className="relative">
               <TouchableOpacity
-                className="bg-red-orange-100 rounded-xl px-6 py-3 flex-row items-center"
+                className={`${colorStyles.lightest.container} rounded-xl pl-5 pr-4 py-3 flex-row items-center`}
                 onPress={handleAddRule}
               >
-                <Plus size={22} color="#490806" />
-                <Text className="text-base text-black ml-2">규칙 추가</Text>
+                <Text className={`text-base ${colorStyles.lightest.icon} mr-2`}>규칙 추가</Text>
+                <Plus size={22} color={colorStyles.lightest.icon} strokeWidth={2.5} />
               </TouchableOpacity>
               <View className="absolute -right-8 top-1/2 -mt-3">
-                <CircleQuestionMark size={24} color="#767676" />
+                <QuestionMarkIcon
+                  tooltipText="몇 단마다 규칙(꽈배기나 늘림 등)이 있을 때 이 기능을 활용해 보세요!"
+                />
               </View>
             </View>
           </View>
