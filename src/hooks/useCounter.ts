@@ -160,7 +160,7 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
       );
 
       if (latest) {
-        // title, info, mascotIsActive, wayIsChange 등 메타데이터 업데이트(헤더/표시용), 조작 가능한 필드들은 유지
+        // title, info, mascotIsActive, wayIsChange, repeatRules 등 메타데이터 업데이트(헤더/표시용), 조작 가능한 필드들은 유지
         setCounter(prevCounter => {
           if (!prevCounter) {
             return latest;
@@ -171,6 +171,7 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
             info: latest.info,
             mascotIsActive: latest.mascotIsActive ?? false,
             wayIsChange: latest.wayIsChange ?? false,
+            repeatRules: latest.repeatRules ?? [],
           };
         });
         setWay(latest.way ?? 'front');
