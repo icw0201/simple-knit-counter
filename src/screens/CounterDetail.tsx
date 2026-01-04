@@ -120,7 +120,7 @@ const CounterDetail = () => {
 
   // 방향 이미지 크기 계산 (원본 비율 87:134 유지)
   const imageWidth = iconSize;
-  const imageHeight = iconSize * (87 / 134);
+  const imageHeight = iconSize * (87 / 134); //여기 수정해야 함
   const hasParent = !!counter?.parentProjectId;
 
   // SubCounterModal 크기 및 위치 계산 (화면 크기별)
