@@ -245,13 +245,13 @@ const WaySetting = () => {
           <View className="w-full items-center mb-6">
             <View className="relative">
               <TouchableOpacity
-                className={`${colorStyles.lightest.container} rounded-xl pl-5 pr-4 py-3 flex-row items-center`}
+                className={`${colorStyles.lightest.container} rounded-xl pl-5 pr-4 py-2 flex-row items-center`}
                 onPress={handleAddRule}
               >
                 <Text className={`text-base ${colorStyles.lightest.icon} mr-2`}>규칙 추가</Text>
                 <Plus size={22} color={colorStyles.lightest.icon} strokeWidth={2.5} />
               </TouchableOpacity>
-              <View className="absolute -right-8 top-5 -mt-3">
+              <View className="absolute -right-8 top-4 -mt-3">
                 <QuestionMarkTooltip tooltipText="몇 단마다 규칙(꽈배기나 늘림 등)이 있을 때 이 기능을 활용해 보세요!" />
               </View>
             </View>
