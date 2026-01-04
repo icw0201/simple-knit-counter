@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text } from 'react-native';
 import CircleIcon from '@components/common/CircleIcon';
 import TextInputBox from '@components/common/TextInputBox';
+import { calculateRulePreview } from '@utils/ruleUtils';
 
 interface RuleCardProps {
   message: string;
@@ -93,43 +94,12 @@ const RuleCard: React.FC<RuleCardProps> = ({
   };
 
   // 규칙 미리보기 계산 (시작단 제외)
-  const calculateRulePreview = () => {
+  const getRulePreview = () => {
     const parsedStartNumber = parseInt(editStartNumber, 10) || 0;
     const parsedEndNumber = parseInt(editEndNumber, 10) || 0;
     const parsedRuleNumber = parseInt(editRuleNumber, 10) || 0;
 
-    // 규칙이 입력되지 않았으면 빈 배열 반환
-    if (parsedRuleNumber === 0) {
-      return [];
-    }
-
-    const results: number[] = [];
-    const maxCount = 5; // 최대 5회까지 표시
-
-    if (parsedStartNumber > 0 && parsedEndNumber > 0) {
-      // 시작단과 종료단 둘 다 있는 경우: 시작단 + ruleNumber부터 시작 (시작단 제외)
-      let current = parsedStartNumber + parsedRuleNumber;
-      while (current <= parsedEndNumber && results.length < maxCount) {
-        results.push(current);
-        current += parsedRuleNumber;
-      }
-    } else if (parsedStartNumber > 0) {
-      // 시작단만 있는 경우: 시작단 + ruleNumber부터 시작 (시작단 제외)
-      let current = parsedStartNumber + parsedRuleNumber;
-      for (let i = 0; i < maxCount; i++) {
-        results.push(current);
-        current += parsedRuleNumber;
-      }
-    } else if (parsedEndNumber > 0) {
-      // 종료단만 있는 경우: ruleNumber부터 종료단까지
-      let current = parsedRuleNumber;
-      while (current <= parsedEndNumber && results.length < maxCount) {
-        results.push(current);
-        current += parsedRuleNumber;
-      }
-    }
-
-    return results;
+    return calculateRulePreview(parsedStartNumber, parsedEndNumber, parsedRuleNumber, 5);
   };
 
   // 규칙 오류 체크
@@ -259,7 +229,7 @@ const RuleCard: React.FC<RuleCardProps> = ({
           const parsedEndNumber = parseInt(editEndNumber, 10) || 0;
           const parsedRuleNumber = parseInt(editRuleNumber, 10) || 0;
           const hasRuleInput = (parsedStartNumber > 0 || parsedEndNumber > 0) && parsedRuleNumber > 0;
-          const rulePreview = calculateRulePreview();
+          const rulePreview = getRulePreview();
           const ruleError = checkRuleError(parsedStartNumber, parsedEndNumber, parsedRuleNumber);
 
           if (!hasRuleInput) {

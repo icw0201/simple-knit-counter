@@ -249,6 +249,8 @@ const CounterDetail = () => {
           mascotIsActive={mascotIsActive}
           wayIsChange={wayIsChange}
           way={way}
+          currentCount={counter.count}
+          repeatRules={counter.repeatRules || []}
           imageWidth={imageWidth}
           imageHeight={imageHeight}
           screenSize={screenSize}
