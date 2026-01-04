@@ -150,6 +150,15 @@ const CounterDirection: React.FC<CounterDirectionProps> = ({
                   zIndex: 1, // 버블 이미지 위에 텍스트
                 }}
               >
+                {/* 다중 규칙일 때 라벨 표시 */}
+                {appliedRules.length > 1 && (
+                  <Text
+                    className="text-darkgray text-center"
+                    style={{ fontSize: imageHeight * 0.12, marginBottom: imageHeight * 0.02 }}
+                  >
+                    ({currentRuleIndex + 1}/{appliedRules.length})
+                  </Text>
+                )}
                 <Text
                   className="font-bold text-center"
                   style={{ fontSize: imageHeight * 0.25 }}
