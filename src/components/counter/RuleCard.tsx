@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text } from 'react-native';
 import CircleIcon from '@components/common/CircleIcon';
-import TextInputBox from '@components/common/TextInputBox';
+import TextInputBox, { TextInputBoxRef } from '@components/common/TextInputBox';
 import { calculateRulePreview } from '@utils/ruleUtils';
 
 interface RuleCardProps {
@@ -38,6 +38,12 @@ const RuleCard: React.FC<RuleCardProps> = ({
   const [editEndNumber, setEditEndNumber] = useState(numberToString(endNumber));
   const [editRuleNumber, setEditRuleNumber] = useState(numberToString(ruleNumber));
   const [validationError, setValidationError] = useState('');
+
+  // TextInputBox refs
+  const messageInputRef = useRef<TextInputBoxRef>(null);
+  const startNumberInputRef = useRef<TextInputBoxRef>(null);
+  const endNumberInputRef = useRef<TextInputBoxRef>(null);
+  const ruleNumberInputRef = useRef<TextInputBoxRef>(null);
 
   // props가 변경되면 내부 state도 업데이트
   useEffect(() => {
@@ -160,6 +166,7 @@ const RuleCard: React.FC<RuleCardProps> = ({
         <Text className="text-base font-extrabold text-black mr-2">메시지 :</Text>
         <View className="flex-1">
           <TextInputBox
+            ref={messageInputRef}
             label=""
             value={editMessage}
             onChangeText={(text) => {
@@ -168,6 +175,9 @@ const RuleCard: React.FC<RuleCardProps> = ({
             }}
             type="text"
             containerClassName="mt-1"
+            returnKeyType="next"
+            onSubmitEditing={() => startNumberInputRef.current?.focus()}
+            blurOnSubmit={false}
           />
         </View>
       </View>
@@ -179,6 +189,7 @@ const RuleCard: React.FC<RuleCardProps> = ({
           <Text className="text-base font-extrabold text-black mr-2">규칙 :</Text>
           <View className="mr-2 w-18">
             <TextInputBox
+              ref={startNumberInputRef}
               label=""
               value={editStartNumber}
               onChangeText={(text) => {
@@ -187,11 +198,15 @@ const RuleCard: React.FC<RuleCardProps> = ({
               }}
               type="number"
               containerClassName="mb-2"
+              returnKeyType="next"
+              onSubmitEditing={() => endNumberInputRef.current?.focus()}
+              blurOnSubmit={false}
             />
           </View>
           <Text className="text-base text-black mr-2">단부터</Text>
           <View className="mr-2 w-18">
             <TextInputBox
+              ref={endNumberInputRef}
               label=""
               value={editEndNumber}
               onChangeText={(text) => {
@@ -200,6 +215,9 @@ const RuleCard: React.FC<RuleCardProps> = ({
               }}
               type="number"
               containerClassName="mb-2"
+              returnKeyType="next"
+              onSubmitEditing={() => ruleNumberInputRef.current?.focus()}
+              blurOnSubmit={false}
             />
           </View>
           <Text className="text-base text-black">단까지</Text>
@@ -210,6 +228,7 @@ const RuleCard: React.FC<RuleCardProps> = ({
           <Text className="text-base font-extrabold text-black mr-2 opacity-0">규칙 :</Text>
           <View className="mr-2 w-18">
             <TextInputBox
+              ref={ruleNumberInputRef}
               label=""
               value={editRuleNumber}
               onChangeText={(text) => {
@@ -218,6 +237,9 @@ const RuleCard: React.FC<RuleCardProps> = ({
               }}
               type="number"
               containerClassName="mb-0"
+              returnKeyType="done"
+              onSubmitEditing={() => ruleNumberInputRef.current?.blur()}
+              blurOnSubmit={true}
             />
           </View>
           <Text className="text-base text-black">단마다 반복 규칙</Text>
