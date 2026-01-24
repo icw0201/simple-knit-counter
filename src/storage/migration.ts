@@ -8,7 +8,7 @@ const STORAGE_KEY = 'knit_items';
 const DATA_VERSION_KEY = 'data_version';
 
 // 데이터 버전 관리
-export const CURRENT_DATA_VERSION = 4; // repeatRules 배열로 변경 및 way를 Counter로 이동 마이그레이션
+export const CURRENT_DATA_VERSION = 4; // repeatRules 배열로 변경, way를 Counter로 이동, RepeatRule에 color 필드 추가
 
 /**
  * 버전 1: 기존 'active' 상태를 'auto'로 마이그레이션
@@ -47,10 +47,11 @@ const migrateV2_ActivateModeToWayIsChangeAndMascotIsActive = (items: Item[]): It
 };
 
 /**
- * 버전 4: 반복 규칙을 배열로 변경 및 way를 Counter로 이동
+ * 버전 4: 반복 규칙을 배열로 변경, way를 Counter로 이동, RepeatRule에 color 필드 추가
  * 1. 기존: repeatRuleIsActive, repeatRuleNumber, repeatRuleStartNumber, repeatRuleEndNumber
- *    신규: repeatRules: RepeatRule[]
+ *    신규: repeatRules: RepeatRule[] (color 필드 포함, optional)
  * 2. way를 info.way에서 counter.way로 이동
+ * 3. 기존 repeatRules 배열이 있으면 color 필드가 없어도 유지 (optional 필드)
  * @param items 마이그레이션할 아이템 배열
  * @returns 마이그레이션된 아이템 배열
  */
@@ -61,14 +62,23 @@ const migrateV4_RepeatRulesToArrayAndMoveWay = (items: Item[]): Item[] => {
       const { repeatRuleIsActive, repeatRuleNumber, repeatRuleStartNumber, repeatRuleEndNumber, info, ...rest } = counter;
 
       // 1. 반복 규칙을 배열로 변환
-      const repeatRules: any[] = [];
+      let repeatRules: any[] = [];
+
+      // 기존 단일 규칙 필드가 있으면 배열로 변환
       if (repeatRuleIsActive && repeatRuleNumber > 0 && repeatRuleStartNumber !== undefined && repeatRuleEndNumber !== undefined) {
         repeatRules.push({
           message: '', // 기존 데이터에는 메시지가 없으므로 빈 문자열
           startNumber: repeatRuleStartNumber ?? 0,
           endNumber: repeatRuleEndNumber ?? 0,
           ruleNumber: repeatRuleNumber ?? 0,
+          // color 필드는 optional이므로 추가하지 않음
         });
+      } else if (counter.repeatRules && Array.isArray(counter.repeatRules)) {
+        // 이미 배열 형태인 경우 (버전 4 이후 데이터), color 필드가 없어도 유지
+        repeatRules = counter.repeatRules.map((rule: any) => ({
+          ...rule,
+          // color 필드는 optional이므로 기존 규칙에는 추가하지 않음
+        }));
       }
 
       // 2. way를 info에서 counter로 이동
@@ -159,7 +169,7 @@ const runMigrations = (items: Item[], fromVersion: number, toVersion: number): I
 
   if (fromVersion < 4 && toVersion >= 4) {
     migratedItems = migrateV3_AddNewProperties(migratedItems); // 기본값 설정
-    migratedItems = migrateV4_RepeatRulesToArrayAndMoveWay(migratedItems); // repeatRules 배열 및 way 이동
+    migratedItems = migrateV4_RepeatRulesToArrayAndMoveWay(migratedItems); // repeatRules 배열, way 이동, color 필드 추가
   }
 
   return migratedItems;
