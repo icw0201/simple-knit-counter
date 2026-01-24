@@ -126,6 +126,19 @@ const CounterDirection: React.FC<CounterDirectionProps> = ({
           {/* 규칙이 적용되는 경우: bubble 이미지 (way 이미지 아래, y축으로 위에 위치) */}
           {isRuleAppliedToCurrentCount && currentRule && (
             <>
+              {/* 다중 규칙일 때 라벨 표시 (말풍선 위쪽에 분리) */}
+              {appliedRules.length > 1 && (
+                <View
+                  className="absolute left-0 right-0 items-center"
+                  style={{
+                    top: -imageHeight * 1.3, // 말풍선 위쪽에 배치
+                  }}
+                >
+                  <Text className="text-sm text-darkgray text-center font-bold">
+                    {currentRuleIndex + 1}/{appliedRules.length}
+                  </Text>
+                </View>
+              )}
               <Image
                 source={Images.emphasis_bubble}
                 style={{
@@ -150,15 +163,6 @@ const CounterDirection: React.FC<CounterDirectionProps> = ({
                   zIndex: 1, // 버블 이미지 위에 텍스트
                 }}
               >
-                {/* 다중 규칙일 때 라벨 표시 */}
-                {appliedRules.length > 1 && (
-                  <Text
-                    className="text-darkgray text-center"
-                    style={{ fontSize: imageHeight * 0.12, marginBottom: imageHeight * 0.02 }}
-                  >
-                    ({currentRuleIndex + 1}/{appliedRules.length})
-                  </Text>
-                )}
                 <Text
                   className="font-bold text-center"
                   style={{ fontSize: imageHeight * 0.25 }}
