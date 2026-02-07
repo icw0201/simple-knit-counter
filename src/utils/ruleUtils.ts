@@ -106,7 +106,10 @@ export const getDefaultColorForNewRule = (existingRules: RepeatRule[]): string =
   const available = COLOR_PRIORITY_INDICES.find(
     (i) => RED_ORANGE_SWATCHES[i] && !usedColors.has(RED_ORANGE_SWATCHES[i])
   );
-  return available !== undefined
-    ? RED_ORANGE_SWATCHES[available]
-    : RED_ORANGE_SWATCHES[0];
+  if (available !== undefined) {
+    return RED_ORANGE_SWATCHES[available];
+  }
+  // 모두 사용 중이면 우선순위 순서대로 순환
+  const cycleIndex = existingRules.length % COLOR_PRIORITY_INDICES.length;
+  return RED_ORANGE_SWATCHES[COLOR_PRIORITY_INDICES[cycleIndex]];
 };
