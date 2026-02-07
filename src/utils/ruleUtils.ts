@@ -15,8 +15,8 @@ export const isRuleApplied = (count: number, rule: RepeatRule): boolean => {
   }
 
   if (startNumber > 0 && endNumber > 0) {
-    // 시작단과 종료단 둘 다 있는 경우: 시작단 + ruleNumber부터 시작 (시작단 제외)
-    let current = startNumber + ruleNumber;
+    // 시작단과 종료단 둘 다 있는 경우: 시작단 포함, ruleNumber 간격으로 적용
+    let current = startNumber;
     while (current <= endNumber) {
       if (current === count) {
         return true;
@@ -24,9 +24,8 @@ export const isRuleApplied = (count: number, rule: RepeatRule): boolean => {
       current += ruleNumber;
     }
   } else if (startNumber > 0) {
-    // 시작단만 있는 경우: 시작단 + ruleNumber부터 시작 (시작단 제외)
-    // count가 startNumber + ruleNumber 이상이고, (count - startNumber)가 ruleNumber의 배수인지 확인
-    if (count >= startNumber + ruleNumber) {
+    // 시작단만 있는 경우: 시작단 포함, ruleNumber 간격으로 적용
+    if (count >= startNumber) {
       return (count - startNumber) % ruleNumber === 0;
     }
   } else if (endNumber > 0) {
@@ -44,7 +43,7 @@ export const isRuleApplied = (count: number, rule: RepeatRule): boolean => {
 };
 
 /**
- * 규칙 미리보기 계산 (시작단 제외)
+ * 규칙 미리보기 계산 (시작단 포함)
  * 규칙이 적용되는 단들의 배열을 반환합니다.
  * @param startNumber 시작단
  * @param endNumber 종료단
@@ -66,15 +65,15 @@ export const calculateRulePreview = (
   const results: number[] = [];
 
   if (startNumber > 0 && endNumber > 0) {
-    // 시작단과 종료단 둘 다 있는 경우: 시작단 + ruleNumber부터 시작 (시작단 제외)
-    let current = startNumber + ruleNumber;
+    // 시작단과 종료단 둘 다 있는 경우: 시작단 포함, ruleNumber 간격으로 적용
+    let current = startNumber;
     while (current <= endNumber && results.length < maxCount) {
       results.push(current);
       current += ruleNumber;
     }
   } else if (startNumber > 0) {
-    // 시작단만 있는 경우: 시작단 + ruleNumber부터 시작 (시작단 제외)
-    let current = startNumber + ruleNumber;
+    // 시작단만 있는 경우: 시작단 포함, ruleNumber 간격으로 적용
+    let current = startNumber;
     for (let i = 0; i < maxCount; i++) {
       results.push(current);
       current += ruleNumber;

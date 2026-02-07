@@ -110,7 +110,7 @@ const RuleCard: React.FC<RuleCardProps> = ({
     onDelete?.();
   };
 
-  // 규칙 미리보기 계산 (시작단 제외)
+  // 규칙 미리보기 계산 (시작단 포함)
   const getRulePreview = () => {
     const parsedStartNumber = parseInt(editStartNumber, 10) || 0;
     const parsedEndNumber = parseInt(editEndNumber, 10) || 0;
@@ -131,10 +131,6 @@ const RuleCard: React.FC<RuleCardProps> = ({
       // 시작단이 종료단보다 큰 경우
       if (start >= end) {
         return '시작단이 종료단 이상일 수 없습니다.';
-      }
-      // 규칙이 적용되지 않는 경우
-      if (start + rule > end) {
-        return '구간 내에 규칙이 적용되지 않습니다.';
       }
     }
 
@@ -281,13 +277,12 @@ const RuleCard: React.FC<RuleCardProps> = ({
           }
 
           const previewText = rulePreview.length > 0
-            ? rulePreview.join(' ')
+            ? rulePreview.map((n) => `${n}단`).join(', ')
             : '';
 
           return (
-            <View className="mt-2 flex-row">
-              {/* 정렬을 위한 투명한 "규칙 :" 텍스트 */}
-              <Text className="text-base font-extrabold text-black mr-2 opacity-0">규칙 :</Text>
+            <View className="mt-2 flex-row items-center">
+              <Text className="text-base font-extrabold text-black mr-2">적용 단 :</Text>
               <View>
                 {previewText && (
                   <Text className={`text-sm ${ruleError ? 'text-red-orange-500' : 'text-darkgray'}`}>
