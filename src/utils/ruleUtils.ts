@@ -1,4 +1,5 @@
 import { RepeatRule } from '@storage/types';
+import { RED_ORANGE_SWATCHES } from '@constants/colors';
 
 /**
  * 규칙이 적용되는 단인지 확인하는 함수
@@ -90,3 +91,21 @@ export const calculateRulePreview = (
   return results;
 };
 
+/** 색상 우선순위: 2단계씩 건너뛰며 (1,3,5,7,9,11 → 2,4,6,8,10) */
+const COLOR_PRIORITY_INDICES = [0, 2, 4, 6, 8, 10, 1, 3, 5, 7, 9];
+
+/**
+ * 신규 규칙 카드의 기본 색상 반환
+ * 기존 규칙과 겹치지 않는 red-orange 색상을 우선순위에 따라 선택, 모두 사용 중이면 첫 번째 색상 반환
+ */
+export const getDefaultColorForNewRule = (existingRules: RepeatRule[]): string => {
+  const usedColors = new Set(
+    existingRules.map((r) => r.color).filter((c): c is string => Boolean(c))
+  );
+  const available = COLOR_PRIORITY_INDICES.find(
+    (i) => RED_ORANGE_SWATCHES[i] && !usedColors.has(RED_ORANGE_SWATCHES[i])
+  );
+  return available !== undefined
+    ? RED_ORANGE_SWATCHES[available]
+    : RED_ORANGE_SWATCHES[0];
+};

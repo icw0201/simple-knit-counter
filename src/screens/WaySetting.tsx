@@ -15,6 +15,7 @@ import { colorStyles } from '@styles/colorStyles';
 import { RootStackParamList } from '@navigation/AppNavigator';
 import { getStoredItems, updateItem } from '@storage/storage';
 import { Counter, RepeatRule } from '@storage/types';
+import { getDefaultColorForNewRule } from '@utils/ruleUtils';
 
 /**
  * Way 설정 화면 컴포넌트
@@ -106,12 +107,14 @@ const WaySetting = () => {
       return;
     }
 
+    const existingRules = counter.repeatRules ?? [];
+    const defaultColor = index === null ? getDefaultColorForNewRule(existingRules) : undefined;
     const newRule: RepeatRule = {
       message: data.message,
       startNumber: data.startNumber,
       endNumber: data.endNumber,
       ruleNumber: data.ruleNumber,
-      color: data.color,
+      color: data.color ?? defaultColor,
     };
 
     let updatedRules: RepeatRule[];
@@ -236,6 +239,7 @@ const WaySetting = () => {
             startNumber={0}
             endNumber={0}
             ruleNumber={0}
+            color={getDefaultColorForNewRule(repeatRules)}
             isEditable={true}
             onConfirm={(data) => handleRuleConfirm(null, data)}
             onDelete={() => setIsAddingNewRule(false)}
