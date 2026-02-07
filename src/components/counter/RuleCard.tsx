@@ -128,9 +128,9 @@ const RuleCard: React.FC<RuleCardProps> = ({
 
     // 시작단과 종료단 둘 다 있는 경우
     if (start > 0 && end > 0) {
-      // 시작단이 종료단보다 큰 경우
-      if (start >= end) {
-        return '시작단이 종료단 이상일 수 없습니다.';
+      // 시작단이 종료단보다 큰 경우만 오류 (시작단=종료단 허용)
+      if (start > end) {
+        return '시작단이 종료단보다 클 수 없습니다.';
       }
     }
 
@@ -284,15 +284,16 @@ const RuleCard: React.FC<RuleCardProps> = ({
             <View className="mt-2 flex-row items-center">
               <Text className="text-base font-extrabold text-black mr-2">적용 단 :</Text>
               <View>
-                {previewText && (
-                  <Text className={`text-sm ${ruleError ? 'text-red-orange-500' : 'text-darkgray'}`}>
-                    {previewText}{rulePreview.length === 5 ? '...' : ''}
-                  </Text>
-                )}
-                {ruleError && (
-                  <Text className="text-sm text-red-orange-500 mt-1 mb-2">
+                {ruleError ? (
+                  <Text className="text-sm text-red-orange-500">
                     {ruleError}
                   </Text>
+                ) : (
+                  previewText && (
+                    <Text className="text-sm text-darkgray">
+                      {previewText}{rulePreview.length === 5 ? '...' : ''}
+                    </Text>
+                  )
                 )}
               </View>
             </View>
