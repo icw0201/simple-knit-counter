@@ -91,8 +91,9 @@ export const calculateRulePreview = (
   return results;
 };
 
-/** 색상 우선순위: 2단계씩 건너뛰며 (1,3,5,7,9,11 → 2,4,6,8,10) */
-const COLOR_PRIORITY_INDICES = [0, 2, 4, 6, 8, 10, 1, 3, 5, 7, 9];
+/** 색상 우선순위: 2단계씩 건너뛰며 (1,3,5,7,9,11 → 2, 4,6,8,10) */
+// 100번 컬러(index 1)는 배경색과 동일하여 제거
+const COLOR_PRIORITY_INDICES = [0, 2, 4, 6, 8, 10, 3, 5, 7, 9];
 
 /**
  * 신규 규칙 카드의 기본 색상 반환
