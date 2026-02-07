@@ -257,7 +257,13 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
    * 사운드 파일 로드 및 초기화
    */
   useEffect(() => {
-    const sound = new Sound(require('../assets/sounds/click_cut.mp3'), (error) => {
+    // Android: res/raw에 있는 파일명을 사용 (확장자는 있어도 되고, 내부에서 소문자/확장자 제거 처리)
+    // iOS: 앱 번들에 파일을 포함시킨 뒤 파일명으로 로드해야 합니다.
+    const filename = Platform.OS === 'android'
+      ? 'src_assets_sounds_click_cut.mp3'
+      : 'click_cut.mp3';
+
+    const sound = new Sound(filename, Sound.MAIN_BUNDLE, (error) => {
       if (error) {
         setErrorMessage('사운드 로드 실패:\n' + error.message);
         setErrorModalVisible(true);
