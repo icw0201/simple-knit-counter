@@ -69,7 +69,7 @@ const ColorPickerComponent: React.FC<ColorPickerProps> = ({
             onPress={handleCancel}
           >
             <Pressable
-              className="bg-white rounded-2xl p-4 m-4 w-[85%] max-w-[320px]"
+              className="bg-white rounded-2xl px-4 py-8 m-4 w-[85%] max-w-[320px]"
               onPress={(e) => e.stopPropagation()}
             >
               {/* reanimated-color-picker는 style prop 필요 */}
