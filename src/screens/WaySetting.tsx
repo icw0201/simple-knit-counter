@@ -92,7 +92,7 @@ const WaySetting = () => {
   };
 
   // 규칙 확인 (추가 또는 수정)
-  const handleRuleConfirm = (index: number | null, data: { message: string; startNumber: number; endNumber: number; ruleNumber: number }) => {
+  const handleRuleConfirm = (index: number | null, data: { message: string; startNumber: number; endNumber: number; ruleNumber: number; color?: string }) => {
     if (!counterId) {
       return;
     }
@@ -111,6 +111,7 @@ const WaySetting = () => {
       startNumber: data.startNumber,
       endNumber: data.endNumber,
       ruleNumber: data.ruleNumber,
+      color: data.color,
     };
 
     let updatedRules: RepeatRule[];
@@ -221,6 +222,7 @@ const WaySetting = () => {
             startNumber={rule.startNumber}
             endNumber={rule.endNumber}
             ruleNumber={rule.ruleNumber}
+            color={rule.color}
             isEditable={false}
             onConfirm={(data) => handleRuleConfirm(index, data)}
             onDelete={() => handleRuleDeleteClick(index)}
