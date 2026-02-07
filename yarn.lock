@@ -3042,7 +3042,7 @@ __metadata:
     react-native-mmkv: ^3.2.0
     react-native-safe-area-context: ^5.4.1
     react-native-screens: ^4.10.0
-    react-native-sound: ^0.11.2
+    react-native-sound: ^0.13.0
     react-native-svg: ^15.13.0
     react-test-renderer: 19.0.0
     tailwind-merge: ^3.2.0
@@ -8570,12 +8570,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-sound@npm:^0.11.2":
-  version: 0.11.2
-  resolution: "react-native-sound@npm:0.11.2"
+"react-native-sound@npm:^0.13.0":
+  version: 0.13.0
+  resolution: "react-native-sound@npm:0.13.0"
   peerDependencies:
-    react-native: ">=0.8.0"
-  checksum: d019de415c5f7bc8af51bc50adff7b9c307cb990aad3ea193933f89df743bbcdbfaa33c4a12bb1143a223137cea39f8b69baf5e1c29f77cf80476616bccc6f91
+    react: "*"
+    react-native: "*"
+  checksum: 75e08645103930e914d7c40fd6d580f0f3399fe2493220dbbee974744eef75e877ed05465c2988e8450472e9546d12a4b01ce305337365d013ed39853ae6498a
   languageName: node
   linkType: hard
 
