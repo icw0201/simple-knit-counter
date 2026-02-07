@@ -8570,12 +8570,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-sound@npm:^0.11.2":
+"react-native-sound@npm:0.11.2":
   version: 0.11.2
   resolution: "react-native-sound@npm:0.11.2"
   peerDependencies:
     react-native: ">=0.8.0"
   checksum: d019de415c5f7bc8af51bc50adff7b9c307cb990aad3ea193933f89df743bbcdbfaa33c4a12bb1143a223137cea39f8b69baf5e1c29f77cf80476616bccc6f91
+  languageName: node
+  linkType: hard
+
+"react-native-sound@patch:react-native-sound@npm%3A0.11.2#./.yarn/patches/react-native-sound-npm-0.11.2-52b5401a23.patch::locator=SimpleKnitCounter%40workspace%3A.":
+  version: 0.11.2
+  resolution: "react-native-sound@patch:react-native-sound@npm%3A0.11.2#./.yarn/patches/react-native-sound-npm-0.11.2-52b5401a23.patch::version=0.11.2&hash=ed5fcd&locator=SimpleKnitCounter%40workspace%3A."
+  peerDependencies:
+    react-native: ">=0.8.0"
+  checksum: 6bb2e841e44b1c5a19675f9be44f47869bb7abeaf5cac03e9b65f0c15065264a01b9eb15ec03ce15b6977508f17f18f89f9deb930c0bf57d4e196792a8d01eb6
   languageName: node
   linkType: hard
 
