@@ -1,8 +1,10 @@
 // src/components/counter/ColorPicker.tsx
 import React, { useState } from 'react';
-import { Pressable, View, Modal, Text } from 'react-native';
+import { Pressable, View, Modal } from 'react-native';
 import ColorPickerIcon from '@assets/images/color_picker.svg';
-import ColorPicker, { Panel1, Swatches, Preview, OpacitySlider, HueSlider } from 'reanimated-color-picker';
+import ColorPicker, { Panel1, Swatches, HueSlider } from 'reanimated-color-picker';
+import { RED_ORANGE_SWATCHES } from '@constants/colors';
+import RoundedButton from '@components/common/RoundedButton';
 
 interface ColorPickerProps {
   selectedColor?: string; // hex 색상 값 (예: '#fc3e39')
@@ -18,20 +20,27 @@ const ColorPickerComponent: React.FC<ColorPickerProps> = ({
   onSelect,
 }) => {
   const [modalVisible, setModalVisible] = useState(false);
+  const [pendingColor, setPendingColor] = useState(selectedColor ?? '#fc3e39');
+
+  const initialColor = selectedColor ?? '#fc3e39';
 
   const handlePress = () => {
+    setPendingColor(initialColor);
     setModalVisible(true);
   };
 
-  const handleSelectColor = ({ hex }: { hex: string }) => {
-    onSelect(hex);
+  const handleColorChange = ({ hex }: { hex: string }) => {
+    setPendingColor(hex);
   };
 
-  const handleClose = () => {
+  const handleConfirm = () => {
+    onSelect(pendingColor);
     setModalVisible(false);
   };
 
-  const initialColor = selectedColor ?? '#fc3e39';
+  const handleCancel = () => {
+    setModalVisible(false);
+  };
 
   return (
     <>
@@ -39,14 +48,11 @@ const ColorPickerComponent: React.FC<ColorPickerProps> = ({
         onPress={handlePress}
         className="w-8 h-8 justify-center items-center"
       >
-        {selectedColor ? (
-          <View
-            className="w-6 h-6 rounded border border-lightgray"
-            style={{ backgroundColor: selectedColor }}
-          />
-        ) : (
-          <ColorPickerIcon width={24} height={24} />
-        )}
+        <ColorPickerIcon
+          width={24}
+          height={24}
+          color={selectedColor ?? '#fc3e39'}
+        />
       </Pressable>
 
       <Modal
@@ -54,34 +60,50 @@ const ColorPickerComponent: React.FC<ColorPickerProps> = ({
         transparent
         animationType="slide"
       >
-        <Pressable
-          className="flex-1 bg-black/50 justify-center items-center"
-          onPress={handleClose}
+        <View
+          className="flex-1"
+          style={{ paddingVertical: 32 }} // eslint-disable-line react-native/no-inline-styles
         >
           <Pressable
-            className="bg-white rounded-2xl p-4 m-4 w-[85%] max-w-[320px]"
-            onPress={(e) => e.stopPropagation()}
+            className="flex-1 bg-black/50 justify-center items-center"
+            onPress={handleCancel}
           >
-            {/* reanimated-color-picker는 style prop 필요 */}
-            <ColorPicker
-              value={initialColor}
-              style={{ width: '100%' }} // eslint-disable-line react-native/no-inline-styles
-              onCompleteJS={handleSelectColor}
-            >
-              <Preview />
-              <Panel1 />
-              <HueSlider />
-              <OpacitySlider />
-              <Swatches />
-            </ColorPicker>
             <Pressable
-              onPress={handleClose}
-              className="mt-4 py-3 rounded-xl bg-red-orange-500 items-center"
+              className="bg-white rounded-2xl p-4 m-4 w-[85%] max-w-[320px]"
+              onPress={(e) => e.stopPropagation()}
             >
-              <Text className="text-base font-extrabold text-white">확인</Text>
+              {/* reanimated-color-picker는 style prop 필요 */}
+              <ColorPicker
+                value={pendingColor}
+                style={{ width: '100%' }} // eslint-disable-line react-native/no-inline-styles
+                onCompleteJS={handleColorChange}
+                onChangeJS={handleColorChange}
+              >
+                <Panel1 />
+                <View className="h-3" />
+                <HueSlider />
+                <View className="h-4" />
+                <View>
+                  <Swatches colors={RED_ORANGE_SWATCHES.slice(0, 5)} />
+                  <View className="h-2" />
+                  <Swatches colors={RED_ORANGE_SWATCHES.slice(5, 10)} />
+                </View>
+              </ColorPicker>
+              <View className="mt-4 flex-row justify-evenly">
+                <RoundedButton
+                  title="취소"
+                  colorStyle="light"
+                  onPress={handleCancel}
+                />
+                <RoundedButton
+                  title="확인"
+                  colorStyle="vivid"
+                  onPress={handleConfirm}
+                />
+              </View>
             </Pressable>
           </Pressable>
-        </Pressable>
+        </View>
       </Modal>
     </>
   );
