@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { View, Text } from 'react-native';
 import CircleIcon from '@components/common/CircleIcon';
 import TextInputBox, { TextInputBoxRef } from '@components/common/TextInputBox';
+import ColorPicker from '@components/counter/ColorPicker';
 import { calculateRulePreview } from '@utils/ruleUtils';
 
 interface RuleCardProps {
@@ -9,8 +10,9 @@ interface RuleCardProps {
   startNumber: number;
   endNumber: number;
   ruleNumber: number;
+  color?: string; // 색상 (hex 값, 예: '#fc3e39')
   onDelete?: () => void;
-  onConfirm?: (data: { message: string; startNumber: number; endNumber: number; ruleNumber: number }) => void;
+  onConfirm?: (data: { message: string; startNumber: number; endNumber: number; ruleNumber: number; color?: string }) => void;
   isEditable?: boolean; // 편집 가능 여부
 }
 
@@ -23,6 +25,7 @@ const RuleCard: React.FC<RuleCardProps> = ({
   startNumber,
   endNumber,
   ruleNumber,
+  color,
   onDelete,
   onConfirm,
   isEditable = false,
@@ -37,6 +40,7 @@ const RuleCard: React.FC<RuleCardProps> = ({
   const [editStartNumber, setEditStartNumber] = useState(numberToString(startNumber));
   const [editEndNumber, setEditEndNumber] = useState(numberToString(endNumber));
   const [editRuleNumber, setEditRuleNumber] = useState(numberToString(ruleNumber));
+  const [editColor, setEditColor] = useState(color);
   const [validationError, setValidationError] = useState('');
 
   // TextInputBox refs
@@ -51,7 +55,8 @@ const RuleCard: React.FC<RuleCardProps> = ({
     setEditStartNumber(numberToString(startNumber));
     setEditEndNumber(numberToString(endNumber));
     setEditRuleNumber(numberToString(ruleNumber));
-  }, [message, startNumber, endNumber, ruleNumber]);
+    setEditColor(color);
+  }, [message, startNumber, endNumber, ruleNumber, color]);
 
   const handleEditClick = () => {
     setValidationError('');
@@ -91,7 +96,12 @@ const RuleCard: React.FC<RuleCardProps> = ({
       startNumber: parsedStartNumber,
       endNumber: parsedEndNumber,
       ruleNumber: parsedRuleNumber,
+      color: editColor,
     });
+  };
+
+  const handleColorSelect = (selectedColor: string) => {
+    setEditColor(selectedColor);
   };
 
   const handleDelete = () => {
@@ -164,21 +174,29 @@ const RuleCard: React.FC<RuleCardProps> = ({
       {/* 메시지 섹션 */}
       <View className="mb-3 flex-row items-center">
         <Text className="text-base font-extrabold text-black mr-2">메시지 :</Text>
-        <View className="flex-1">
-          <TextInputBox
-            ref={messageInputRef}
-            label=""
-            value={editMessage}
-            onChangeText={(text) => {
-              setEditMessage(text);
-              setValidationError('');
-            }}
-            type="text"
-            containerClassName="mt-1"
-            returnKeyType="next"
-            onSubmitEditing={() => startNumberInputRef.current?.focus()}
-            blurOnSubmit={false}
-          />
+        <View className="flex-1 flex-row items-center">
+          <View className="flex-1">
+            <TextInputBox
+              ref={messageInputRef}
+              label=""
+              value={editMessage}
+              onChangeText={(text) => {
+                setEditMessage(text);
+                setValidationError('');
+              }}
+              type="text"
+              containerClassName="mt-1"
+              returnKeyType="next"
+              onSubmitEditing={() => startNumberInputRef.current?.focus()}
+              blurOnSubmit={false}
+            />
+          </View>
+          <View className="ml-2">
+            <ColorPicker
+              selectedColor={editColor}
+              onSelect={handleColorSelect}
+            />
+          </View>
         </View>
       </View>
 
