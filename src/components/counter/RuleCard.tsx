@@ -145,7 +145,7 @@ const RuleCard: React.FC<RuleCardProps> = ({
     const hasError = checkRuleError(startNumber, endNumber, ruleNumber) !== null;
     return (
       <View className="mb-4 bg-white border border-lightgray rounded-xl p-4">
-        <View className="flex-row items-start">
+        <View className="flex-row items-center">
           <View className="flex-1">
             {message && (
               <Text className={`text-base font-extrabold mb-2 ${hasError ? 'text-red-orange-500' : 'text-black'}`}>
