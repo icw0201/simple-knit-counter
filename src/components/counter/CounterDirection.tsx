@@ -6,6 +6,17 @@ import { Images } from '@assets/images';
 import { ScreenSize, getGapClass } from '@constants/screenSizeConfig';
 import { isRuleApplied } from '@utils/ruleUtils';
 
+/** hex 색상이 진하면 true (텍스트 흰색 권장) */
+const isDarkColor = (hex: string): boolean => {
+  const match = hex.replace(/^#/, '').match(/.{2}/g);
+  if (!match) {
+    return false;
+  }
+  const [r, g, b] = match.map((x) => parseInt(x, 16) / 255);
+  const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
+  return luminance < 0.5;
+};
+
 interface CounterDirectionProps {
   mascotIsActive: boolean;
   wayIsChange: boolean;
@@ -149,6 +160,7 @@ const CounterDirection: React.FC<CounterDirectionProps> = ({
                   top: -imageHeight * 0.8, // way 이미지 위에 위치
                   left: imageWidth * 0.05,
                   zIndex: 0, // way 이미지보다 아래
+                  tintColor: currentRule.color ?? '#fc3e39',
                 }}
               />
               <View
@@ -165,7 +177,10 @@ const CounterDirection: React.FC<CounterDirectionProps> = ({
               >
                 <Text
                   className="font-bold text-center"
-                  style={{ fontSize: imageHeight * 0.25 }}
+                  style={{
+                    fontSize: imageHeight * 0.25,
+                    color: isDarkColor(currentRule.color ?? '#fc3e39') ? '#ffffff' : '#000000',
+                  }}
                   numberOfLines={2}
                   ellipsizeMode="tail"
                 >
