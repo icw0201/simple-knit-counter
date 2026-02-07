@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text } from 'react-native';
+import ColorCompleteIcon from '@assets/images/color_complete.svg';
 import CircleIcon from '@components/common/CircleIcon';
 import TextInputBox, { TextInputBoxRef } from '@components/common/TextInputBox';
 import ColorPicker from '@components/counter/ColorPicker';
@@ -148,9 +149,12 @@ const RuleCard: React.FC<RuleCardProps> = ({
         <View className="flex-row items-center">
           <View className="flex-1">
             {message && (
-              <Text className={`text-base font-extrabold mb-2 ${hasError ? 'text-red-orange-500' : 'text-black'}`}>
-                {message}
-              </Text>
+              <View className="flex-row items-center gap-2 mb-2">
+                <Text className={`text-base font-extrabold ${hasError ? 'text-red-orange-500' : 'text-black'}`}>
+                  {message}
+                </Text>
+                <ColorCompleteIcon width={24} height={24} color={color ?? '#fc3e39'} />
+              </View>
             )}
             <Text className="text-base text-black">
               {startNumber}단부터 {endNumber}단까지 {ruleNumber}단마다
