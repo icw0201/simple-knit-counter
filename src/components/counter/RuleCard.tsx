@@ -42,7 +42,6 @@ const RuleCard: React.FC<RuleCardProps> = ({
   const [editEndNumber, setEditEndNumber] = useState(numberToString(endNumber));
   const [editRuleNumber, setEditRuleNumber] = useState(numberToString(ruleNumber));
   const [editColor, setEditColor] = useState(color);
-  const [validationError, setValidationError] = useState('');
 
   // TextInputBox refs
   const messageInputRef = useRef<TextInputBoxRef>(null);
@@ -60,43 +59,25 @@ const RuleCard: React.FC<RuleCardProps> = ({
   }, [message, startNumber, endNumber, ruleNumber, color]);
 
   const handleEditClick = () => {
-    setValidationError('');
     setIsEditMode(true);
   };
 
   const handleConfirm = () => {
-    // 유효성 검사
-    const trimmedMessage = editMessage.trim();
-    const parsedStartNumber = parseInt(editStartNumber, 10) || 0;
-    const parsedEndNumber = parseInt(editEndNumber, 10) || 0;
-    const parsedRuleNumber = parseInt(editRuleNumber, 10) || 0;
-
-    // 1. 메시지 란은 반드시 채워져야 함
-    if (!trimmedMessage) {
-      setValidationError('메시지를 입력해 주세요.');
+    const result = validateRule(
+      editMessage.trim(),
+      editStartNumber,
+      editEndNumber,
+      editRuleNumber
+    );
+    if (result.error) {
       return;
     }
-
-    // 2. 규칙은 시작단 or 종료단 둘 중 하나는 채워져야 함
-    if (parsedStartNumber === 0 && parsedEndNumber === 0) {
-      setValidationError('시작단 혹은 종료단을 설정해 주세요.');
-      return;
-    }
-
-    // 3. 몇단마다 반복 규칙인지 채워져야 함
-    if (parsedRuleNumber === 0) {
-      setValidationError('반복 규칙을 설정해 주세요.');
-      return;
-    }
-
-    // 유효성 검사 통과
-    setValidationError('');
     setIsEditMode(false);
     onConfirm?.({
-      message: trimmedMessage,
-      startNumber: parsedStartNumber,
-      endNumber: parsedEndNumber,
-      ruleNumber: parsedRuleNumber,
+      message: editMessage.trim(),
+      startNumber: result.start,
+      endNumber: result.end,
+      ruleNumber: result.rule,
       color: editColor,
     });
   };
@@ -110,48 +91,46 @@ const RuleCard: React.FC<RuleCardProps> = ({
     onDelete?.();
   };
 
-  // 규칙 미리보기 계산 (시작단 포함)
-  const getRulePreview = () => {
-    const parsedStartNumber = parseInt(editStartNumber, 10) || 0;
-    const parsedEndNumber = parseInt(editEndNumber, 10) || 0;
-    const parsedRuleNumber = parseInt(editRuleNumber, 10) || 0;
+  /** 유효성 검사 + 파싱 (문자열/숫자 모두 받음) */
+  const validateRule = (
+    trimmedMessage: string,
+    start: string | number,
+    end: string | number,
+    rule: string | number
+  ): { error: string | null; start: number; end: number; rule: number } => {
+    const parsedStart = typeof start === 'string' ? parseInt(start, 10) || 0 : start;
+    const parsedEnd = typeof end === 'string' ? parseInt(end, 10) || 0 : end;
+    const parsedRule = typeof rule === 'string' ? parseInt(rule, 10) || 0 : rule;
+    const parsed = { start: parsedStart, end: parsedEnd, rule: parsedRule };
 
-    return calculateRulePreview(parsedStartNumber, parsedEndNumber, parsedRuleNumber, 5);
+    if (!trimmedMessage) {
+      return { ...parsed, error: '메시지를 입력해 주세요.' };
+    }
+    if (parsedStart === 0 && parsedEnd === 0) {
+      return { ...parsed, error: '시작단 혹은 종료단을 설정해 주세요.' };
+    }
+    if (parsedRule === 0) {
+      return { ...parsed, error: '반복 규칙을 설정해 주세요.' };
+    }
+    if (parsedStart > 0 && parsedEnd > 0 && parsedStart > parsedEnd) {
+      return { ...parsed, error: '시작단이 종료단보다 클 수 없습니다.' };
+    }
+    return { ...parsed, error: null };
   };
 
-  // 규칙 오류 체크
-  const checkRuleError = (start: number, end: number, rule: number): string | null => {
-    // 규칙이 입력되지 않았으면 오류 없음
-    if (rule === 0) {
-      return null;
-    }
-
-    // 시작단과 종료단 둘 다 있는 경우
-    if (start > 0 && end > 0) {
-      // 시작단이 종료단보다 큰 경우만 오류 (시작단=종료단 허용)
-      if (start > end) {
-        return '시작단이 종료단보다 클 수 없습니다.';
-      }
-    }
-
-    return null;
-  };
 
   // 보기 모드
   if (!isEditMode) {
-    const hasError = checkRuleError(startNumber, endNumber, ruleNumber) !== null;
     return (
       <View className="mb-4 bg-white border border-lightgray rounded-xl p-4">
         <View className="flex-row items-center">
           <View className="flex-1">
-            {message && (
-              <View className="flex-row items-center gap-2 mb-2">
-                <Text className={`text-base font-extrabold ${hasError ? 'text-red-orange-500' : 'text-black'}`}>
-                  {message}
-                </Text>
-                <ColorCompleteIcon width={24} height={24} color={color ?? '#fc3e39'} />
-              </View>
-            )}
+            <View className="flex-row items-center gap-2 mb-2">
+              <Text className="text-base font-extrabold text-black">
+                {message}
+              </Text>
+              <ColorCompleteIcon width={24} height={24} color={color ?? '#fc3e39'} />
+            </View>
             <Text className="text-base text-black">
               {startNumber}단부터 {endNumber}단까지 {ruleNumber}단마다
             </Text>
@@ -180,10 +159,7 @@ const RuleCard: React.FC<RuleCardProps> = ({
               ref={messageInputRef}
               label=""
               value={editMessage}
-              onChangeText={(text) => {
-                setEditMessage(text);
-                setValidationError('');
-              }}
+              onChangeText={setEditMessage}
               type="text"
               containerClassName="mt-1"
               returnKeyType="next"
@@ -210,10 +186,7 @@ const RuleCard: React.FC<RuleCardProps> = ({
               ref={startNumberInputRef}
               label=""
               value={editStartNumber}
-              onChangeText={(text) => {
-                setEditStartNumber(text);
-                setValidationError('');
-              }}
+              onChangeText={setEditStartNumber}
               type="number"
               containerClassName="mb-2"
               returnKeyType="next"
@@ -227,10 +200,7 @@ const RuleCard: React.FC<RuleCardProps> = ({
               ref={endNumberInputRef}
               label=""
               value={editEndNumber}
-              onChangeText={(text) => {
-                setEditEndNumber(text);
-                setValidationError('');
-              }}
+              onChangeText={setEditEndNumber}
               type="number"
               containerClassName="mb-2"
               returnKeyType="next"
@@ -249,10 +219,7 @@ const RuleCard: React.FC<RuleCardProps> = ({
               ref={ruleNumberInputRef}
               label=""
               value={editRuleNumber}
-              onChangeText={(text) => {
-                setEditRuleNumber(text);
-                setValidationError('');
-              }}
+              onChangeText={setEditRuleNumber}
               type="number"
               containerClassName="mb-0"
               returnKeyType="done"
@@ -263,31 +230,32 @@ const RuleCard: React.FC<RuleCardProps> = ({
           <Text className="text-base text-black">단마다 반복 규칙</Text>
         </View>
 
-        {/* 규칙 미리보기 */}
+        {/* 규칙 미리보기 / 에러 표시 */}
         {(() => {
-          const parsedStartNumber = parseInt(editStartNumber, 10) || 0;
-          const parsedEndNumber = parseInt(editEndNumber, 10) || 0;
-          const parsedRuleNumber = parseInt(editRuleNumber, 10) || 0;
-          const hasRuleInput = (parsedStartNumber > 0 || parsedEndNumber > 0) && parsedRuleNumber > 0;
-          const rulePreview = getRulePreview();
-          const ruleError = checkRuleError(parsedStartNumber, parsedEndNumber, parsedRuleNumber);
+          const { error: ruleError, start, end, rule } = validateRule(
+            editMessage.trim(),
+            editStartNumber,
+            editEndNumber,
+            editRuleNumber
+          );
+          const hasRuleInput = (start > 0 || end > 0) && rule > 0;
+          const rulePreview = hasRuleInput ? calculateRulePreview(start, end, rule, 5) : [];
 
-          if (!hasRuleInput) {
+          if (!hasRuleInput && !ruleError) {
             return null;
           }
 
-          const previewText = rulePreview.length > 0
-            ? rulePreview.map((n) => `${n}단`).join(', ')
-            : '';
+          const previewText =
+            hasRuleInput && rulePreview.length > 0
+              ? rulePreview.map((n) => `${n}단`).join(', ')
+              : '';
 
           return (
             <View className="mt-2 flex-row items-center">
               <Text className="text-base font-extrabold text-black mr-2">적용 단 :</Text>
               <View>
                 {ruleError ? (
-                  <Text className="text-sm text-red-orange-500">
-                    {ruleError}
-                  </Text>
+                  <Text className="text-sm text-red-orange-500">{ruleError}</Text>
                 ) : (
                   previewText && (
                     <Text className="text-sm text-darkgray">
@@ -302,12 +270,7 @@ const RuleCard: React.FC<RuleCardProps> = ({
       </View>
 
       {/* 삭제/확인 버튼 */}
-      <View className="flex-row items-center justify-end">
-        {validationError && (
-          <Text className="text-sm text-red-orange-500 mr-2 flex-1">
-            {validationError}
-          </Text>
-        )}
+      <View className="flex-row items-center justify-end mt-1">
         <CircleIcon
           size={44}
           isButton={true}
