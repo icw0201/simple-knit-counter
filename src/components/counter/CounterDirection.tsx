@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Image, Pressable, Text } from 'react-native';
 import { Way, RepeatRule } from '@storage/types';
-import { Images } from '@assets/images';
+import { directionImages } from '@assets/images';
 import { ScreenSize, getGapClass } from '@constants/screenSizeConfig';
 import { isRuleApplied } from '@utils/ruleUtils';
 
@@ -117,16 +117,16 @@ const CounterDirection: React.FC<CounterDirectionProps> = ({
   if (isRuleAppliedToCurrentCount) {
     // 규칙이 적용되는 단: emphasis 이미지 사용
     if (wayIsChange) {
-      imageSource = way === 'front' ? Images.emphasis_front : Images.emphasis_back;
+      imageSource = way === 'front' ? directionImages.emphasis_front : directionImages.emphasis_back;
     } else {
-      imageSource = Images.emphasis_plain;
+      imageSource = directionImages.emphasis_plain;
     }
   } else {
     // 규칙이 적용되지 않는 단: 기존 이미지 사용
     if (wayIsChange) {
-      imageSource = way === 'front' ? Images.way_front : Images.way_back;
+      imageSource = way === 'front' ? directionImages.way_front : directionImages.way_back;
     } else {
-      imageSource = Images.way_plain;
+      imageSource = directionImages.way_plain;
     }
   }
 
@@ -144,7 +144,7 @@ const CounterDirection: React.FC<CounterDirectionProps> = ({
                   return (
                     <Image
                       key={offset}
-                      source={Images.emphasis_bubble}
+                      source={directionImages.emphasis_bubble}
                       style={{
                         position: 'absolute',
                         width: imageWidth,
@@ -172,7 +172,7 @@ const CounterDirection: React.FC<CounterDirectionProps> = ({
                 </View>
               )}
               <Image
-                source={Images.emphasis_bubble}
+                source={directionImages.emphasis_bubble}
                 style={{
                   position: 'absolute',
                   width: imageWidth,
