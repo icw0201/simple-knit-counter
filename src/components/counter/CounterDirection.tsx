@@ -137,6 +137,27 @@ const CounterDirection: React.FC<CounterDirectionProps> = ({
           {/* 규칙이 적용되는 경우: bubble 이미지 (way 이미지 아래, y축으로 위에 위치) */}
           {isRuleAppliedToCurrentCount && currentRule && (
             <>
+              {/* 다중 규칙일 때: 다음 규칙 미리보기 버블 (y- x- z-, 최대 2개) */}
+              {appliedRules.length > 1 &&
+                [1, 2].slice(0, Math.min(2, appliedRules.length - 1)).map((offset) => {
+                  const nextRule = appliedRules[(currentRuleIndex + offset) % appliedRules.length];
+                  return (
+                    <Image
+                      key={offset}
+                      source={Images.emphasis_bubble}
+                      style={{
+                        position: 'absolute',
+                        width: imageWidth,
+                        height: imageHeight,
+                        resizeMode: 'contain',
+                        top: -imageHeight * 0.8 - imageHeight * 0.08 * offset,
+                        left: imageWidth * 0.05 - imageWidth * 0.04 * offset,
+                        zIndex: -offset,
+                        tintColor: nextRule.color ?? '#fc3e39',
+                      }}
+                    />
+                  );
+                })}
               {/* 다중 규칙일 때 라벨 표시 (말풍선 위쪽에 분리) */}
               {appliedRules.length > 1 && (
                 <View
