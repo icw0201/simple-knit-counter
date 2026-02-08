@@ -128,7 +128,9 @@ const RuleCard: React.FC<RuleCardProps> = ({
               <ColorCompleteIcon width={24} height={24} color={color ?? '#fc3e39'} />
             </View>
             <Text className="text-base text-black">
-              {startNumber}단부터 {endNumber}단까지 {ruleNumber}단마다
+              {startNumber > 0 ? `${startNumber}단부터 ` : ''}
+              {endNumber > 0 ? `${endNumber}단까지 ` : ''}
+              {ruleNumber}단마다
             </Text>
           </View>
           <CircleIcon
