@@ -4,18 +4,7 @@ import { View, Image, Pressable, Text } from 'react-native';
 import { Way, RepeatRule } from '@storage/types';
 import { directionImages } from '@assets/images';
 import { ScreenSize, getGapClass } from '@constants/screenSizeConfig';
-import { isRuleApplied } from '@utils/ruleUtils';
-
-/** hex 색상이 진하면 true (텍스트 흰색 권장) */
-const isDarkColor = (hex: string): boolean => {
-  const match = hex.replace(/^#/, '').match(/.{2}/g);
-  if (!match) {
-    return false;
-  }
-  const [r, g, b] = match.map((x) => parseInt(x, 16) / 255);
-  const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
-  return luminance < 0.5;
-};
+import { isRuleApplied, isDarkColor } from '@utils/ruleUtils';
 
 interface CounterDirectionProps {
   mascotIsActive: boolean;
@@ -171,6 +160,7 @@ const CounterDirection: React.FC<CounterDirectionProps> = ({
                   </Text>
                 </View>
               )}
+              {/* 규칙 말풍선 이미지 */}
               <Image
                 source={directionImages.emphasis_bubble}
                 style={{
@@ -196,6 +186,7 @@ const CounterDirection: React.FC<CounterDirectionProps> = ({
                   zIndex: 1, // 버블 이미지 위에 텍스트
                 }}
               >
+                {/* 규칙 메시지 텍스트 */}
                 <Text
                   className="font-bold text-center"
                   style={{
@@ -210,7 +201,7 @@ const CounterDirection: React.FC<CounterDirectionProps> = ({
               </View>
             </>
           )}
-          {/* 방향 이미지 (위에 표시) */}
+          {/* 방향 이미지 마스코트 어쩌미 (위에 표시) */}
           <Image
             source={imageSource}
             style={{

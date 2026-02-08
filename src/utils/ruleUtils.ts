@@ -113,3 +113,14 @@ export const getDefaultColorForNewRule = (existingRules: RepeatRule[]): string =
   const cycleIndex = existingRules.length % COLOR_PRIORITY_INDICES.length;
   return RED_ORANGE_SWATCHES[COLOR_PRIORITY_INDICES[cycleIndex]];
 };
+
+/** hex 색상이 진하면 true (텍스트 흰색 권장) */
+export const isDarkColor = (hex: string): boolean => {
+  const match = hex.replace(/^#/, '').match(/.{2}/g);
+  if (!match) {
+    return false;
+  }
+  const [r, g, b] = match.map((x) => parseInt(x, 16) / 255);
+  const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
+  return luminance < 0.5;
+};
