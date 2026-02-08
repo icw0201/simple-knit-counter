@@ -1,7 +1,6 @@
 export const activateIcons = {
   inactive: require('./activate/activate_inactive.png'),
   active: require('./activate/activate_active.png'),
-  auto: require('./activate/activate_auto.png'),
 };
 
 export const Images = {
