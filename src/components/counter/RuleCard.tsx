@@ -5,6 +5,7 @@ import CircleIcon from '@components/common/CircleIcon';
 import TextInputBox, { TextInputBoxRef } from '@components/common/TextInputBox';
 import ColorPicker from '@components/counter/ColorPicker';
 import { calculateRulePreview } from '@utils/ruleUtils';
+import { numberToString } from '@utils/numberUtils';
 
 interface RuleCardProps {
   message: string;
@@ -31,11 +32,6 @@ const RuleCard: React.FC<RuleCardProps> = ({
   onConfirm,
   isEditable = false,
 }) => {
-  // 숫자를 문자열로 변환 (0이면 빈 문자열)
-  const numberToString = (num: number): string => {
-    return num === 0 ? '' : num.toString();
-  };
-
   const [isEditMode, setIsEditMode] = useState(isEditable);
   const [editMessage, setEditMessage] = useState(message);
   const [editStartNumber, setEditStartNumber] = useState(numberToString(startNumber));
