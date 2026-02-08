@@ -98,7 +98,7 @@ const AppNavigator = () => (
         options={({ navigation, route: _route }) => ({
           ...getDefaultHeaderLeft(navigation),
           ...getDefaultHeaderRight(navigation),
-          ...getDefaultTitle('어쩌미 옵션 설정'),
+          ...getDefaultTitle('어쩌미 알림 단 설정'),
         })}
       />
     </Stack.Navigator>

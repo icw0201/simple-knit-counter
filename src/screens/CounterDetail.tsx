@@ -228,7 +228,7 @@ const CounterDetail = () => {
         {/* 헤더 활성 아이콘 안내 툴팁 (헤더 대신 화면 위층에 표시) */}
         {screenSize !== ScreenSize.COMPACT && tooltipEnabled && (
           <Tooltip
-            text="길게 눌러 어쩌미 옵션 설정하기"
+            text="길게 눌러 어쩌미 알림 단 설정하기"
             containerClassName="absolute right-3 top-2 z-50"
             targetAnchorX={hasParent ? width - 65 : width - 103}
           />
