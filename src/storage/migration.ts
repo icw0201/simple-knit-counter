@@ -47,59 +47,6 @@ const migrateV2_ActivateModeToWayIsChangeAndMascotIsActive = (items: Item[]): It
 };
 
 /**
- * 버전 4: 반복 규칙을 배열로 변경, way를 Counter로 이동, RepeatRule에 color 필드 추가
- * 1. 기존: repeatRuleIsActive, repeatRuleNumber, repeatRuleStartNumber, repeatRuleEndNumber
- *    신규: repeatRules: RepeatRule[] (color 필드 포함, optional)
- * 2. way를 info.way에서 counter.way로 이동
- * 3. 기존 repeatRules 배열이 있으면 color 필드가 없어도 유지 (optional 필드)
- * @param items 마이그레이션할 아이템 배열
- * @returns 마이그레이션된 아이템 배열
- */
-const migrateV4_RepeatRulesToArrayAndMoveWay = (items: Item[]): Item[] => {
-  return items.map((item) => {
-    if (item.type === 'counter') {
-      const counter = item as any;
-      const { repeatRuleIsActive, repeatRuleNumber, repeatRuleStartNumber, repeatRuleEndNumber, info, ...rest } = counter;
-
-      // 1. 반복 규칙을 배열로 변환
-      let repeatRules: any[] = [];
-
-      // 기존 단일 규칙 필드가 있으면 배열로 변환
-      if (repeatRuleIsActive && repeatRuleNumber > 0 && repeatRuleStartNumber !== undefined && repeatRuleEndNumber !== undefined) {
-        repeatRules.push({
-          message: '', // 기존 데이터에는 메시지가 없으므로 빈 문자열
-          startNumber: repeatRuleStartNumber ?? 0,
-          endNumber: repeatRuleEndNumber ?? 0,
-          ruleNumber: repeatRuleNumber ?? 0,
-          // color 필드는 optional이므로 추가하지 않음
-        });
-      } else if (counter.repeatRules && Array.isArray(counter.repeatRules)) {
-        // 이미 배열 형태인 경우 (버전 4 이후 데이터), color 필드가 없어도 유지
-        repeatRules = counter.repeatRules.map((rule: any) => ({
-          ...rule,
-          // color 필드는 optional이므로 기존 규칙에는 추가하지 않음
-        }));
-      }
-
-      // 2. way를 info에서 counter로 이동
-      const way = info?.way;
-      const updatedInfo = info ? { ...info } : undefined;
-      if (updatedInfo && 'way' in updatedInfo) {
-        delete updatedInfo.way;
-      }
-
-      return {
-        ...rest,
-        repeatRules,
-        way,
-        info: updatedInfo,
-      };
-    }
-    return item;
-  });
-};
-
-/**
  * 버전 3: 새로 추가된 프로퍼티들에 기본값 설정
  * - targetCount: 0 (목표 없음)
  * - elapsedTime: 0 (초 단위, 0 ~ 359999)
@@ -116,10 +63,13 @@ const migrateV3_AddNewProperties = (items: Item[]): Item[] => {
   return items.map((item) => {
     if (item.type === 'counter') {
       const counter = item as any;
+      // 이전 버전의 불필요한 필드 제거 (activateMode는 V2에서 제거되어야 하지만 안전을 위해)
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { activateMode, ...rest } = counter;
 
       // 새로 추가된 프로퍼티들의 기본값 설정
       return {
-        ...counter,
+        ...rest,
         // 타이머 및 목표 관련 프로퍼티
         targetCount: counter.targetCount ?? 0,
         elapsedTime: counter.elapsedTime ?? 0,
@@ -138,6 +88,53 @@ const migrateV3_AddNewProperties = (items: Item[]): Item[] => {
         // 구간 기록 필드들 (필수 프로퍼티)
         sectionRecords: counter.sectionRecords ?? [],
         sectionModalIsOpen: counter.sectionModalIsOpen ?? false,
+      };
+    }
+    return item;
+  });
+};
+
+
+/**
+ * 버전 4: 반복 규칙을 배열로 변경, way를 Counter로 이동, RepeatRule에 color 필드 추가
+ * 1. 기존: repeatRuleIsActive, repeatRuleNumber, repeatRuleStartNumber, repeatRuleEndNumber
+ *    신규: repeatRules: RepeatRule[] (color 필드 포함, optional)
+ * 2. way를 info.way에서 counter.way로 이동
+ * 3. 기존 repeatRules 배열이 있으면 color 필드가 없어도 유지 (optional 필드)
+ * @param items 마이그레이션할 아이템 배열
+ * @returns 마이그레이션된 아이템 배열
+ */
+const migrateV4_RepeatRulesToArrayAndMoveWay = (items: Item[]): Item[] => {
+  return items.map((item) => {
+    if (item.type === 'counter') {
+      const counter = item as any;
+      // 이전 버전의 불필요한 필드 제거 (repeatRuleIsActive, repeatRuleNumber 등)
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const {
+        repeatRuleIsActive,
+        repeatRuleNumber,
+        repeatRuleStartNumber,
+        repeatRuleEndNumber,
+        info,
+        ...rest
+      } = counter;
+
+      // 1. 반복 규칙을 배열로 변환
+      // 이전 버전에서는 항상 초기값이었으므로 빈 배열 반환
+      const repeatRules: any[] = [];
+
+      // 2. way를 info에서 counter로 이동
+      const way = info?.way;
+      const updatedInfo = info ? { ...info } : undefined;
+      if (updatedInfo && 'way' in updatedInfo) {
+        delete updatedInfo.way;
+      }
+
+      return {
+        ...rest,
+        repeatRules,
+        way,
+        info: updatedInfo,
       };
     }
     return item;
