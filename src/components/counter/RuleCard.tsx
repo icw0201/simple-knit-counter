@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text } from 'react-native';
+import type { NativeSyntheticEvent } from 'react-native';
+import { View, Text, type LayoutChangeEvent, type TextLayoutEventData } from 'react-native';
 import ColorCompleteIcon from '@assets/images/color_complete.svg';
 import CircleIcon from '@components/common/CircleIcon';
 import TextInputBox, { TextInputBoxRef } from '@components/common/TextInputBox';
@@ -17,6 +18,129 @@ interface RuleCardProps {
   onConfirm?: (data: { message: string; startNumber: number; endNumber: number; ruleNumber: number; color?: string }) => void;
   isEditable?: boolean; // 편집 가능 여부
 }
+
+const MESSAGE_ICON_SIZE = 24;
+const MESSAGE_ICON_GAP = 6;
+
+type MessageLastLine = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
+/**
+ * 메시지 컨테이너의 레이아웃 변경 핸들러
+ */
+const createMessageContainerLayoutHandler = (
+  setMessageContainerWidth: React.Dispatch<React.SetStateAction<number | null>>
+) => {
+  return (e: LayoutChangeEvent) => {
+    const width = e.nativeEvent.layout.width;
+    setMessageContainerWidth((prev) => (prev === width ? prev : width));
+  };
+};
+
+/**
+ * 텍스트 레이아웃 변경 핸들러 (마지막 줄 좌표 추출)
+ */
+const createTextLayoutHandler = (
+  setMessageLastLine: React.Dispatch<React.SetStateAction<MessageLastLine | null>>
+) => {
+  return (e: NativeSyntheticEvent<TextLayoutEventData>) => {
+    const lines = e.nativeEvent.lines;
+    if (!lines || lines.length === 0) {
+      return;
+    }
+    const last = lines[lines.length - 1];
+    const next = { x: last.x, y: last.y, width: last.width, height: last.height };
+    setMessageLastLine((prev) => {
+      if (
+        prev &&
+        prev.x === next.x &&
+        prev.y === next.y &&
+        prev.width === next.width &&
+        prev.height === next.height
+      ) {
+        return prev;
+      }
+      return next;
+    });
+  };
+};
+
+/**
+ * 아이콘의 left 위치 계산
+ */
+const calculateIconLeft = (
+  messageLastLine: MessageLastLine,
+  messageContainerWidth: number | null
+): number => {
+  const rawLeft = messageLastLine.x + messageLastLine.width + MESSAGE_ICON_GAP;
+  if (messageContainerWidth == null) {
+    return rawLeft;
+  }
+  // paddingRight로 공간을 확보했더라도, 안전하게 한 번 더 클램프
+  return Math.max(0, Math.min(rawLeft, messageContainerWidth - MESSAGE_ICON_SIZE));
+};
+
+/**
+ * 아이콘의 top 위치 계산
+ */
+const calculateIconTop = (messageLastLine: MessageLastLine): number => {
+  return messageLastLine.y + (messageLastLine.height - MESSAGE_ICON_SIZE) / 2;
+};
+
+/**
+ * 규칙 미리보기 렌더링
+ */
+const renderRulePreview = (
+  editMessage: string,
+  editStartNumber: string,
+  editEndNumber: string,
+  editRuleNumber: string,
+  validateRule: (
+    trimmedMessage: string,
+    start: string | number,
+    end: string | number,
+    rule: string | number
+  ) => { error: string | null; start: number; end: number; rule: number }
+) => {
+  const { error: ruleError, start, end, rule } = validateRule(
+    editMessage.trim(),
+    editStartNumber,
+    editEndNumber,
+    editRuleNumber
+  );
+  const hasRuleInput = (start > 0 || end > 0) && rule > 0;
+  const rulePreview = hasRuleInput ? calculateRulePreview(start, end, rule, 5) : [];
+
+  if (!hasRuleInput && !ruleError) {
+    return null;
+  }
+
+  const previewText =
+    hasRuleInput && rulePreview.length > 0
+      ? rulePreview.map((n) => `${n}단`).join(', ')
+      : '';
+
+  return (
+    <View className="mt-2 flex-row items-center">
+      <Text className="text-base font-extrabold text-black mr-2">적용 단 :</Text>
+      <View className="flex-1">
+        {ruleError ? (
+          <Text className="text-sm text-red-orange-500">{ruleError}</Text>
+        ) : (
+          previewText && (
+            <Text className="text-sm text-darkgray">
+              {previewText}{rulePreview.length === 5 ? '...' : ''}
+            </Text>
+          )
+        )}
+      </View>
+    </View>
+  );
+};
 
 /**
  * 규칙 카드 컴포넌트
@@ -38,6 +162,8 @@ const RuleCard: React.FC<RuleCardProps> = ({
   const [editEndNumber, setEditEndNumber] = useState(numberToString(endNumber));
   const [editRuleNumber, setEditRuleNumber] = useState(numberToString(ruleNumber));
   const [editColor, setEditColor] = useState(color);
+  const [messageContainerWidth, setMessageContainerWidth] = useState<number | null>(null);
+  const [messageLastLine, setMessageLastLine] = useState<MessageLastLine | null>(null);
 
   // TextInputBox refs
   const messageInputRef = useRef<TextInputBoxRef>(null);
@@ -53,6 +179,11 @@ const RuleCard: React.FC<RuleCardProps> = ({
     setEditRuleNumber(numberToString(ruleNumber));
     setEditColor(color);
   }, [message, startNumber, endNumber, ruleNumber, color]);
+
+  // 보기 모드 메시지가 바뀌면 마지막 줄 좌표도 초기화
+  useEffect(() => {
+    setMessageLastLine(null);
+  }, [message]);
 
   const handleEditClick = () => {
     setIsEditMode(true);
@@ -120,12 +251,32 @@ const RuleCard: React.FC<RuleCardProps> = ({
     return (
       <View className="mb-4 bg-white border border-lightgray rounded-xl p-4">
         <View className="flex-row items-center">
-          <View className="flex-1">
-            <View className="flex-row items-center gap-2 mb-2">
-              <Text className="text-base font-extrabold text-black">
+          <View className="flex-1 min-w-0">
+            <View
+              className="mb-2 min-w-0 relative"
+              onLayout={createMessageContainerLayoutHandler(setMessageContainerWidth)}
+            >
+              <Text
+                className="text-base font-extrabold text-black flex-shrink pr-[30px]"
+                onTextLayout={createTextLayoutHandler(setMessageLastLine)}
+              >
                 {message}
               </Text>
-              <ColorCompleteIcon width={24} height={24} color={color ?? '#fc3e39'} />
+              {messageLastLine && (
+                <View
+                  className="absolute"
+                  style={{
+                    left: calculateIconLeft(messageLastLine, messageContainerWidth),
+                    top: calculateIconTop(messageLastLine),
+                  }}
+                >
+                  <ColorCompleteIcon
+                    width={MESSAGE_ICON_SIZE}
+                    height={MESSAGE_ICON_SIZE}
+                    color={color ?? '#fc3e39'}
+                  />
+                </View>
+              )}
             </View>
             <Text className="text-base text-black">
               {startNumber > 0 ? `${startNumber}단부터 ` : ''}
@@ -133,13 +284,15 @@ const RuleCard: React.FC<RuleCardProps> = ({
               {ruleNumber}단마다
             </Text>
           </View>
-          <CircleIcon
-            size={44}
-            iconName="pencil"
-            colorStyle="medium"
-            isButton
-            onPress={handleEditClick}
-          />
+          <View className="flex-shrink-0 ml-2">
+            <CircleIcon
+              size={44}
+              iconName="pencil"
+              colorStyle="medium"
+              isButton
+              onPress={handleEditClick}
+            />
+          </View>
         </View>
       </View>
     );
@@ -229,42 +382,7 @@ const RuleCard: React.FC<RuleCardProps> = ({
         </View>
 
         {/* 규칙 미리보기 / 에러 표시 */}
-        {(() => {
-          const { error: ruleError, start, end, rule } = validateRule(
-            editMessage.trim(),
-            editStartNumber,
-            editEndNumber,
-            editRuleNumber
-          );
-          const hasRuleInput = (start > 0 || end > 0) && rule > 0;
-          const rulePreview = hasRuleInput ? calculateRulePreview(start, end, rule, 5) : [];
-
-          if (!hasRuleInput && !ruleError) {
-            return null;
-          }
-
-          const previewText =
-            hasRuleInput && rulePreview.length > 0
-              ? rulePreview.map((n) => `${n}단`).join(', ')
-              : '';
-
-          return (
-            <View className="mt-2 flex-row items-center">
-              <Text className="text-base font-extrabold text-black mr-2">적용 단 :</Text>
-              <View>
-                {ruleError ? (
-                  <Text className="text-sm text-red-orange-500">{ruleError}</Text>
-                ) : (
-                  previewText && (
-                    <Text className="text-sm text-darkgray">
-                      {previewText}{rulePreview.length === 5 ? '...' : ''}
-                    </Text>
-                  )
-                )}
-              </View>
-            </View>
-          );
-        })()}
+        {renderRulePreview(editMessage, editStartNumber, editEndNumber, editRuleNumber, validateRule)}
       </View>
 
       {/* 삭제/확인 버튼 */}
