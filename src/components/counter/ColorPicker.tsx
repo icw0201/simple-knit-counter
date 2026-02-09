@@ -72,19 +72,19 @@ const ColorPickerComponent: React.FC<ColorPickerProps> = ({
           >
             {/* 2D 색상 패널 */}
             <Panel1 />
-            <View className="h-3" /> {/* 패널 ↔ Hue 슬라이더 간격 */}
+            <View className="h-3" />{/* 패널 ↔ Hue 슬라이더 간격 */}
             {/* 색조 슬라이더 */}
             <HueSlider />
-            <View className="h-4" /> {/* 슬라이더 ↔ 스와치 간격 */}
+            <View className="h-4" />{/* 슬라이더 ↔ 스와치 간격 */}
             <View>
-              {/* 스와치 1행 (50~400) */}
-              <Swatches colors={RED_ORANGE_SWATCHES.slice(0, 5)} />
-              <View className="h-2" /> {/* 스와치 행 간격 */}
-              {/* 스와치 2행 (500~950) */}
-              <Swatches colors={RED_ORANGE_SWATCHES.slice(5, 10)} />
+              {/* 스와치 1행 (인덱스 0, 2, 3, 4, 5) */}
+              <Swatches colors={[0, 2, 3, 4, 5].map((i) => RED_ORANGE_SWATCHES[i]).filter(Boolean)} />
+              <View className="h-2" />{/* 스와치 행 간격 */}
+              {/* 스와치 2행 (인덱스 6~10) */}
+              <Swatches colors={RED_ORANGE_SWATCHES.slice(6, 11).filter(Boolean)} />
             </View>
           </ColorPicker>
-          <View className="mt-4 flex-row justify-evenly"> {/* 컨텐츠 ↔ 버튼 영역 간격 */}
+          <View className="mt-4 flex-row justify-evenly">{/* 컨텐츠 ↔ 버튼 영역 간격 */}
             <RoundedButton
               title="취소"
               colorStyle="light"
