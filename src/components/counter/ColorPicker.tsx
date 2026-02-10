@@ -8,7 +8,7 @@ import RoundedButton from '@components/common/RoundedButton';
 import BaseModal from '@components/common/modals/BaseModal/BaseModal';
 
 interface ColorPickerProps {
-  selectedColor?: string; // hex 색상 값 (예: '#fc3e39')
+  selectedColor: string; // hex 색상 값 (예: '#fc3e39', 필수)
   onSelect: (color: string) => void; // hex 색상 값을 반환
 }
 
@@ -21,9 +21,9 @@ const ColorPickerComponent: React.FC<ColorPickerProps> = ({
   onSelect,
 }) => {
   const [modalVisible, setModalVisible] = useState(false);
-  const [pendingColor, setPendingColor] = useState(selectedColor ?? '#fc3e39');
+  const [pendingColor, setPendingColor] = useState(selectedColor);
 
-  const initialColor = selectedColor ?? '#fc3e39';
+  const initialColor = selectedColor;
 
   const handlePress = () => {
     setPendingColor(initialColor);
@@ -52,7 +52,7 @@ const ColorPickerComponent: React.FC<ColorPickerProps> = ({
         <ColorPickerIcon
           width={24}
           height={24}
-          color={selectedColor ?? '#fc3e39'}
+          color={selectedColor}
         />
       </Pressable>
 

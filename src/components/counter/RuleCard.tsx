@@ -13,9 +13,9 @@ interface RuleCardProps {
   startNumber: number;
   endNumber: number;
   ruleNumber: number;
-  color?: string; // 색상 (hex 값, 예: '#fc3e39')
+  color: string; // 색상 (hex 값, 예: '#fc3e39', 필수)
   onDelete?: () => void;
-  onConfirm?: (data: { message: string; startNumber: number; endNumber: number; ruleNumber: number; color?: string }) => void;
+  onConfirm?: (data: { message: string; startNumber: number; endNumber: number; ruleNumber: number; color: string }) => void;
   isEditable?: boolean; // 편집 가능 여부
 }
 
@@ -260,7 +260,7 @@ const RuleCard: React.FC<RuleCardProps> = ({
                   <ColorCompleteIcon
                     width={MESSAGE_ICON_SIZE}
                     height={MESSAGE_ICON_SIZE}
-                    color={color ?? '#fc3e39'}
+                    color={color}
                   />
                 </View>
               )}

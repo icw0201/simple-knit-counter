@@ -100,9 +100,7 @@ const COLOR_PRIORITY_INDICES = [0, 2, 4, 6, 8, 10, 3, 5, 7, 9];
  * 기존 규칙과 겹치지 않는 red-orange 색상을 우선순위에 따라 선택, 모두 사용 중이면 첫 번째 색상 반환
  */
 export const getDefaultColorForNewRule = (existingRules: RepeatRule[]): string => {
-  const usedColors = new Set(
-    existingRules.map((r) => r.color).filter((c): c is string => Boolean(c))
-  );
+  const usedColors = new Set(existingRules.map((r) => r.color));
   const available = COLOR_PRIORITY_INDICES.find(
     (i) => RED_ORANGE_SWATCHES[i] && !usedColors.has(RED_ORANGE_SWATCHES[i])
   );

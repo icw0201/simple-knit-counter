@@ -4,7 +4,6 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '@navigation/AppNavigator';
 import { getStoredItems, updateItem } from '@storage/storage';
 import { Counter, RepeatRule } from '@storage/types';
-import { getDefaultColorForNewRule } from '@utils/ruleUtils';
 
 /**
  * 규칙 확인 데이터 타입
@@ -14,7 +13,7 @@ export type RuleConfirmData = {
   startNumber: number;
   endNumber: number;
   ruleNumber: number;
-  color?: string;
+  color: string; // 색상 (필수)
 };
 
 /**
@@ -95,13 +94,12 @@ export const useWaySetting = () => {
       return;
     }
 
-    const defaultColor = isNewRule ? getDefaultColorForNewRule(repeatRules) : undefined;
     const newRule: RepeatRule = {
       message: data.message,
       startNumber: data.startNumber,
       endNumber: data.endNumber,
       ruleNumber: data.ruleNumber,
-      color: data.color ?? defaultColor,
+      color: data.color,
     };
 
     const updatedRules = isNewRule

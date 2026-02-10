@@ -46,7 +46,7 @@ export type RepeatRule = {
   startNumber: number;  // 시작단
   endNumber: number;   // 종료단
   ruleNumber: number;   // 룰넘버 (몇 단마다)
-  color?: string;       // 색상
+  color: string;       // 색상 (필수)
 };
 
 // 구간 기록 타입

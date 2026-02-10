@@ -96,11 +96,11 @@ const migrateV3_AddNewProperties = (items: Item[]): Item[] => {
 
 
 /**
- * 버전 4: 반복 규칙을 배열로 변경, way를 Counter로 이동, RepeatRule에 color 필드 추가
+ * 버전 4: 반복 규칙을 배열로 변경, way를 Counter로 이동, RepeatRule에 color 필드 추가 (필수)
  * 1. 기존: repeatRuleIsActive, repeatRuleNumber, repeatRuleStartNumber, repeatRuleEndNumber
- *    신규: repeatRules: RepeatRule[] (color 필드 포함, optional)
+ *    신규: repeatRules: RepeatRule[] (color 필드 포함, 필수)
  * 2. way를 info.way에서 counter.way로 이동
- * 3. 기존 repeatRules 배열이 있으면 color 필드가 없어도 유지 (optional 필드)
+ * 3. 이전 버전에서는 항상 초기값이었으므로 빈 배열 반환
  * @param items 마이그레이션할 아이템 배열
  * @returns 마이그레이션된 아이템 배열
  */

@@ -165,7 +165,7 @@ const CounterDirection: React.FC<CounterDirectionProps> = ({
                         top: imageHeight * BUBBLE_TOP_OFFSET_RATIO - imageHeight * BUBBLE_STACK_TOP_OFFSET_RATIO * offset,
                         left: imageWidth * BUBBLE_LEFT_OFFSET_RATIO - imageWidth * BUBBLE_STACK_LEFT_OFFSET_RATIO * offset,
                         zIndex: -offset,
-                        tintColor: nextRule.color ?? '#fc3e39',
+                        tintColor: nextRule.color,
                       }}
                     />
                   );
@@ -194,7 +194,7 @@ const CounterDirection: React.FC<CounterDirectionProps> = ({
                   top: imageHeight * BUBBLE_TOP_OFFSET_RATIO,
                   left: imageWidth * BUBBLE_LEFT_OFFSET_RATIO,
                   zIndex: 0, // way 이미지보다 아래
-                  tintColor: currentRule.color ?? '#fc3e39',
+                  tintColor: currentRule.color,
                 }}
               />
               <View
@@ -214,7 +214,7 @@ const CounterDirection: React.FC<CounterDirectionProps> = ({
                   className="font-bold text-center"
                   style={{
                     fontSize: textFontSize,
-                    color: isDarkColor(currentRule.color ?? '#fc3e39') ? '#ffffff' : '#000000',
+                    color: isDarkColor(currentRule.color) ? '#ffffff' : '#000000',
                   }}
                   allowFontScaling={false}
                 >
