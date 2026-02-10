@@ -27,6 +27,9 @@ const BUBBLE_STACK_TOP_OFFSET_RATIO = 0.08; // 다중 버블 스택 시 상단 �
 const BUBBLE_STACK_LEFT_OFFSET_RATIO = 0.04; // 다중 버블 스택 시 좌측 오프셋 비율
 const LABEL_TOP_OFFSET_RATIO = -1.3; // 라벨의 상단 오프셋 비율 (말풍선 위쪽)
 
+// 버블 이미지 크기 상수
+const BUBBLE_SIZE_SCALE = 1.15; // 버블 이미지 크기 배율
+
 // 텍스트 컨테이너 위치 상수
 const TEXT_CONTAINER_LEFT_RATIO = 0.2; // 텍스트 컨테이너의 좌측 오프셋 비율 (이미지 너비 대비)
 const TEXT_CONTAINER_WIDTH_RATIO = 0.6; // 텍스트 컨테이너의 너비 비율 (이미지 너비 대비)
@@ -154,22 +157,27 @@ const CounterDirection: React.FC<CounterDirectionProps> = ({
               {appliedRules.length > 1 &&
                 [1, 2].slice(0, Math.min(2, appliedRules.length - 1)).map((offset) => {
                   const nextRule = appliedRules[(currentRuleIndex + offset) % appliedRules.length];
+                  const bubbleWidth = imageWidth * BUBBLE_SIZE_SCALE;
+                  const bubbleHeight = imageHeight * BUBBLE_SIZE_SCALE;
+                  // 원래 버블의 중앙 x 좌표를 유지하도록 left 위치 조정
+                  const originalCenterX = imageWidth * BUBBLE_LEFT_OFFSET_RATIO + imageWidth / 2;
+                  const newLeft = originalCenterX - bubbleWidth / 2 - imageWidth * BUBBLE_STACK_LEFT_OFFSET_RATIO * offset;
                   return (
                     // 미리보기 버블
                     <View
                       key={offset}
                       style={{
                         position: 'absolute',
-                        width: imageWidth,
-                        height: imageHeight,
+                        width: bubbleWidth,
+                        height: bubbleHeight,
                         top: imageHeight * BUBBLE_TOP_OFFSET_RATIO - imageHeight * BUBBLE_STACK_TOP_OFFSET_RATIO * offset,
-                        left: imageWidth * BUBBLE_LEFT_OFFSET_RATIO - imageWidth * BUBBLE_STACK_LEFT_OFFSET_RATIO * offset,
+                        left: newLeft,
                         zIndex: -offset,
                       }}
                     >
                       <EmphasisBubbleIcon
-                        width={imageWidth}
-                        height={imageHeight}
+                        width={bubbleWidth}
+                        height={bubbleHeight}
                         color={nextRule.color}
                       />
                     </View>
@@ -192,16 +200,17 @@ const CounterDirection: React.FC<CounterDirectionProps> = ({
               <View
                 style={{
                   position: 'absolute',
-                  width: imageWidth,
-                  height: imageHeight,
+                  width: imageWidth * BUBBLE_SIZE_SCALE,
+                  height: imageHeight * BUBBLE_SIZE_SCALE,
                   top: imageHeight * BUBBLE_TOP_OFFSET_RATIO,
-                  left: imageWidth * BUBBLE_LEFT_OFFSET_RATIO,
+                  // 원래 버블의 중앙 x 좌표를 유지하도록 left 위치 조정
+                  left: imageWidth * BUBBLE_LEFT_OFFSET_RATIO + imageWidth / 2 - (imageWidth * BUBBLE_SIZE_SCALE) / 2,
                   zIndex: 0, // way 이미지보다 아래
                 }}
               >
                 <EmphasisBubbleIcon
-                  width={imageWidth}
-                  height={imageHeight}
+                  width={imageWidth * BUBBLE_SIZE_SCALE}
+                  height={imageHeight * BUBBLE_SIZE_SCALE}
                   color={currentRule.color}
                 />
               </View>
