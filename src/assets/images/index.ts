@@ -10,7 +10,6 @@ export const directionImages = {
   emphasis_front: require('./way/emphasis_front.png'),
   emphasis_back: require('./way/emphasis_back.png'),
   emphasis_plain: require('./way/emphasis_plain.png'),
-  emphasis_bubble: require('./way/emphasis_bubble.png'),
 };
 
 export const completeImages = {

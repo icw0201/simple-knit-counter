@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { View, Image, Pressable, Text } from 'react-native';
 import { Way, RepeatRule } from '@storage/types';
 import { directionImages } from '@assets/images';
+import EmphasisBubbleIcon from '@assets/images/way/emphasis_bubble.svg';
 import { ScreenSize, getGapClass } from '@constants/screenSizeConfig';
 import { isRuleApplied, isDarkColor } from '@utils/ruleUtils';
 import { calculateInitialFontSize } from '@utils/textUtils';
@@ -155,20 +156,23 @@ const CounterDirection: React.FC<CounterDirectionProps> = ({
                   const nextRule = appliedRules[(currentRuleIndex + offset) % appliedRules.length];
                   return (
                     // 미리보기 버블
-                    <Image
+                    <View
                       key={offset}
-                      source={directionImages.emphasis_bubble}
                       style={{
                         position: 'absolute',
                         width: imageWidth,
                         height: imageHeight,
-                        resizeMode: 'contain',
                         top: imageHeight * BUBBLE_TOP_OFFSET_RATIO - imageHeight * BUBBLE_STACK_TOP_OFFSET_RATIO * offset,
                         left: imageWidth * BUBBLE_LEFT_OFFSET_RATIO - imageWidth * BUBBLE_STACK_LEFT_OFFSET_RATIO * offset,
                         zIndex: -offset,
-                        tintColor: nextRule.color,
                       }}
-                    />
+                    >
+                      <EmphasisBubbleIcon
+                        width={imageWidth}
+                        height={imageHeight}
+                        color={nextRule.color}
+                      />
+                    </View>
                   );
                 })}
               {/* 다중 규칙일 때 라벨 표시 (말풍선 위쪽에 분리) */}
@@ -185,19 +189,22 @@ const CounterDirection: React.FC<CounterDirectionProps> = ({
                 </View>
               )}
               {/* 규칙 말풍선 이미지 */}
-              <Image
-                source={directionImages.emphasis_bubble}
+              <View
                 style={{
                   position: 'absolute',
                   width: imageWidth,
                   height: imageHeight,
-                  resizeMode: 'contain',
                   top: imageHeight * BUBBLE_TOP_OFFSET_RATIO,
                   left: imageWidth * BUBBLE_LEFT_OFFSET_RATIO,
                   zIndex: 0, // way 이미지보다 아래
-                  tintColor: currentRule.color,
                 }}
-              />
+              >
+                <EmphasisBubbleIcon
+                  width={imageWidth}
+                  height={imageHeight}
+                  color={currentRule.color}
+                />
+              </View>
               {/* 규칙 메시지 텍스트 (말풍선 위에 표시) */}
               <View
                 style={{
