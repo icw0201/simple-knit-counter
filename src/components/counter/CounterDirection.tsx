@@ -19,6 +19,20 @@ interface CounterDirectionProps {
   onToggleWay: () => void;
 }
 
+// 버블 이미지 위치 상수
+const BUBBLE_TOP_OFFSET_RATIO = -0.8; // 버블 이미지의 상단 오프셋 비율 (이미지 높이 대비)
+const BUBBLE_LEFT_OFFSET_RATIO = 0.05; // 버블 이미지의 좌측 오프셋 비율 (이미지 너비 대비)
+const BUBBLE_STACK_TOP_OFFSET_RATIO = 0.08; // 다중 버블 스택 시 상단 오프셋 비율
+const BUBBLE_STACK_LEFT_OFFSET_RATIO = 0.04; // 다중 버블 스택 시 좌측 오프셋 비율
+const LABEL_TOP_OFFSET_RATIO = -1.3; // 라벨의 상단 오프셋 비율 (말풍선 위쪽)
+
+// 텍스트 컨테이너 위치 상수
+const TEXT_CONTAINER_LEFT_RATIO = 0.2; // 텍스트 컨테이너의 좌측 오프셋 비율 (이미지 너비 대비)
+const TEXT_CONTAINER_WIDTH_RATIO = 0.6; // 텍스트 컨테이너의 너비 비율 (이미지 너비 대비)
+
+// 규칙 순회 간격
+const RULE_ROTATION_INTERVAL_MS = 2000; // 규칙 순회 간격 (밀리초)
+
 /**
  * 카운터 방향 표시 컴포넌트
  * mascotIsActive가 true일 때만 표시되고, wayIsChange가 true일 때만 클릭으로 방향 토글 가능합니다.
@@ -83,7 +97,7 @@ const CounterDirection: React.FC<CounterDirectionProps> = ({
       const rulesLength = appliedRules.length;
       intervalRef.current = setInterval(() => {
         setCurrentRuleIndex((prevIndex) => (prevIndex + 1) % rulesLength);
-      }, 2000);
+      }, RULE_ROTATION_INTERVAL_MS);
     }
 
     return () => {
@@ -148,8 +162,8 @@ const CounterDirection: React.FC<CounterDirectionProps> = ({
                         width: imageWidth,
                         height: imageHeight,
                         resizeMode: 'contain',
-                        top: -imageHeight * 0.8 - imageHeight * 0.08 * offset,
-                        left: imageWidth * 0.05 - imageWidth * 0.04 * offset,
+                        top: imageHeight * BUBBLE_TOP_OFFSET_RATIO - imageHeight * BUBBLE_STACK_TOP_OFFSET_RATIO * offset,
+                        left: imageWidth * BUBBLE_LEFT_OFFSET_RATIO - imageWidth * BUBBLE_STACK_LEFT_OFFSET_RATIO * offset,
                         zIndex: -offset,
                         tintColor: nextRule.color ?? '#fc3e39',
                       }}
@@ -161,7 +175,7 @@ const CounterDirection: React.FC<CounterDirectionProps> = ({
                 <View
                   className="absolute left-0 right-0 items-center"
                   style={{
-                    top: -imageHeight * 1.3, // 말풍선 위쪽에 배치
+                    top: imageHeight * LABEL_TOP_OFFSET_RATIO,
                   }}
                 >
                   <Text className="text-sm text-darkgray text-center font-bold">
@@ -177,8 +191,8 @@ const CounterDirection: React.FC<CounterDirectionProps> = ({
                   width: imageWidth,
                   height: imageHeight,
                   resizeMode: 'contain',
-                  top: -imageHeight * 0.8, // way 이미지 위에 위치
-                  left: imageWidth * 0.05,
+                  top: imageHeight * BUBBLE_TOP_OFFSET_RATIO,
+                  left: imageWidth * BUBBLE_LEFT_OFFSET_RATIO,
                   zIndex: 0, // way 이미지보다 아래
                   tintColor: currentRule.color ?? '#fc3e39',
                 }}
@@ -186,9 +200,9 @@ const CounterDirection: React.FC<CounterDirectionProps> = ({
               <View
                 style={{
                   position: 'absolute',
-                  top: -imageHeight * 0.8,
-                  left: imageWidth * 0.2,
-                  width: imageWidth * 0.6,
+                  top: imageHeight * BUBBLE_TOP_OFFSET_RATIO,
+                  left: imageWidth * TEXT_CONTAINER_LEFT_RATIO,
+                  width: imageWidth * TEXT_CONTAINER_WIDTH_RATIO,
                   height: imageHeight,
                   justifyContent: 'center',
                   alignItems: 'center',

@@ -60,8 +60,8 @@ const CheckBox: React.FC<CheckBoxProps> = ({ label, checked, onToggle, disabled 
         <Text className={`${textSizeClass} text-black shrink flex-1`} numberOfLines={2}>{label}</Text>
       )}
 
-      {/* children이 있으면 라벨과 체크박스 사이에 배치 */}
-      {children && (
+      {/* children이 있으면 라벨과 체크박스 사이에 배치 (label이 있을 때만) */}
+      {label && children && (
         <View className="mx-2">
           {children}
         </View>

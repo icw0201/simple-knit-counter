@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import type { NativeSyntheticEvent } from 'react-native';
-import { View, Text, type LayoutChangeEvent, type TextLayoutEventData } from 'react-native';
+import { View, Text, type TextLayoutEventData } from 'react-native';
 import ColorCompleteIcon from '@assets/images/color_complete.svg';
 import CircleIcon from '@components/common/CircleIcon';
 import TextInputBox, { TextInputBoxRef } from '@components/common/TextInputBox';
@@ -30,19 +30,8 @@ type MessageLastLine = {
 };
 
 /**
- * 메시지 컨테이너의 레이아웃 변경 핸들러
- */
-const createMessageContainerLayoutHandler = (
-  setMessageContainerWidth: React.Dispatch<React.SetStateAction<number | null>>
-) => {
-  return (e: LayoutChangeEvent) => {
-    const width = e.nativeEvent.layout.width;
-    setMessageContainerWidth((prev) => (prev === width ? prev : width));
-  };
-};
-
-/**
  * 텍스트 레이아웃 변경 핸들러 (마지막 줄 좌표 추출)
+ * 텍스트가 렌더링될 때 마지막 줄의 위치 정보를 추출하여 아이콘 배치에 사용
  */
 const createTextLayoutHandler = (
   setMessageLastLine: React.Dispatch<React.SetStateAction<MessageLastLine | null>>
@@ -53,8 +42,9 @@ const createTextLayoutHandler = (
       return;
     }
     const last = lines[lines.length - 1];
-    const next = { x: last.x, y: last.y, width: last.width, height: last.height };
+    const next: MessageLastLine = { x: last.x, y: last.y, width: last.width, height: last.height };
     setMessageLastLine((prev) => {
+      // 이전 값과 동일하면 업데이트하지 않음 (불필요한 리렌더링 방지)
       if (
         prev &&
         prev.x === next.x &&
@@ -71,40 +61,40 @@ const createTextLayoutHandler = (
 
 /**
  * 아이콘의 left 위치 계산
+ * 텍스트 마지막 줄의 끝 위치에 간격을 더하여 아이콘을 배치
  */
-const calculateIconLeft = (
-  messageLastLine: MessageLastLine,
-  messageContainerWidth: number | null
-): number => {
-  const rawLeft = messageLastLine.x + messageLastLine.width + MESSAGE_ICON_GAP;
-  if (messageContainerWidth == null) {
-    return rawLeft;
-  }
-  // paddingRight로 공간을 확보했더라도, 안전하게 한 번 더 클램프
-  return Math.max(0, Math.min(rawLeft, messageContainerWidth - MESSAGE_ICON_SIZE));
+const calculateIconLeft = (messageLastLine: MessageLastLine): number => {
+  return messageLastLine.x + messageLastLine.width + MESSAGE_ICON_GAP;
 };
 
 /**
  * 아이콘의 top 위치 계산
+ * 텍스트 마지막 줄의 수직 중앙에 아이콘을 배치
  */
 const calculateIconTop = (messageLastLine: MessageLastLine): number => {
   return messageLastLine.y + (messageLastLine.height - MESSAGE_ICON_SIZE) / 2;
 };
 
 /**
+ * 규칙 유효성 검사 함수 타입 정의
+ */
+type ValidateRuleFunction = (
+  trimmedMessage: string,
+  start: string | number,
+  end: string | number,
+  rule: string | number
+) => { error: string | null; start: number; end: number; rule: number };
+
+/**
  * 규칙 미리보기 렌더링
+ * 편집 중인 규칙의 유효성을 검사하고, 적용될 단수를 미리보기로 표시
  */
 const renderRulePreview = (
   editMessage: string,
   editStartNumber: string,
   editEndNumber: string,
   editRuleNumber: string,
-  validateRule: (
-    trimmedMessage: string,
-    start: string | number,
-    end: string | number,
-    rule: string | number
-  ) => { error: string | null; start: number; end: number; rule: number }
+  validateRule: ValidateRuleFunction
 ) => {
   const { error: ruleError, start, end, rule } = validateRule(
     editMessage.trim(),
@@ -162,7 +152,6 @@ const RuleCard: React.FC<RuleCardProps> = ({
   const [editEndNumber, setEditEndNumber] = useState(numberToString(endNumber));
   const [editRuleNumber, setEditRuleNumber] = useState(numberToString(ruleNumber));
   const [editColor, setEditColor] = useState(color);
-  const [messageContainerWidth, setMessageContainerWidth] = useState<number | null>(null);
   const [messageLastLine, setMessageLastLine] = useState<MessageLastLine | null>(null);
 
   // TextInputBox refs
@@ -252,12 +241,10 @@ const RuleCard: React.FC<RuleCardProps> = ({
       <View className="mb-4 bg-white border border-lightgray rounded-xl p-4">
         <View className="flex-row items-center">
           <View className="flex-1 min-w-0">
-            <View
-              className="mb-2 min-w-0 relative"
-              onLayout={createMessageContainerLayoutHandler(setMessageContainerWidth)}
-            >
+            <View className="mb-2 min-w-0 relative">
               <Text
-                className="text-base font-extrabold text-black flex-shrink pr-[30px]"
+                className="text-base font-extrabold text-black flex-shrink"
+                style={{ paddingRight: MESSAGE_ICON_SIZE + MESSAGE_ICON_GAP }}
                 onTextLayout={createTextLayoutHandler(setMessageLastLine)}
               >
                 {message}
@@ -266,7 +253,7 @@ const RuleCard: React.FC<RuleCardProps> = ({
                 <View
                   className="absolute"
                   style={{
-                    left: calculateIconLeft(messageLastLine, messageContainerWidth),
+                    left: calculateIconLeft(messageLastLine),
                     top: calculateIconTop(messageLastLine),
                   }}
                 >
