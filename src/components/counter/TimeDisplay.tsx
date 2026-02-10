@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Text, View, LayoutChangeEvent, Pressable } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
 import { ScreenSize, getTimeDisplayTextClass, getGapClass } from '@constants/screenSizeConfig';
 import { formatElapsedTime } from '@utils/timeUtils';
+import TimerBackgroundIcon from '@assets/images/timer_background.svg';
 
 interface TimeDisplayProps {
   screenSize: ScreenSize;
@@ -17,7 +17,6 @@ interface TimeDisplayProps {
  */
 const TimeDisplay: React.FC<TimeDisplayProps> = ({ screenSize, timerIsPlaying, elapsedTime, onPress }) => {
   // 깎인 모서리 크기 (픽셀 단위)
-  const cornerSize = 8;
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [showColon, setShowColon] = useState(true);
 
@@ -52,10 +51,6 @@ const TimeDisplay: React.FC<TimeDisplayProps> = ({ screenSize, timerIsPlaying, e
     setDimensions({ width, height });
   };
 
-  // View 크기에 맞춰 깎인 크기를 비율로 계산
-  const cornerX = dimensions.width > 0 ? (cornerSize / dimensions.width) * 100 : 0;
-  const cornerY = dimensions.height > 0 ? (cornerSize / dimensions.height) * 100 : 0;
-
   // 화면 크기에 따른 패딩 클래스
   const paddingClass = screenSize === ScreenSize.SMALL ? 'px-3 py-1.5' : 'px-4 py-2';
 
@@ -72,15 +67,14 @@ const TimeDisplay: React.FC<TimeDisplayProps> = ({ screenSize, timerIsPlaying, e
       className={`items-center justify-center ${getGapClass(screenSize)} ${paddingClass} relative`}
       onLayout={onLayout}
     >
-      {/* 배경 - SVG path로 깎인 모양 구현 */}
+      {/* 배경 - SVG로 깎인 모양 구현 */}
       {dimensions.width > 0 && dimensions.height > 0 && (
         <View className="absolute inset-0">
-          <Svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
-            <Path
-              d={`M ${cornerX},0 L ${100 - cornerX},0 L 100,${cornerY} L 100,${100 - cornerY} L ${100 - cornerX},100 L ${cornerX},100 L 0,${100 - cornerY} L 0,${cornerY} Z`}
-              fill={backgroundColor}
-            />
-          </Svg>
+          <TimerBackgroundIcon
+            width={dimensions.width}
+            height={dimensions.height}
+            color={backgroundColor}
+          />
         </View>
       )}
       <Text style={{ fontFamily: 'DSEG7Classic-Bold' }} className={`${getTimeDisplayTextClass(screenSize)} relative z-10`}>
