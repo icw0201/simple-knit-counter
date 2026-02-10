@@ -1,10 +1,11 @@
 // src/components/counter/CounterDirection.tsx
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { View, Image, Pressable, Text } from 'react-native';
 import { Way, RepeatRule } from '@storage/types';
 import { directionImages } from '@assets/images';
 import { ScreenSize, getGapClass } from '@constants/screenSizeConfig';
 import { isRuleApplied, isDarkColor } from '@utils/ruleUtils';
+import { calculateInitialFontSize } from '@utils/textUtils';
 
 interface CounterDirectionProps {
   mascotIsActive: boolean;
@@ -96,6 +97,14 @@ const CounterDirection: React.FC<CounterDirectionProps> = ({
   // 현재 표시할 규칙 (안전하게 인덱스 보정)
   const currentRule =
     appliedRules.length > 0 ? appliedRules[currentRuleIndex % appliedRules.length] : undefined;
+
+  // 텍스트 길이에 따라 폰트 크기를 미리 계산
+  const textFontSize = useMemo(() => {
+    if (!currentRule?.message) {
+      return imageHeight * 0.3;
+    }
+    return calculateInitialFontSize(currentRule.message.length, imageWidth, imageHeight);
+  }, [currentRule?.message, imageHeight, imageWidth]);
 
   if (!mascotIsActive) {
     return null;
@@ -190,11 +199,10 @@ const CounterDirection: React.FC<CounterDirectionProps> = ({
                 <Text
                   className="font-bold text-center"
                   style={{
-                    fontSize: imageHeight * 0.25,
+                    fontSize: textFontSize,
                     color: isDarkColor(currentRule.color ?? '#fc3e39') ? '#ffffff' : '#000000',
                   }}
-                  numberOfLines={2}
-                  ellipsizeMode="tail"
+                  allowFontScaling={false}
                 >
                   {currentRule.message}
                 </Text>
