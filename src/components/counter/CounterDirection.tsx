@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { View, Image, Pressable, Text } from 'react-native';
 import { Way, RepeatRule } from '@storage/types';
 import { directionImages } from '@assets/images';
+import EmphasisBubbleIcon from '@assets/images/way/emphasis_bubble.svg';
 import { ScreenSize, getGapClass } from '@constants/screenSizeConfig';
 import { isRuleApplied, isDarkColor } from '@utils/ruleUtils';
 import { calculateInitialFontSize } from '@utils/textUtils';
@@ -25,6 +26,9 @@ const BUBBLE_LEFT_OFFSET_RATIO = 0.05; // 버블 이미지의 좌측 오프셋 �
 const BUBBLE_STACK_TOP_OFFSET_RATIO = 0.08; // 다중 버블 스택 시 상단 오프셋 비율
 const BUBBLE_STACK_LEFT_OFFSET_RATIO = 0.04; // 다중 버블 스택 시 좌측 오프셋 비율
 const LABEL_TOP_OFFSET_RATIO = -1.3; // 라벨의 상단 오프셋 비율 (말풍선 위쪽)
+
+// 버블 이미지 크기 상수
+const BUBBLE_SIZE_SCALE = 1.15; // 버블 이미지 크기 배율
 
 // 텍스트 컨테이너 위치 상수
 const TEXT_CONTAINER_LEFT_RATIO = 0.2; // 텍스트 컨테이너의 좌측 오프셋 비율 (이미지 너비 대비)
@@ -153,22 +157,30 @@ const CounterDirection: React.FC<CounterDirectionProps> = ({
               {appliedRules.length > 1 &&
                 [1, 2].slice(0, Math.min(2, appliedRules.length - 1)).map((offset) => {
                   const nextRule = appliedRules[(currentRuleIndex + offset) % appliedRules.length];
+                  const bubbleWidth = imageWidth * BUBBLE_SIZE_SCALE;
+                  const bubbleHeight = imageHeight * BUBBLE_SIZE_SCALE;
+                  // 원래 버블의 중앙 x 좌표를 유지하도록 left 위치 조정
+                  const originalCenterX = imageWidth * BUBBLE_LEFT_OFFSET_RATIO + imageWidth / 2;
+                  const newLeft = originalCenterX - bubbleWidth / 2 - imageWidth * BUBBLE_STACK_LEFT_OFFSET_RATIO * offset;
                   return (
                     // 미리보기 버블
-                    <Image
+                    <View
                       key={offset}
-                      source={directionImages.emphasis_bubble}
                       style={{
                         position: 'absolute',
-                        width: imageWidth,
-                        height: imageHeight,
-                        resizeMode: 'contain',
+                        width: bubbleWidth,
+                        height: bubbleHeight,
                         top: imageHeight * BUBBLE_TOP_OFFSET_RATIO - imageHeight * BUBBLE_STACK_TOP_OFFSET_RATIO * offset,
-                        left: imageWidth * BUBBLE_LEFT_OFFSET_RATIO - imageWidth * BUBBLE_STACK_LEFT_OFFSET_RATIO * offset,
+                        left: newLeft,
                         zIndex: -offset,
-                        tintColor: nextRule.color,
                       }}
-                    />
+                    >
+                      <EmphasisBubbleIcon
+                        width={bubbleWidth}
+                        height={bubbleHeight}
+                        color={nextRule.color}
+                      />
+                    </View>
                   );
                 })}
               {/* 다중 규칙일 때 라벨 표시 (말풍선 위쪽에 분리) */}
@@ -185,19 +197,23 @@ const CounterDirection: React.FC<CounterDirectionProps> = ({
                 </View>
               )}
               {/* 규칙 말풍선 이미지 */}
-              <Image
-                source={directionImages.emphasis_bubble}
+              <View
                 style={{
                   position: 'absolute',
-                  width: imageWidth,
-                  height: imageHeight,
-                  resizeMode: 'contain',
+                  width: imageWidth * BUBBLE_SIZE_SCALE,
+                  height: imageHeight * BUBBLE_SIZE_SCALE,
                   top: imageHeight * BUBBLE_TOP_OFFSET_RATIO,
-                  left: imageWidth * BUBBLE_LEFT_OFFSET_RATIO,
+                  // 원래 버블의 중앙 x 좌표를 유지하도록 left 위치 조정
+                  left: imageWidth * BUBBLE_LEFT_OFFSET_RATIO + imageWidth / 2 - (imageWidth * BUBBLE_SIZE_SCALE) / 2,
                   zIndex: 0, // way 이미지보다 아래
-                  tintColor: currentRule.color,
                 }}
-              />
+              >
+                <EmphasisBubbleIcon
+                  width={imageWidth * BUBBLE_SIZE_SCALE}
+                  height={imageHeight * BUBBLE_SIZE_SCALE}
+                  color={currentRule.color}
+                />
+              </View>
               {/* 규칙 메시지 텍스트 (말풍선 위에 표시) */}
               <View
                 style={{
