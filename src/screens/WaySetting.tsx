@@ -62,10 +62,9 @@ const WaySetting = () => {
             label="단마다 앞/뒤 방향 표시하기"
             checked={wayIsChange}
             onToggle={handleToggleWayIsChange}
-          />
-          <View className="absolute right-12 top-2">
+          >
             <QuestionMarkTooltip tooltipText="어쩌미가 단마다 앞/뒤, 도안 읽는 방향을 표시해줍니다." />
-          </View>
+          </CheckBox>
         </View>
 
         {/* 규칙 카드들 */}
