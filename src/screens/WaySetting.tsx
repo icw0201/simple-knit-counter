@@ -12,7 +12,7 @@ import { screenStyles, safeAreaEdges } from '@styles/screenStyles';
 import { colorStyles } from '@styles/colorStyles';
 import { RepeatRule } from '@storage/types';
 import { getDefaultColorForNewRule } from '@utils/ruleUtils';
-import { useWaySetting } from '@hooks/useWaySetting';
+import { useWaySetting, type RuleConfirmData } from '@hooks/useWaySetting';
 
 // 상수 정의
 const KEYBOARD_VERTICAL_OFFSET = 80; // 키보드가 나타날 때 수직 오프셋
@@ -22,13 +22,7 @@ const KEYBOARD_VERTICAL_OFFSET = 80; // 키보드가 나타날 때 수직 오프
  */
 type NewRuleCardProps = {
   repeatRules: RepeatRule[];
-  onConfirm: (data: {
-    message: string;
-    startNumber: number;
-    endNumber: number;
-    ruleNumber: number;
-    color?: string;
-  }) => void;
+  onConfirm: (data: RuleConfirmData) => void;
   onCancel: () => void;
 };
 
@@ -108,19 +102,24 @@ const WaySetting = () => {
         </View>
 
         {/* 규칙 카드들 */}
-        {repeatRules.map((rule: RepeatRule, index: number) => (
-          <RuleCard
-            key={`rule-${rule.message}-${rule.startNumber}-${rule.endNumber}-${rule.ruleNumber}-${index}`}
-            message={rule.message}
-            startNumber={rule.startNumber}
-            endNumber={rule.endNumber}
-            ruleNumber={rule.ruleNumber}
-            color={rule.color}
-            isEditable={false}
-            onConfirm={(data) => handleRuleConfirm(index, data)}
-            onDelete={() => handleRuleDeleteClick(index)}
-          />
-        ))}
+        {repeatRules.map((rule: RepeatRule, index: number) => {
+          // 규칙의 모든 속성을 조합하여 안정적인 key 생성
+          // 순서가 바뀌지 않으므로 index 없이 속성만으로 key 생성 가능
+          const ruleKey = `rule-${rule.message}-${rule.startNumber}-${rule.endNumber}-${rule.ruleNumber}-${rule.color ?? 'default'}`;
+          return (
+            <RuleCard
+              key={ruleKey}
+              message={rule.message}
+              startNumber={rule.startNumber}
+              endNumber={rule.endNumber}
+              ruleNumber={rule.ruleNumber}
+              color={rule.color}
+              isEditable={false}
+              onConfirm={(data) => handleRuleConfirm(index, data)}
+              onDelete={() => handleRuleDeleteClick(index)}
+            />
+          );
+        })}
 
         {/* 새 규칙 추가 카드 */}
         {isAddingNewRule && (

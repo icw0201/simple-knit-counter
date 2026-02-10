@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useState } from 'react';
-import { useRoute, useNavigation } from '@react-navigation/native';
+import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '@navigation/AppNavigator';
 import { getStoredItems, updateItem } from '@storage/storage';
@@ -7,12 +7,23 @@ import { Counter, RepeatRule } from '@storage/types';
 import { getDefaultColorForNewRule } from '@utils/ruleUtils';
 
 /**
+ * 규칙 확인 데이터 타입
+ */
+export type RuleConfirmData = {
+  message: string;
+  startNumber: number;
+  endNumber: number;
+  ruleNumber: number;
+  color?: string;
+};
+
+/**
  * Way 설정 화면 전용 훅
  */
 export const useWaySetting = () => {
-  const route = useRoute();
+  const route = useRoute<RouteProp<RootStackParamList, 'WaySetting'>>();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const counterId = (route.params as { counterId?: string })?.counterId;
+  const { counterId } = route.params;
 
   const [counter, setCounter] = useState<Counter | null>(null);
   const [mascotIsActive, setMascotIsActive] = useState(false);
@@ -25,7 +36,6 @@ export const useWaySetting = () => {
 
   useEffect(() => {
     if (!counterId) {
-      setCounter(null);
       return;
     }
     const found = getStoredItems().find(
@@ -73,21 +83,18 @@ export const useWaySetting = () => {
     setIsAddingNewRule(false);
   };
 
-  const handleRuleConfirm = (
-    index: number | null,
-    data: {
-      message: string;
-      startNumber: number;
-      endNumber: number;
-      ruleNumber: number;
-      color?: string;
-    }
-  ) => {
+  const handleRuleConfirm = (index: number | null, data: RuleConfirmData) => {
     if (!counter) {
       return;
     }
 
     const isNewRule = index === null;
+
+    // 편집 모드일 때 범위 체크
+    if (!isNewRule && (index < 0 || index >= repeatRules.length)) {
+      return;
+    }
+
     const defaultColor = isNewRule ? getDefaultColorForNewRule(repeatRules) : undefined;
     const newRule: RepeatRule = {
       message: data.message,
