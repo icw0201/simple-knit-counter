@@ -86,7 +86,9 @@ export const useWaySetting = () => {
     if (!counter) {
       return;
     }
-    const defaultColor = index === null ? getDefaultColorForNewRule(repeatRules) : undefined;
+
+    const isNewRule = index === null;
+    const defaultColor = isNewRule ? getDefaultColorForNewRule(repeatRules) : undefined;
     const newRule: RepeatRule = {
       message: data.message,
       startNumber: data.startNumber,
@@ -94,40 +96,59 @@ export const useWaySetting = () => {
       ruleNumber: data.ruleNumber,
       color: data.color ?? defaultColor,
     };
-    const updatedRules =
-      index === null
-        ? [...repeatRules, newRule]
-        : repeatRules.map((r, i) => (i === index ? newRule : r));
-    if (index === null) {
+
+    const updatedRules = isNewRule
+      ? [...repeatRules, newRule]
+      : repeatRules.map((r, i) => (i === index ? newRule : r));
+
+    if (isNewRule) {
       setIsAddingNewRule(false);
     }
+
     setRepeatRules(updatedRules);
     updateItem(counter.id, { repeatRules: updatedRules });
   };
 
   const handleRuleDeleteClick = (index: number) => {
+    // 범위 체크
+    if (index < 0 || index >= repeatRules.length) {
+      return;
+    }
+
     const rule = repeatRules[index];
     setDeleteRuleIndex(index);
-    setDeleteRuleMessage(rule.message || '');
+    setDeleteRuleMessage(rule.message);
     setShowDeleteModal(true);
+  };
+
+  /**
+   * 삭제 모달 상태 초기화 헬퍼 함수
+   */
+  const resetDeleteModalState = () => {
+    setShowDeleteModal(false);
+    setDeleteRuleIndex(null);
+    setDeleteRuleMessage('');
   };
 
   const handleRuleDeleteConfirm = () => {
     if (!counter || deleteRuleIndex === null) {
       return;
     }
+
+    // 범위 체크
+    if (deleteRuleIndex < 0 || deleteRuleIndex >= repeatRules.length) {
+      resetDeleteModalState();
+      return;
+    }
+
     const updatedRules = repeatRules.filter((_, i) => i !== deleteRuleIndex);
     setRepeatRules(updatedRules);
     updateItem(counter.id, { repeatRules: updatedRules });
-    setShowDeleteModal(false);
-    setDeleteRuleIndex(null);
-    setDeleteRuleMessage('');
+    resetDeleteModalState();
   };
 
   const handleCloseDeleteModal = () => {
-    setShowDeleteModal(false);
-    setDeleteRuleIndex(null);
-    setDeleteRuleMessage('');
+    resetDeleteModalState();
   };
 
   return {

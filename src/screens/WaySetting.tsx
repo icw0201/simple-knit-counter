@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Plus } from 'lucide-react-native';
@@ -13,6 +13,46 @@ import { colorStyles } from '@styles/colorStyles';
 import { RepeatRule } from '@storage/types';
 import { getDefaultColorForNewRule } from '@utils/ruleUtils';
 import { useWaySetting } from '@hooks/useWaySetting';
+
+// 상수 정의
+const KEYBOARD_VERTICAL_OFFSET = 80; // 키보드가 나타날 때 수직 오프셋
+
+/**
+ * 새 규칙 추가 카드 컴포넌트 Props 타입
+ */
+type NewRuleCardProps = {
+  repeatRules: RepeatRule[];
+  onConfirm: (data: {
+    message: string;
+    startNumber: number;
+    endNumber: number;
+    ruleNumber: number;
+    color?: string;
+  }) => void;
+  onCancel: () => void;
+};
+
+/**
+ * 새 규칙 추가 카드 컴포넌트 (메모이제이션)
+ */
+const NewRuleCard = React.memo<NewRuleCardProps>(({ repeatRules, onConfirm, onCancel }) => {
+  const defaultColor = useMemo(() => getDefaultColorForNewRule(repeatRules), [repeatRules]);
+
+  return (
+    <RuleCard
+      message=""
+      startNumber={0}
+      endNumber={0}
+      ruleNumber={0}
+      color={defaultColor}
+      isEditable={true}
+      onConfirm={onConfirm}
+      onDelete={onCancel}
+    />
+  );
+});
+
+NewRuleCard.displayName = 'NewRuleCard';
 
 /**
  * Way 설정 화면 컴포넌트
@@ -41,7 +81,7 @@ const WaySetting = () => {
       <KeyboardAvoidingView
         style={screenStyles.flex1}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={80}
+        keyboardVerticalOffset={KEYBOARD_VERTICAL_OFFSET}
       >
         <ScrollView
           contentContainerStyle={screenStyles.scrollViewContentCentered}
@@ -70,7 +110,7 @@ const WaySetting = () => {
         {/* 규칙 카드들 */}
         {repeatRules.map((rule: RepeatRule, index: number) => (
           <RuleCard
-            key={index}
+            key={`rule-${rule.message}-${rule.startNumber}-${rule.endNumber}-${rule.ruleNumber}-${index}`}
             message={rule.message}
             startNumber={rule.startNumber}
             endNumber={rule.endNumber}
@@ -84,15 +124,10 @@ const WaySetting = () => {
 
         {/* 새 규칙 추가 카드 */}
         {isAddingNewRule && (
-          <RuleCard
-            message=""
-            startNumber={0}
-            endNumber={0}
-            ruleNumber={0}
-            color={getDefaultColorForNewRule(repeatRules)}
-            isEditable={true}
+          <NewRuleCard
+            repeatRules={repeatRules}
             onConfirm={(data) => handleRuleConfirm(null, data)}
-            onDelete={handleCancelAddRule}
+            onCancel={handleCancelAddRule}
           />
         )}
 
