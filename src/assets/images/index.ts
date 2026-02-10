@@ -1,12 +1,19 @@
 export const activateIcons = {
-  inactive: require('./activate_inactive.png'),
-  active: require('./activate_active.png'),
-  auto: require('./activate_auto.png'),
+  inactive: require('./activate/activate_inactive.png'),
+  active: require('./activate/activate_active.png'),
 };
 
-export const Images = {
-  way_front: require('./way_front.png'),
-  way_back: require('./way_back.png'),
-  complete_nomal: require('./complete_nomal.png'),
-  complete_reverse: require('./complete_reverse.png'),
+export const directionImages = {
+  way_front: require('./way/way_front.png'),
+  way_back: require('./way/way_back.png'),
+  way_plain: require('./way/way_plain.png'),
+  emphasis_front: require('./way/emphasis_front.png'),
+  emphasis_back: require('./way/emphasis_back.png'),
+  emphasis_plain: require('./way/emphasis_plain.png'),
+  emphasis_bubble: require('./way/emphasis_bubble.png'),
+};
+
+export const completeImages = {
+  normal: require('./complete/complete_nomal.png'),
+  reverse: require('./complete/complete_reverse.png'),
 };

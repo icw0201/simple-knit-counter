@@ -20,5 +20,6 @@ module.exports = {
         },
       },
     ],
+    'react-native-worklets/plugin', // reanimated 4.x: worklets 플러그인 사용, 반드시 마지막에 위치
   ],
 };

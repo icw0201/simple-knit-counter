@@ -118,9 +118,9 @@ const CounterDetail = () => {
     setPaddingReady(true);
   }, [counter, subModalIsOpen, height, updatePaddingTopAnimation]);
 
-  // 방향 이미지 크기 계산 (원본 비율 87:134 유지)
-  const imageWidth = iconSize;
-  const imageHeight = iconSize * (87 / 134);
+  // 방향 이미지 크기 계산 (원본 비율 90 / 189 유지)
+  const imageWidth = iconSize * 1.4;
+  const imageHeight = iconSize * (90 / 189) * 1.4;
   const hasParent = !!counter?.parentProjectId;
 
   // SubCounterModal 크기 및 위치 계산 (화면 크기별)
@@ -179,6 +179,7 @@ const CounterDetail = () => {
           toggleMascotIsActive,
           counter.timerIsActive,
           toggleTimerIsActive,
+          counter.id,
           hasParent ? undefined : () => navigation.navigate('InfoScreen', { itemId: counter.id })
         ),
     });
@@ -227,7 +228,7 @@ const CounterDetail = () => {
         {/* 헤더 활성 아이콘 안내 툴팁 (헤더 대신 화면 위층에 표시) */}
         {screenSize !== ScreenSize.COMPACT && tooltipEnabled && (
           <Tooltip
-            text="편물 앞 뒤 체크하기"
+            text="길게 눌러 어쩌미 알림 단 설정하기"
             containerClassName="absolute right-3 top-2 z-50"
             targetAnchorX={hasParent ? width - 65 : width - 103}
           />
@@ -248,6 +249,8 @@ const CounterDetail = () => {
           mascotIsActive={mascotIsActive}
           wayIsChange={wayIsChange}
           way={way}
+          currentCount={counter.count}
+          repeatRules={counter.repeatRules || []}
           imageWidth={imageWidth}
           imageHeight={imageHeight}
           screenSize={screenSize}

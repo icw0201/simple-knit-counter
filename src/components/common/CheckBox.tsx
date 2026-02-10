@@ -12,6 +12,7 @@ import clsx from 'clsx';
  * @param onToggle - 체크박스 클릭 시 실행될 콜백 함수
  * @param disabled - 체크박스 비활성화 여부 (기본값: false)
  * @param size - 체크박스 크기 ('base' | 'xs'), 기본값: 'base'
+ * @param children - 체크박스 왼쪽에 표시할 추가 요소 (선택사항)
  */
 interface CheckBoxProps {
   label?: string;
@@ -19,6 +20,7 @@ interface CheckBoxProps {
   onToggle: () => void;
   disabled?: boolean;
   size?: 'base' | 'xs';
+  children?: React.ReactNode;
 }
 
 /**
@@ -26,7 +28,7 @@ interface CheckBoxProps {
  * 라벨과 함께 표시되는 체크박스로, 클릭 시 상태를 토글할 수 있습니다.
  * 비활성화 상태일 때는 클릭이 불가능합니다.
  */
-const CheckBox: React.FC<CheckBoxProps> = ({ label, checked, onToggle, disabled = false, size = 'base' }) => {
+const CheckBox: React.FC<CheckBoxProps> = ({ label, checked, onToggle, disabled = false, size = 'base', children }) => {
   // 체크박스 색상 설정
   const activeColor = colorStyles.vivid.container; // 활성화 상태일 때의 배경색 (체크된 상태)
   const inactiveColor = 'bg-red-orange-100'; // 비활성화 상태일 때의 배경색 (체크되지 않은 상태)
@@ -56,6 +58,13 @@ const CheckBox: React.FC<CheckBoxProps> = ({ label, checked, onToggle, disabled 
       {/* 체크박스 라벨 텍스트 - label이 있을 때만 표시 */}
       {label && (
         <Text className={`${textSizeClass} text-black shrink flex-1`} numberOfLines={2}>{label}</Text>
+      )}
+
+      {/* children이 있으면 라벨과 체크박스 사이에 배치 (label이 있을 때만) */}
+      {label && children && (
+        <View className="mx-2">
+          {children}
+        </View>
       )}
 
       {/* 체크박스 아이콘 컨테이너 */}

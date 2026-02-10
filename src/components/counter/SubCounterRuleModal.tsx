@@ -54,7 +54,7 @@ const SubCounterRuleModal: React.FC<SubCounterRuleModalProps> = ({
                 value={rule}
                 onChangeText={setRule}
                 type="number"
-                className="mb-0"
+                containerClassName="mb-2"
                 placeholder="0"
               />
             </View>

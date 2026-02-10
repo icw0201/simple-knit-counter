@@ -1,10 +1,10 @@
 // src/screens/InfoScreen.tsx
 
-import React from 'react';
+import React, { useRef } from 'react';
 import { ScrollView, View, KeyboardAvoidingView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import TextInputBox from '@components/common/TextInputBox';
+import TextInputBox, { TextInputBoxRef } from '@components/common/TextInputBox';
 import RoundedButton from '@components/common/RoundedButton';
 import { ConfirmModal } from '@components/common/modals';
 import { screenStyles, safeAreaEdges } from '@styles/screenStyles';
@@ -46,6 +46,12 @@ const InfoScreen = () => {
     isSaveButtonActive,
   } = useItemInfo();
 
+  // TextInputBox refs
+  const titleInputRef = useRef<TextInputBoxRef>(null);
+  const startDateInputRef = useRef<TextInputBoxRef>(null);
+  const endDateInputRef = useRef<TextInputBoxRef>(null);
+  const gaugeInputRef = useRef<TextInputBoxRef>(null);
+
   return (
     <SafeAreaView style={screenStyles.flex1} edges={safeAreaEdges}>
       <KeyboardAvoidingView
@@ -56,38 +62,51 @@ const InfoScreen = () => {
         <ScrollView contentContainerStyle={screenStyles.scrollViewContent}>
           {/* 제목 입력 필드 */}
           <TextInputBox
+            ref={titleInputRef}
             label="이름"
             value={title}
             onChangeText={setTitle}
             placeholder="프로젝트명 혹은 카운터명"
             type="text"
             required
+            returnKeyType="next"
+            onSubmitEditing={() => startDateInputRef.current?.focus()}
+            blurOnSubmit={false}
           />
 
           {/* 날짜 입력 필드들 (좌우 배치) */}
           <View className="flex-row justify-between">
             <View className="flex-1 mr-2">
               <TextInputBox
+                ref={startDateInputRef}
                 label="시작일"
                 value={startDate}
                 onChangeText={setStartDate}
                 placeholder="yyyy.mm.dd"
                 type="date"
+                returnKeyType="next"
+                onSubmitEditing={() => endDateInputRef.current?.focus()}
+                blurOnSubmit={false}
               />
             </View>
             <View className="flex-1 ml-2">
               <TextInputBox
+                ref={endDateInputRef}
                 label="종료일"
                 value={endDate}
                 onChangeText={setEndDate}
                 placeholder="yyyy.mm.dd"
                 type="date"
+                returnKeyType="next"
+                onSubmitEditing={() => gaugeInputRef.current?.focus()}
+                blurOnSubmit={false}
               />
             </View>
           </View>
 
           {/* 게이지 입력 필드 */}
           <TextInputBox
+            ref={gaugeInputRef}
             label="게이지"
             value={gauge}
             onChangeText={setGauge}

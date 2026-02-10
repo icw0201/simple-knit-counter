@@ -10,3 +10,5 @@ export { default as SubCounterTouchArea } from './SubCounterTouchArea';
 export { default as SubCounterRuleModal } from './SubCounterRuleModal';
 export { default as ProgressBar } from './ProgressBar';
 export { default as SegmentRecordModal } from './SegmentRecordModal';
+export { default as RuleCard } from './RuleCard';
+export { default as ColorPicker } from './ColorPicker';

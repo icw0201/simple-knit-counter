@@ -3,8 +3,8 @@ import { ChevronLeft, Settings, Trash2, Info, ArrowDownUp, Timer } from 'lucide-
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from './AppNavigator';
 
-import { View, Image, TouchableOpacity } from 'react-native';
-import { activateIcons } from '@assets/images';
+import { View, TouchableOpacity } from 'react-native';
+import ActivateToggle from '@components/common/ActivateToggle';
 
 export const getDefaultHeaderLeft = (
   navigation: any
@@ -82,6 +82,7 @@ export const getHeaderRightWithActivateInfoSettings = (
   onActivatePress: () => void,
   timerIsActive: boolean,
   onTimerPress: () => void,
+  counterId: string,
   onInfoPress?: () => void
 ): React.JSX.Element => {
   return (
@@ -92,13 +93,13 @@ export const getHeaderRightWithActivateInfoSettings = (
       </TouchableOpacity>
 
       {/* 활성 아이콘 */}
-      <TouchableOpacity onPress={onActivatePress} style={{ marginRight: 13 }}>
-        <Image
-          source={activateIcons[mascotIsActive ? 'active' : 'inactive']}
-          style={{ width: 23, height: 23 }}
-          resizeMode="contain"
+      <View style={{ marginRight: 13 }}>
+        <ActivateToggle
+          mascotIsActive={mascotIsActive}
+          onToggle={onActivatePress}
+          onLongPress={() => navigation.navigate('WaySetting', { counterId })}
         />
-      </TouchableOpacity>
+      </View>
 
       {/* Info 버튼 (선택적) */}
       {onInfoPress && (
