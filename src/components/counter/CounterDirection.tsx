@@ -154,6 +154,7 @@ const CounterDirection: React.FC<CounterDirectionProps> = ({
                 [1, 2].slice(0, Math.min(2, appliedRules.length - 1)).map((offset) => {
                   const nextRule = appliedRules[(currentRuleIndex + offset) % appliedRules.length];
                   return (
+                    // 미리보기 버블
                     <Image
                       key={offset}
                       source={directionImages.emphasis_bubble}
@@ -197,6 +198,7 @@ const CounterDirection: React.FC<CounterDirectionProps> = ({
                   tintColor: currentRule.color,
                 }}
               />
+              {/* 규칙 메시지 텍스트 (말풍선 위에 표시) */}
               <View
                 style={{
                   position: 'absolute',
