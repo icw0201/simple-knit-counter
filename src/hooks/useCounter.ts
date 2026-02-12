@@ -1,7 +1,7 @@
 // src/hooks/useCounter.ts
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import { Platform, Vibration, Animated, AppState } from 'react-native';
 import HapticFeedback from 'react-native-haptic-feedback';
 import Sound from 'react-native-sound';
@@ -84,6 +84,8 @@ interface UseCounterReturn {
  * - 에러 처리
  */
 export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => {
+  // 화면 포커스 상태 확인
+  const isFocused = useIsFocused();
 
   // 카운터 데이터 상태
   const [counter, setCounter] = useState<Counter | null>(null);
@@ -331,16 +333,17 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
   /**
    * 타이머 재생 중 소요 시간 증가
    * timerIsActive가 true이고 timerIsPlaying이 true일 때만 동작
+   * 화면에 포커스가 있을 때만 동작 (다른 화면으로 이동하면 일시정지)
    */
   useEffect(() => {
-    if (!counter || !counter.timerIsActive || !counter.timerIsPlaying) {
+    if (!counter || !counter.timerIsActive || !counter.timerIsPlaying || !isFocused) {
       return;
     }
 
     const intervalId = setInterval(() => {
       // 최신 counter 값을 가져오기 위해 함수형 업데이트 사용
       setCounter(prev => {
-        if (!prev || !prev.timerIsActive || !prev.timerIsPlaying) {
+        if (!prev || !prev.timerIsActive || !prev.timerIsPlaying || !isFocused) {
           return prev;
         }
 
@@ -356,7 +359,7 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
       clearInterval(intervalId);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [counter?.timerIsActive, counter?.timerIsPlaying, counter?.id]);
+  }, [counter?.timerIsActive, counter?.timerIsPlaying, counter?.id, isFocused]);
 
   /**
    * 에러 모달 표시
