@@ -217,9 +217,27 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
         return;
       }
 
-      // 백그라운드 진입: 현재 메모리 상태를 MMKV에 저장 (방어적 저장)
+      // 백그라운드 진입: MMKV에서 최신 데이터를 읽어서 저장 (다른 화면에서 변경된 내용 보존)
       if (nextState === 'background') {
-        updateItem(counter.id, counter);
+        const items = getStoredItems();
+        const persisted = items.find(
+          (item): item is Counter => item.id === counterId && item.type === 'counter'
+        );
+        if (persisted) {
+          // MMKV의 최신 데이터를 사용 (다른 화면에서 변경된 내용 포함)
+          const memoryTimestamp = counter.updatedAt ?? 0;
+          const persistedTimestamp = persisted.updatedAt ?? 0;
+          if (persistedTimestamp >= memoryTimestamp) {
+            // MMKV 데이터가 더 최신이거나 같으면 MMKV 데이터를 저장 (이미 저장되어 있지만 확실히 하기 위해)
+            updateItem(counter.id, persisted);
+          } else {
+            // 메모리가 더 최신이면 메모리 데이터를 저장
+            updateItem(counter.id, counter);
+          }
+        } else {
+          // MMKV에 없으면 메모리 상태를 저장
+          updateItem(counter.id, counter);
+        }
         return;
       }
 
