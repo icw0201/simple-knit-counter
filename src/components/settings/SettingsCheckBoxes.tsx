@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { CommonActions, useNavigation } from '@react-navigation/native';
-import { activateKeepAwake, deactivateKeepAwake } from '@sayem314/react-native-keep-awake';
 
 import CheckBox from '@components/common/CheckBox';
 import { ConfirmModal } from '@components/common/modals';
@@ -75,12 +74,6 @@ const SettingsCheckBoxes: React.FC<SettingsCheckBoxesProps> = () => {
     const newValue = !screenAwake;
     setScreenAwake(newValue);
     setScreenAwakeSetting(newValue);
-
-    if (newValue) {
-      activateKeepAwake();
-    } else {
-      deactivateKeepAwake();
-    }
   };
 
   /**
@@ -161,7 +154,7 @@ const SettingsCheckBoxes: React.FC<SettingsCheckBoxesProps> = () => {
           onToggle={handleVibrationToggle}
         />
         <CheckBox
-          label="카운터 스크린 항상 켜두기"
+          label="스크린 항상 켜두기"
           checked={screenAwake}
           onToggle={handleScreenAwakeToggle}
         />

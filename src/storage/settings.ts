@@ -79,6 +79,23 @@ export const getScreenAwakeSetting = (): boolean => {
 };
 
 /**
+ * screenAwake 설정 변경을 구독합니다. (변경 시점만 알려줌)
+ * - 키 문자열/리스너 등록을 이 파일로 숨겨서 사용처를 깔끔하게 유지
+ * @returns unsubscribe 함수
+ */
+export const subscribeScreenAwakeSettingChange = (callback: () => void) => {
+  const listener = storage.addOnValueChangedListener((changedKey) => {
+    if (changedKey === KEY_SCREEN_AWAKE) {
+      callback();
+    }
+  });
+
+  return () => {
+    listener.remove();
+  };
+};
+
+/**
  * 정렬 기준 설정을 저장합니다.
  * @param value 정렬 기준 ('name' | 'created' | 'startDate' | 'endDate' | 'progress' | 'elapsedTime')
  */

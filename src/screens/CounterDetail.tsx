@@ -6,10 +6,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '@navigation/AppNavigator';
-import { activateKeepAwake, deactivateKeepAwake } from '@sayem314/react-native-keep-awake';
 
 import { getHeaderRightWithActivateInfoSettings } from '@navigation/HeaderOptions';
-import { getScreenAwakeSetting } from '@storage/settings';
 
 import { CounterTouchArea, CounterDirection, CounterActions, CounterModals, SubCounterModal, ProgressBar, TimeDisplay, SegmentRecordModal } from '@components/counter';
 import Tooltip from '@components/common/Tooltip';
@@ -95,6 +93,10 @@ const CounterDetail = () => {
     updatePaddingTopAnimation,
   } = useCounter({ counterId });
 
+  // NOTE: paddingTopAnim은 추후 사용 예정(현재는 사용처 없음)
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+  void paddingTopAnim;
+
   // 패딩 탑 애니메이션 업데이트
   // 최초 진입 시에는 애니메이션 없이 즉시 설정하고, 이후에는 subModalIsOpen 변경 시에만 애니메이션
   const didInitPadding = useRef(false);
@@ -139,21 +141,8 @@ const CounterDetail = () => {
    */
   useFocusEffect(
     useCallback(() => {
-      // 화면 켜짐 설정 적용
-      const screenAwake = getScreenAwakeSetting();
-      if (screenAwake) {
-        activateKeepAwake();
-      } else {
-        deactivateKeepAwake();
-      }
-
       // 툴팁 표시 설정 로드
       setTooltipEnabled(getTooltipEnabledSetting());
-
-      // 정리 함수: 화면 켜짐 해제
-      return () => {
-        deactivateKeepAwake();
-      };
     }, [])
   );
 
