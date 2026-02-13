@@ -65,7 +65,7 @@ export const SubCounterModal: React.FC<SubCounterModalProps> = ({
       />
 
       {/* 콘텐츠 영역 */}
-      <View className="flex-1 items-center justify-center" style={{ paddingLeft: handleWidth }}>
+      <View className="flex-1 items-center justify-center">
 
       <View pointerEvents="none">
         <Text className={`text-4xl font-bold text-black ${textMarginClass}`}>

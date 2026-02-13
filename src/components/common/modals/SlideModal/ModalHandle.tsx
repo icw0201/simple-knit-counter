@@ -18,8 +18,9 @@ interface ModalHandleProps {
 
 interface DragState {
   isDragging: boolean;
-  startY: number;
-  currentY: number;
+  startX: number;
+  currentX: number;
+  startTranslateX: number;
 }
 
 // ===== 상수 =====
@@ -29,7 +30,6 @@ const CLOSE_THRESHOLD = 30; // 모달 닫기 임계값 (px)
 
 // ===== 핸들 컴포넌트 =====
 export const ModalHandle: React.FC<ModalHandleProps> = ({
-  isOpen,
   height,
   handleWidth,
   modalWidth,
@@ -37,15 +37,24 @@ export const ModalHandle: React.FC<ModalHandleProps> = ({
   top,
   onOpen,
   onClose,
-  onToggle,
   onDragUpdate,
 }) => {
   // ===== 드래그 상태 관리 =====
   const [dragState, setDragState] = useState<DragState>({
     isDragging: false,
-    startY: 0,
-    currentY: 0,
+    startX: 0,
+    currentX: 0,
+    startTranslateX: 0,
   });
+
+  const clampTranslateX = (value: number) => {
+    return Math.max(handleWidth, Math.min(modalWidth, value));
+  };
+
+  const getIsOpenByTranslateX = (value: number) => {
+    // 위치 기반 판정: 절반 이상 열려있으면 open 처리
+    return value >= (handleWidth + modalWidth) / 2;
+  };
 
   // ===== 터치 이벤트 핸들러 =====
 
@@ -54,80 +63,66 @@ export const ModalHandle: React.FC<ModalHandleProps> = ({
     const touch = e.nativeEvent.touches[0];
     setDragState({
       isDragging: false,
-      startY: touch.pageX,
-      currentY: touch.pageX,
+      startX: touch.pageX,
+      currentX: touch.pageX,
+      startTranslateX: translateY,
     });
   };
 
   // 터치 이동 이벤트 처리 (드래그)
   const handleTouchMove = (e: any) => {
     const touch = e.nativeEvent.touches[0];
-    const deltaX = touch.pageX - dragState.startY;
+    const deltaX = touch.pageX - dragState.startX;
+    const shouldDrag = Math.abs(deltaX) > DRAG_THRESHOLD;
 
     // 드래그 상태로 전환
-    if (Math.abs(deltaX) > DRAG_THRESHOLD && !dragState.isDragging) {
+    if (shouldDrag && !dragState.isDragging) {
       setDragState((prev) => ({ ...prev, isDragging: true }));
     }
 
-    if (dragState.isDragging) {
-      if (isOpen) {
-        // 열려있을 때: 오른쪽으로만 드래그 가능
-        if (deltaX >= 0) {
-          const newTranslateY = -modalWidth + deltaX;
-          onDragUpdate(newTranslateY);
-          setDragState((prev) => ({ ...prev, currentY: touch.pageX }));
-        }
-      } else {
-        // 닫혀있을 때: 왼쪽으로만 드래그 가능
-        if (deltaX <= 0) {
-          const newTranslateY = -handleWidth + deltaX;
-          onDragUpdate(newTranslateY);
-          setDragState((prev) => ({ ...prev, currentY: touch.pageX }));
-        }
-      }
+    // isOpen prop에 의존하지 않고, 현재 위치 기준으로 양방향 드래그 허용
+    if (shouldDrag) {
+      const newTranslateX = clampTranslateX(dragState.startTranslateX + deltaX);
+      onDragUpdate(newTranslateX);
+      setDragState((prev) => ({ ...prev, currentX: touch.pageX }));
     }
   };
 
   // 터치 종료 이벤트 처리 (드래그 완료)
   const handleTouchEnd = () => {
-    if (!dragState.isDragging) {
-      // 드래그가 아닌 단순 클릭일 때 토글
-      if (onToggle) {
-        onToggle();
-      }
+    setDragState((prev) => ({ ...prev, isDragging: false }));
+    const deltaX = dragState.currentX - dragState.startX;
+    const endTranslateX = clampTranslateX(dragState.startTranslateX + deltaX);
+    const isOpenByPosition = getIsOpenByTranslateX(endTranslateX);
+
+    // 원래 코드의 "조금만 드래그하면 복귀" 감각을 유지하기 위해
+    // 방향/거리 기반 임계값을 우선 적용, 아니면 위치(중앙값)으로 결정
+    if (deltaX > OPEN_THRESHOLD) {
+      onOpen();
+      return;
+    }
+    if (deltaX < -CLOSE_THRESHOLD) {
+      onClose();
       return;
     }
 
-    setDragState((prev) => ({ ...prev, isDragging: false }));
-    const deltaX = dragState.currentY - dragState.startY;
-
-    if (isOpen) {
-      // 열려있을 때: 오른쪽으로 충분히 드래그하면 닫힘
-      if (deltaX > CLOSE_THRESHOLD) {
-        onClose();
-      } else {
-        // 원래 열린 위치로 복귀
-        onDragUpdate(-modalWidth);
-      }
+    if (isOpenByPosition) {
+      onOpen();
     } else {
-      // 닫혀있을 때: 왼쪽으로 충분히 드래그하면 열림
-      if (deltaX < -OPEN_THRESHOLD) {
-        onOpen();
-      } else {
-        // 원래 닫힌 위치로 복귀
-        onDragUpdate(-handleWidth);
-      }
+      onClose();
     }
   };
 
   // 단순 터치 이벤트 처리 (드래그가 아닌 경우)
   const handlePress = () => {
-    const deltaX = Math.abs(dragState.currentY - dragState.startY);
+    const deltaX = Math.abs(dragState.currentX - dragState.startX);
     if (deltaX > DRAG_THRESHOLD) {
       return; // 드래그로 간주
     }
 
-    if (isOpen) {
+    // 현재 위치 기반으로 토글 (부모 isOpen이 늦게 갱신되어도 동작 보장)
+    const isOpenByPosition = getIsOpenByTranslateX(translateY);
+    if (isOpenByPosition) {
       onClose();
     } else {
       onOpen();
@@ -136,7 +131,7 @@ export const ModalHandle: React.FC<ModalHandleProps> = ({
 
   // 터치 종료 시 드래그/터치 구분 처리
   const handleTouchEndWithCheck = () => {
-    const deltaX = Math.abs(dragState.currentY - dragState.startY);
+    const deltaX = Math.abs(dragState.currentX - dragState.startX);
 
     if (deltaX <= DRAG_THRESHOLD) {
       // 드래그가 아닌 단순 터치
@@ -151,12 +146,12 @@ export const ModalHandle: React.FC<ModalHandleProps> = ({
       className="absolute bg-transparent"
       style={{
         top: top,
-        right: -handleWidth,
+        left: -handleWidth,
         width: handleWidth,
         height: height,
         zIndex: 2,
-        borderTopLeftRadius: 16,
-        borderBottomLeftRadius: 16,
+        borderTopRightRadius: 16,
+        borderBottomRightRadius: 16,
         transform: [
           { translateX: translateY },
           { translateY: -height / 2 },
@@ -166,27 +161,27 @@ export const ModalHandle: React.FC<ModalHandleProps> = ({
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEndWithCheck}
     >
-      {isOpen ? (
+      {getIsOpenByTranslateX(translateY) ? (
         // 열려있을 때: 투명한 핸들 + 흰색 바
         <View className="w-full h-full items-center justify-center">
           <View
-            className="w-1 bg-white rounded-sm"
+            className="w-1 bg-red-orange-100 rounded-sm"
             style={{ height: height * 0.4 }}
           />
         </View>
       ) : (
         // 닫혀있을 때: 그라데이션 핸들만 (바 없음)
         <View
-          className="flex-1 border-t-2 border-l-2 border-white overflow-hidden"
+          className="flex-1 border-t-2 border-r-2 border-white overflow-hidden"
           style={{
-            borderTopLeftRadius: 16,
-            borderBottomLeftRadius: 16,
+            borderTopRightRadius: 16,
+            borderBottomRightRadius: 16,
           }}
         >
           <LinearGradient
             colors={['#ff6b67', '#ffc7c6']} // 400, 200
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
+            start={{ x: 1, y: 0 }}
+            end={{ x: 0, y: 0 }}
             className="flex-1"
           />
         </View>

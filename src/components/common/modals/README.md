@@ -75,7 +75,7 @@ import ProjectCreateModal from '@components/common/modals/ProjectCreateModal';
 ```
 
 ### SlideModal
-슬라이드 모달. 우측에서 나오는 모달입니다.
+슬라이드 모달. 좌측에서 나오는 모달입니다.
 
 ```tsx
 import { SlideModal } from '@components/common/modals/SlideModal';
