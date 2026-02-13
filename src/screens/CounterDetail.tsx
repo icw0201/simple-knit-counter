@@ -139,11 +139,6 @@ const CounterDetail = () => {
     useCallback(() => {
       // 툴팁 표시 설정 로드
       setTooltipEnabled(getTooltipEnabledSetting());
-
-      // 정리 함수
-      return () => {
-        // no-op
-      };
     }, [])
   );
 
