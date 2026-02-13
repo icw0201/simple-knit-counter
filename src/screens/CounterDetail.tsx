@@ -93,6 +93,10 @@ const CounterDetail = () => {
     updatePaddingTopAnimation,
   } = useCounter({ counterId });
 
+  // NOTE: paddingTopAnim은 추후 사용 예정(현재는 사용처 없음)
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+  void paddingTopAnim;
+
   // 패딩 탑 애니메이션 업데이트
   // 최초 진입 시에는 애니메이션 없이 즉시 설정하고, 이후에는 subModalIsOpen 변경 시에만 애니메이션
   const didInitPadding = useRef(false);

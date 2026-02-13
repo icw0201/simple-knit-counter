@@ -5,10 +5,9 @@ import { getScreenAwakeSetting, subscribeScreenAwakeSettingChange } from '@stora
 
 /**
  * 앱 전역에서 screenAwake 설정을 KeepAwake와 동기화합니다.
- * - 화면/페이지 단위로 흩뿌리지 않고 루트에 1회만 설치
- * - MMKV 리스너를 사용하여 값 변경을 자동으로 감지
+ * - 루트(App)에서 1회 호출
  */
-export function ScreenAwakeSync() {
+export function useScreenAwakeSync() {
   useEffect(() => {
     const applySetting = (enabled: boolean) => {
       if (enabled) {
@@ -37,13 +36,10 @@ export function ScreenAwakeSync() {
     const appStateSub = AppState.addEventListener('change', onAppStateChange);
 
     return () => {
-      // 리스너 해제 및 KeepAwake 해제
       appStateSub.remove();
       unsubscribeSetting();
       deactivateKeepAwake();
     };
   }, []);
-
-  return null;
 }
 
