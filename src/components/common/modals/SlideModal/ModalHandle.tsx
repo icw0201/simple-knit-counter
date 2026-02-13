@@ -8,12 +8,12 @@ interface ModalHandleProps {
   height: number;
   handleWidth: number;
   modalWidth: number;
-  translateY: number;
+  translateX: number;
   top: DimensionValue;
   onOpen: () => void;
   onClose: () => void;
   onToggle?: () => void;
-  onDragUpdate: (translateY: number) => void;
+  onDragUpdate: (translateX: number) => void;
 }
 
 interface DragState {
@@ -33,7 +33,7 @@ export const ModalHandle: React.FC<ModalHandleProps> = ({
   height,
   handleWidth,
   modalWidth,
-  translateY,
+  translateX,
   top,
   onOpen,
   onClose,
@@ -65,7 +65,7 @@ export const ModalHandle: React.FC<ModalHandleProps> = ({
       isDragging: false,
       startX: touch.pageX,
       currentX: touch.pageX,
-      startTranslateX: translateY,
+      startTranslateX: translateX,
     });
   };
 
@@ -121,7 +121,7 @@ export const ModalHandle: React.FC<ModalHandleProps> = ({
     }
 
     // 현재 위치 기반으로 토글 (부모 isOpen이 늦게 갱신되어도 동작 보장)
-    const isOpenByPosition = getIsOpenByTranslateX(translateY);
+    const isOpenByPosition = getIsOpenByTranslateX(translateX);
     if (isOpenByPosition) {
       onClose();
     } else {
@@ -153,7 +153,7 @@ export const ModalHandle: React.FC<ModalHandleProps> = ({
         borderTopRightRadius: 16,
         borderBottomRightRadius: 16,
         transform: [
-          { translateX: translateY },
+          { translateX: translateX },
           { translateY: -height / 2 },
         ],
       }}
@@ -161,7 +161,7 @@ export const ModalHandle: React.FC<ModalHandleProps> = ({
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEndWithCheck}
     >
-      {getIsOpenByTranslateX(translateY) ? (
+      {getIsOpenByTranslateX(translateX) ? (
         // 열려있을 때: 투명한 핸들 + 흰색 바
         <View className="w-full h-full items-center justify-center">
           <View
