@@ -1,6 +1,6 @@
 // src/screens/CounterDetail.tsx
 
-import { useLayoutEffect, useCallback, useEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useCallback, useState } from 'react';
 import { View, Text, useWindowDimensions, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
@@ -88,34 +88,9 @@ const CounterDetail = () => {
     // 구간 기록 모달
     handleSectionModalToggle,
     handleSectionUndo,
-    // 패딩 탑 애니메이션
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- 추후 애니메이션 스타일에 재사용 예정
-    paddingTopAnim,
-    updatePaddingTopAnimation,
   } = useCounter({ counterId });
 
-  // 패딩 탑 애니메이션 업데이트
-  // 최초 진입 시에는 애니메이션 없이 즉시 설정하고, 이후에는 subModalIsOpen 변경 시에만 애니메이션
-  const didInitPadding = useRef(false);
-  const prevCounterId = useRef<string | null>(null);
-  const [isPaddingReady, setPaddingReady] = useState(false);
   const [tooltipEnabled, setTooltipEnabled] = useState(true);
-  useEffect(() => {
-    if (!counter) { return; }
-
-    // 최초 진입(또는 다른 카운터로 전환) 시에는 애니메이션 없이 즉시 설정
-    if (!didInitPadding.current || prevCounterId.current !== counter.id) {
-      updatePaddingTopAnimation(height, subModalIsOpen, { animate: false });
-      didInitPadding.current = true;
-      prevCounterId.current = counter.id;
-      setPaddingReady(true);
-      return;
-    }
-
-    // 이후에는 상태 변경 시에만 애니메이션 적용
-    updatePaddingTopAnimation(height, subModalIsOpen, { animate: true });
-    setPaddingReady(true);
-  }, [counter, subModalIsOpen, height, updatePaddingTopAnimation]);
 
   // 방향 이미지 크기 계산 (원본 비율 90 / 189 유지)
   const imageWidth = iconSize * 1.4;
@@ -191,8 +166,7 @@ const CounterDetail = () => {
         style={[
           screenStyles.pointerEventsBoxNone,
           {
-            paddingTop: -50,
-            opacity: isPaddingReady ? 1 : 0,
+            opacity: 1,
           },
         ]}
       >

@@ -219,13 +219,3 @@ export const getSegmentModalTop = (screenSize: ScreenSize): DimensionValue => {
  * 서브 아이콘 LARGE 크기와 동일 (44)
  */
 export const SEGMENT_UNDO_ICON_SIZE = 44;
-
-/**
- * 패딩 탑 배수 (기본값)
- */
-export const PADDING_TOP_MULTIPLIER = 0;
-
-/**
- * SubCounterModal 열릴 때 패딩 탑 배수 (2배)
- */
-export const PADDING_TOP_RATIO = 2;
