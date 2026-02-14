@@ -5,7 +5,6 @@ import { BaseModal } from '../BaseModal';
 import TextInputBox from '@components/common/TextInputBox';
 import RadioButtonGroup from '@components/common/RadioButtonGroup';
 import RoundedButton from '@components/common/RoundedButton';
-import clsx from 'clsx';
 
 /**
  * ProjectCreateModal 컴포넌트의 Props 인터페이스

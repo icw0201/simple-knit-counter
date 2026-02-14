@@ -109,15 +109,14 @@ const migrateV4_RepeatRulesToArrayAndMoveWay = (items: Item[]): Item[] => {
     if (item.type === 'counter') {
       const counter = item as any;
       // 이전 버전의 불필요한 필드 제거 (repeatRuleIsActive, repeatRuleNumber 등)
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const {
-        repeatRuleIsActive,
-        repeatRuleNumber,
-        repeatRuleStartNumber,
-        repeatRuleEndNumber,
-        info,
-        ...rest
-      } = counter;
+      const rest = { ...counter };
+      delete rest.repeatRuleIsActive;
+      delete rest.repeatRuleNumber;
+      delete rest.repeatRuleStartNumber;
+      delete rest.repeatRuleEndNumber;
+
+      const info = rest.info;
+      delete rest.info;
 
       // 1. 반복 규칙을 배열로 변환
       // 이전 버전에서는 항상 초기값이었으므로 빈 배열 반환
