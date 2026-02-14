@@ -73,7 +73,7 @@ export default function StoreUpdatePrompt() {
     lastCheckedAtRef.current = now;
 
     try {
-      const curVersion = DeviceInfo.getVersion(); // e.g. "1.2.0"
+      const curVersion = DeviceInfo.getVersion(); // "x.x.x"
       const result: NeedsUpdateResponse = await inAppUpdates.checkNeedsUpdate({ curVersion });
 
       if (!result.shouldUpdate) {
