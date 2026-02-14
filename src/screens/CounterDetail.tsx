@@ -2,7 +2,7 @@
 
 import { useLayoutEffect, useCallback, useState } from 'react';
 import { View, Text, useWindowDimensions, Animated } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '@navigation/AppNavigator';
@@ -11,7 +11,7 @@ import { getHeaderRightWithActivateInfoSettings } from '@navigation/HeaderOption
 
 import { CounterTouchArea, CounterDirection, CounterActions, CounterModals, SubCounterModal, ProgressBar, TimeDisplay, SegmentRecordModal } from '@components/counter';
 import Tooltip from '@components/common/Tooltip';
-import { getScreenSize, getIconSize, getTextClass, getGapClass, getSubModalWidthRatio, getSubModalHeightRatio, getSubModalTop, getSubModalHandleWidth, getSegmentModalHeightRatio, getSegmentModalTop, ScreenSize } from '@constants/screenSizeConfig';
+import { getCounterDetailVerticalBands, getScreenSize, getIconSize, getTextClass, getSubModalWidthRatio, getSubModalHeightRatio, getSubModalTop, getSubModalHandleWidth, getSegmentModalHeightRatio, getSegmentModalTop, ScreenSize } from '@constants/screenSizeConfig';
 import { getTooltipEnabledSetting } from '@storage/settings';
 import { screenStyles, safeAreaEdges } from '@styles/screenStyles';
 import { useCounter } from '@hooks/useCounter';
@@ -38,12 +38,17 @@ const CounterDetail = () => {
   const route = useRoute();
   const { counterId } = route.params as { counterId: string };
 
-  // 화면 크기 정보
+  // 화면 크기 정보 (서브 모달과 같은 좌표계: SafeArea 내부 높이 사용)
   const { height, width } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
+  const contentAreaHeight = height - insets.top - insets.bottom;
   const screenSize = getScreenSize(height);
   const iconSize = getIconSize(screenSize);
   const textClass = getTextClass(screenSize);
-  const gapClass = getGapClass(screenSize);
+
+  // ProgressBar.tsx의 heightClass(h-3/h-5/h-7) 기준(px)
+  const progressBarHeightPx =
+    screenSize === ScreenSize.COMPACT ? 12 : screenSize === ScreenSize.SMALL ? 20 : 28;
 
 
   // 카운터 비즈니스 로직 훅
@@ -107,6 +112,63 @@ const CounterDetail = () => {
   const segmentModalWidth = subModalWidth;
   const segmentModalHeight = height * getSegmentModalHeightRatio(screenSize);
   const segmentModalTop = getSegmentModalTop(screenSize);
+
+  const { timerEndPercent, contentStartPercent, contentEndPercent } =
+    getCounterDetailVerticalBands(screenSize);
+
+  // 서브 모달은 top=85%(중앙) + translateY=-height/2 이므로 실제 상단 = 85% - (height비율/2).
+  // 모달 height는 window height 기준으로 전달되므로, contentAreaHeight와 다를 때 보정.
+  const subModalHeightRatio = getSubModalHeightRatio(screenSize);
+  const effectiveContentEndPercent =
+    contentAreaHeight > 0
+      ? 85 - (height / contentAreaHeight) * (subModalHeightRatio * 100) / 2
+      : contentEndPercent;
+
+  // bands %는 contentAreaHeight(SafeArea 내부) 기준으로 px 변환 (서브 모달과 동일 좌표계)
+  const timerHeightPx = Math.max(
+    0,
+    (contentAreaHeight * timerEndPercent) / 100 - progressBarHeightPx
+  );
+  const gapBetweenTimerAndContentPx = Math.max(
+    0,
+    (contentAreaHeight * (contentStartPercent - timerEndPercent)) / 100
+  );
+  const contentHeightPx = Math.max(
+    0,
+    (contentAreaHeight * (effectiveContentEndPercent - contentStartPercent)) / 100
+  );
+  const bottomReservedHeightPx = Math.max(
+    0,
+    contentAreaHeight -
+      progressBarHeightPx -
+      (timerHeightPx + gapBetweenTimerAndContentPx + contentHeightPx)
+  );
+
+  // getCounterDetailVerticalBands(screenSize) 기준 통일 레이아웃 (화면 크기별 %는 config에서 정의)
+  const contentWrapperStyle = {
+    position: 'absolute' as const,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    top: progressBarHeightPx,
+  };
+  const timerContainerStyle = {
+    width: '100%' as const,
+    height: timerHeightPx,
+    alignItems: 'center' as const,
+    justifyContent: 'flex-start' as const,
+  };
+  const contentContainerStyle = {
+    width: '100%' as const,
+    height: contentHeightPx,
+  };
+
+  const showTimeDisplay =
+    (counter?.timerIsActive ?? false) &&
+    (screenSize === ScreenSize.LARGE ||
+      (screenSize !== ScreenSize.COMPACT && !(screenSize === ScreenSize.SMALL && subModalIsOpen)));
+  const showCounterActions =
+    screenSize === ScreenSize.LARGE || !(screenSize === ScreenSize.SMALL && subModalIsOpen);
 
   /**
    * 화면 포커스 시 실행되는 효과
@@ -195,10 +257,10 @@ const CounterDetail = () => {
           />
         )}
 
-        {/* 네 개만 감쌈: 타이머 0%, 방향·숫자·버튼 30%부터 */}
-        <View className="flex-1 w-full items-center justify-start">
-          <View className="w-full items-center" style={{ height: '35%' }}>
-            {counter.timerIsActive && screenSize !== ScreenSize.COMPACT && !(screenSize === ScreenSize.SMALL && (counter.subModalIsOpen ?? false)) && (
+        <View className="flex-1 w-full items-center justify-start" style={contentWrapperStyle}>
+          {/* 타이머 영역 (bands의 timerEndPercent 기준) */}
+          <View className="w-full items-center" style={timerContainerStyle}>
+            {showTimeDisplay && (
               <TimeDisplay
                 screenSize={screenSize}
                 timerIsPlaying={counter.timerIsPlaying ?? false}
@@ -208,36 +270,43 @@ const CounterDetail = () => {
             )}
           </View>
 
-          <CounterDirection
-            mascotIsActive={mascotIsActive}
-            wayIsChange={wayIsChange}
-            way={way}
-            currentCount={counter.count}
-            repeatRules={counter.repeatRules || []}
-            imageWidth={imageWidth}
-            imageHeight={imageHeight}
-            screenSize={screenSize}
-            onToggleWay={toggleWay}
-          />
+          {/* 구간 기록 모달 자리 (bands의 contentStartPercent - timerEndPercent) */}
+          <View style={{ height: gapBetweenTimerAndContentPx }} />
 
-          <View pointerEvents="none" className={gapClass}>
-            <Text
-              className={`${textClass} font-bold text-black`}
-            >
-              {counter.count}
-            </Text>
+          {/* 방향/숫자/버튼 (bands의 contentStartPercent ~ contentEndPercent, 내부 3등분) */}
+          <View className="w-full flex-1 items-center" style={contentContainerStyle}>
+            <View className="w-full flex-1">
+              <View className="items-center justify-center w-full" style={{ flex: 1 }}>
+                <CounterDirection
+                  mascotIsActive={mascotIsActive}
+                  wayIsChange={wayIsChange}
+                  way={way}
+                  currentCount={counter.count}
+                  repeatRules={counter.repeatRules || []}
+                  imageWidth={imageWidth}
+                  imageHeight={imageHeight}
+                  screenSize={screenSize}
+                  onToggleWay={toggleWay}
+                />
+              </View>
+              <View className="items-center justify-center w-full" style={{ flex: 1 }} pointerEvents="none">
+                <Text className={`${textClass} font-bold text-black`}>{counter.count}</Text>
+              </View>
+              {showCounterActions && (
+                <View className="items-center justify-center w-full" style={{ flex: 1 }}>
+                  <CounterActions
+                    screenSize={screenSize}
+                    iconSize={iconSize}
+                    onReset={() => setActiveModal('reset')}
+                    onEdit={handleEditOpen}
+                  />
+                </View>
+              )}
+            </View>
           </View>
 
-          {!(screenSize === ScreenSize.SMALL && subModalIsOpen) && (
-            <View className={gapClass}>
-              <CounterActions
-                screenSize={screenSize}
-                iconSize={iconSize}
-                onReset={() => setActiveModal('reset')}
-                onEdit={handleEditOpen}
-              />
-            </View>
-          )}
+          {/* 서브 모달 아래 영역 예약 (bands 기준 나머지) */}
+          <View style={{ height: bottomReservedHeightPx }} />
         </View>
       </Animated.View>
 
