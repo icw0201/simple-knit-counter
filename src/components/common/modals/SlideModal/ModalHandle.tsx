@@ -9,7 +9,7 @@ interface ModalHandleProps {
   handleWidth: number;
   modalWidth: number;
   translateX: number;
-  top: DimensionValue;
+  centerY: DimensionValue;
   onOpen: () => void;
   onClose: () => void;
   onToggle?: () => void;
@@ -34,7 +34,7 @@ export const ModalHandle: React.FC<ModalHandleProps> = ({
   handleWidth,
   modalWidth,
   translateX,
-  top,
+  centerY,
   onOpen,
   onClose,
   onDragUpdate,
@@ -145,7 +145,7 @@ export const ModalHandle: React.FC<ModalHandleProps> = ({
     <View
       className="absolute bg-transparent"
       style={{
-        top: top,
+        top: centerY,
         left: -handleWidth,
         width: handleWidth,
         height: height,

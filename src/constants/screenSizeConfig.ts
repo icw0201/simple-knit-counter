@@ -157,17 +157,18 @@ export const getSubModalHeightRatio = (screenSize: ScreenSize): number => {
 };
 
 /**
- * 화면 크기에 따른 서브 모달 top 위치를 반환합니다.
+ * 화면 크기에 따른 서브 모달 세로 중앙 위치를 반환합니다.
+ * SlideModal에서 centerY로 사용하며, translateY: -height/2 로 실제 상단이 정해짐.
  * @param screenSize - 화면 크기
- * @returns top 위치 (DimensionValue)
+ * @returns 세로 중앙 위치 (DimensionValue, 예: '85%')
  */
-export const getSubModalTop = (screenSize: ScreenSize): DimensionValue => {
-  const subModalTopConfig: Record<ScreenSize, DimensionValue> = {
-    [ScreenSize.COMPACT]: '85%',  // 컴팩트: 85%
-    [ScreenSize.SMALL]: '85%',    // 작음: 85%
-    [ScreenSize.LARGE]: '85%',    // 큼: 85%
+export const getSubModalCenterY = (screenSize: ScreenSize): DimensionValue => {
+  const subModalCenterYConfig: Record<ScreenSize, DimensionValue> = {
+    [ScreenSize.COMPACT]: '85%',
+    [ScreenSize.SMALL]: '85%',
+    [ScreenSize.LARGE]: '85%',
   };
-  return subModalTopConfig[screenSize];
+  return subModalCenterYConfig[screenSize];
 };
 
 /**
@@ -198,18 +199,18 @@ export const getSegmentModalHeightRatio = (screenSize: ScreenSize): number => {
 };
 
 /**
- * 화면 크기에 따른 구간 기록 모달 top 위치를 반환합니다.
- * SubCounterModal 위에 배치되며, SubCounterModal 상단(80%)에서 구간 기록 모달 높이(15%)와 간격(12%)을 뺀 값입니다.
+ * 화면 크기에 따른 구간 기록 모달 세로 중앙 위치를 반환합니다.
+ * SlideModal에서 centerY로 사용함.
  * @param screenSize - 화면 크기
- * @returns top 위치 (DimensionValue, LARGE일 때만 '53%')
+ * @returns 세로 중앙 위치 (DimensionValue, LARGE일 때만 '23%')
  */
-export const getSegmentModalTop = (screenSize: ScreenSize): DimensionValue => {
-  const segmentModalTopConfig: Record<ScreenSize, DimensionValue> = {
+export const getSegmentModalCenterY = (screenSize: ScreenSize): DimensionValue => {
+  const segmentModalCenterYConfig: Record<ScreenSize, DimensionValue> = {
     [ScreenSize.COMPACT]: 0,      // 컴팩트: 사용 안 함
     [ScreenSize.SMALL]: 0,        // 작음: 사용 안 함
-    [ScreenSize.LARGE]: '23%',   // 큼: 53% (80% - 13% - 14%)
+    [ScreenSize.LARGE]: '23%',
   };
-  return segmentModalTopConfig[screenSize];
+  return segmentModalCenterYConfig[screenSize];
 };
 
 /**
@@ -232,14 +233,14 @@ export type CounterDetailVerticalBands = {
 };
 
 /**
- * 서브 모달(SlideModal)의 top은 "모달 중앙" 기준이며, translateY: -height/2 로 올라가므로
- * 실제 모달 상단 위치 = top% - (height 비율/2).
- * 이 퍼센트를 반환합니다 (컨텐츠 영역이 여기까지 끝나야 겹치지 않음).
+ * 서브 모달(SlideModal)의 centerY(세로 중앙) 기준으로 실제 상단 위치를 퍼센트로 반환합니다.
+ * SlideModal이 translateY: -height/2 를 쓰므로 상단 = centerY% - (height 비율/2).
+ * 컨텐츠 영역이 이 퍼센트까지 끝나야 서브 모달과 겹치지 않음.
  */
 export const getSubModalTopEdgePercent = (screenSize: ScreenSize): number => {
-  const topPercent = 85; // getSubModalTop 전부 '85%'
+  const centerYPercent = 85; // getSubModalCenterY 전부 '85%'
   const heightRatio = getSubModalHeightRatio(screenSize);
-  return topPercent - (heightRatio * 100) / 2;
+  return centerYPercent - (heightRatio * 100) / 2;
 };
 
 /**

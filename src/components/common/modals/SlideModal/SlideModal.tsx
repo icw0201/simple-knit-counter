@@ -13,7 +13,7 @@ interface SlideModalProps {
   handleWidth?: number; // 핸들의 가로 길이 (기본값: 40)
   backgroundColor?: string; // 배경색 (기본값: white)
   padding?: number; // 모달 내부 패딩 (기본값: 20)
-  top?: DimensionValue; // 모달의 상단 위치 (기본값: '50%')
+  centerY?: DimensionValue; // 모달 세로 중앙 위치 (기본값: '50%'). SlideModal이 translateY: -height/2 로 보정함.
   onClose?: () => void; // 닫기 콜백 (선택사항)
 }
 
@@ -31,7 +31,7 @@ export const SlideModal: React.FC<SlideModalProps> = ({
   handleWidth = 40,
   backgroundColor = 'white',
   padding = 20,
-  top = '50%',
+  centerY = '50%',
   onClose,
 }) => {
   // ===== 상태 관리 =====
@@ -80,7 +80,7 @@ export const SlideModal: React.FC<SlideModalProps> = ({
         ref={modalRef}
         className="absolute border-t-2 border-r-2 border-white"
         style={{
-          top: top,
+          top: centerY,
           left: -width,
           width: width,
           height: height,
@@ -128,7 +128,7 @@ export const SlideModal: React.FC<SlideModalProps> = ({
         handleWidth={handleWidth}
         modalWidth={width}
         translateX={translateX}
-        top={top}
+        centerY={centerY}
         onOpen={handleOpen}
         onClose={handleClose}
         onToggle={onToggle}

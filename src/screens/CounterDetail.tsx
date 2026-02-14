@@ -11,7 +11,7 @@ import { getHeaderRightWithActivateInfoSettings } from '@navigation/HeaderOption
 
 import { CounterTouchArea, CounterDirection, CounterActions, CounterModals, SubCounterModal, ProgressBar, TimeDisplay, SegmentRecordModal } from '@components/counter';
 import Tooltip from '@components/common/Tooltip';
-import { getCounterDetailVerticalBands, getScreenSize, getIconSize, getTextClass, getSubModalWidthRatio, getSubModalHeightRatio, getSubModalTop, getSubModalHandleWidth, getSubModalTopEdgePercent, getSegmentModalHeightRatio, getSegmentModalTop, ScreenSize } from '@constants/screenSizeConfig';
+import { getCounterDetailVerticalBands, getScreenSize, getIconSize, getTextClass, getSubModalWidthRatio, getSubModalHeightRatio, getSubModalCenterY, getSubModalHandleWidth, getSubModalTopEdgePercent, getSegmentModalHeightRatio, getSegmentModalCenterY, ScreenSize } from '@constants/screenSizeConfig';
 import { getTooltipEnabledSetting } from '@storage/settings';
 import { screenStyles, safeAreaEdges } from '@styles/screenStyles';
 import { useCounter } from '@hooks/useCounter';
@@ -105,13 +105,13 @@ const CounterDetail = () => {
   // SubCounterModal 크기 및 위치 계산 (화면 크기별)
   const subModalWidth = width * getSubModalWidthRatio(screenSize);
   const subModalHeight = height * getSubModalHeightRatio(screenSize);
-  const subModalTop = getSubModalTop(screenSize);
+  const subModalCenterY = getSubModalCenterY(screenSize);
   const subModalHandleWidth = getSubModalHandleWidth(screenSize);
 
   // 구간 기록 모달 크기 및 위치 계산 (LARGE 화면에서만 사용)
   const segmentModalWidth = subModalWidth;
   const segmentModalHeight = height * getSegmentModalHeightRatio(screenSize);
-  const segmentModalTop = getSegmentModalTop(screenSize);
+  const segmentModalCenterY = getSegmentModalCenterY(screenSize);
 
   const { timerEndPercent, contentStartPercent, contentEndPercent } =
     getCounterDetailVerticalBands(screenSize);
@@ -318,7 +318,7 @@ const CounterDetail = () => {
           screenSize={screenSize}
           width={segmentModalWidth}
           height={segmentModalHeight}
-          top={segmentModalTop}
+          centerY={segmentModalCenterY}
           sectionRecords={counter.sectionRecords}
         />
       )}
@@ -339,7 +339,7 @@ const CounterDetail = () => {
         screenSize={screenSize}
         width={subModalWidth}
         height={subModalHeight}
-        top={subModalTop}
+        centerY={subModalCenterY}
       />
 
       {/* 모달들 */}

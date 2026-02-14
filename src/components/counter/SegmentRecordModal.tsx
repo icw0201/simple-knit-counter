@@ -15,7 +15,7 @@ interface SegmentRecordModalProps {
   screenSize: ScreenSize;
   width: number;
   height: number;
-  top: DimensionValue;
+  centerY: DimensionValue;
   sectionRecords?: SectionRecord[];
 }
 
@@ -28,7 +28,7 @@ export const SegmentRecordModal: React.FC<SegmentRecordModalProps> = ({
   screenSize: _screenSize,
   width,
   height,
-  top,
+  centerY,
   sectionRecords = [],
 }) => {
   return (
@@ -40,7 +40,7 @@ export const SegmentRecordModal: React.FC<SegmentRecordModalProps> = ({
       handleWidth={handleWidth}
       backgroundColor="white"
       padding={0}
-      top={top}
+      centerY={centerY}
     >
       {/* 콘텐츠 영역 */}
       <View
