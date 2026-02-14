@@ -11,7 +11,7 @@ import { getHeaderRightWithActivateInfoSettings } from '@navigation/HeaderOption
 
 import { CounterTouchArea, CounterDirection, CounterActions, CounterModals, SubCounterModal, ProgressBar, TimeDisplay, SegmentRecordModal } from '@components/counter';
 import Tooltip from '@components/common/Tooltip';
-import { getCounterDetailVerticalBands, getScreenSize, getIconSize, getTextClass, getSubModalWidthRatio, getSubModalHeightRatio, getSubModalTop, getSubModalHandleWidth, getSegmentModalHeightRatio, getSegmentModalTop, ScreenSize } from '@constants/screenSizeConfig';
+import { getCounterDetailVerticalBands, getScreenSize, getIconSize, getTextClass, getSubModalWidthRatio, getSubModalHeightRatio, getSubModalTop, getSubModalHandleWidth, getSubModalTopEdgePercent, getSegmentModalHeightRatio, getSegmentModalTop, ScreenSize } from '@constants/screenSizeConfig';
 import { getTooltipEnabledSetting } from '@storage/settings';
 import { screenStyles, safeAreaEdges } from '@styles/screenStyles';
 import { useCounter } from '@hooks/useCounter';
@@ -116,12 +116,11 @@ const CounterDetail = () => {
   const { timerEndPercent, contentStartPercent, contentEndPercent } =
     getCounterDetailVerticalBands(screenSize);
 
-  // 서브 모달은 top=85%(중앙) + translateY=-height/2 이므로 실제 상단 = 85% - (height비율/2).
-  // 모달 height는 window height 기준으로 전달되므로, contentAreaHeight와 다를 때 보정.
-  const subModalHeightRatio = getSubModalHeightRatio(screenSize);
+  // 서브 모달 height는 window 기준으로 전달되므로, contentAreaHeight와 다를 때만 보정 (config의 getSubModalTopEdgePercent 활용).
+  const subModalTopEdgePercent = getSubModalTopEdgePercent(screenSize);
   const effectiveContentEndPercent =
     contentAreaHeight > 0
-      ? 85 - (height / contentAreaHeight) * (subModalHeightRatio * 100) / 2
+      ? 85 - (height / contentAreaHeight) * (85 - subModalTopEdgePercent)
       : contentEndPercent;
 
   // bands %는 contentAreaHeight(SafeArea 내부) 기준으로 px 변환 (서브 모달과 동일 좌표계)
