@@ -272,27 +272,33 @@ const CounterDetail = () => {
           {/* 구간 기록 모달 자리 (bands의 contentStartPercent - timerEndPercent) */}
           <View style={{ height: gapBetweenTimerAndContentPx }} />
 
-          {/* 방향/숫자/버튼 (bands의 contentStartPercent ~ contentEndPercent, 내부 0.3 : 0.4 : 0.3) */}
+          {/* 방향/숫자/버튼 (bands의 contentStartPercent ~ contentEndPercent). mascotIsActive일 때만 디렉션, 아니면 숫자·버튼 0.6 : 0.4 */}
           <View className="w-full flex-1 items-center" style={contentContainerStyle}>
             <View className="w-full flex-1">
-              <View className="items-center justify-center w-full" style={{ flex: 0.25 }}>
-                <CounterDirection
-                  mascotIsActive={mascotIsActive}
-                  wayIsChange={wayIsChange}
-                  way={way}
-                  currentCount={counter.count}
-                  repeatRules={counter.repeatRules || []}
-                  imageWidth={imageWidth}
-                  imageHeight={imageHeight}
-                  screenSize={screenSize}
-                  onToggleWay={toggleWay}
-                />
-              </View>
-              <View className="items-center justify-center w-full" style={{ flex: 0.45 }} pointerEvents="none">
+              {mascotIsActive && (
+                <View className="items-center justify-center w-full" style={{ flex: 0.25 }}>
+                  <CounterDirection
+                    mascotIsActive={mascotIsActive}
+                    wayIsChange={wayIsChange}
+                    way={way}
+                    currentCount={counter.count}
+                    repeatRules={counter.repeatRules || []}
+                    imageWidth={imageWidth}
+                    imageHeight={imageHeight}
+                    screenSize={screenSize}
+                    onToggleWay={toggleWay}
+                  />
+                </View>
+              )}
+              <View
+                className="items-center justify-center w-full"
+                style={{ flex: mascotIsActive ? 0.45 : 0.4 }}
+                pointerEvents="none"
+              >
                 <Text className={`${textClass} font-bold text-black`}>{counter.count}</Text>
               </View>
               {showCounterActions && (
-                <View className="items-center justify-center w-full" style={{ flex: 0.3 }}>
+                <View className="items-center justify-center w-full" style={{ flex: mascotIsActive ? 0.3 : 0.6 }}>
                   <CounterActions
                     screenSize={screenSize}
                     iconSize={iconSize}
