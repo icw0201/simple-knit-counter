@@ -115,20 +115,6 @@ export const getSubModalTextMarginClass = (screenSize: ScreenSize): string => {
 };
 
 /**
- * 화면 크기에 따른 서브 모달 width 비율을 반환합니다.
- * @param screenSize - 화면 크기
- * @returns width 비율 (0.0 ~ 1.0)
- */
-export const getSubModalWidthRatio = (screenSize: ScreenSize): number => {
-  const subModalWidthRatioConfig = {
-    [ScreenSize.COMPACT]: 0.9,    // 컴팩트: 100%
-    [ScreenSize.SMALL]: 0.9,      // 작음: 100%
-    [ScreenSize.LARGE]: 0.9,      // 큼: 90%
-  };
-  return subModalWidthRatioConfig[screenSize];
-};
-
-/**
  * 화면 크기에 따른 서브 모달 height 비율을 반환합니다.
  * @param screenSize - 화면 크기
  * @returns height 비율 (0.0 ~ 1.0)

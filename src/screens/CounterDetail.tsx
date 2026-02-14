@@ -11,7 +11,7 @@ import { getHeaderRightWithActivateInfoSettings } from '@navigation/HeaderOption
 
 import { CounterTouchArea, CounterDirection, CounterActions, CounterModals, SubCounterModal, ProgressBar, TimeDisplay, SegmentRecordModal } from '@components/counter';
 import Tooltip from '@components/common/Tooltip';
-import { getCounterDetailVerticalBands, getScreenSize, getIconSize, getTextClass, getSubModalWidthRatio, getSubModalHeightRatio, getSubModalCenterY, getSubModalHandleWidth, getSubModalTopEdgePercent, getSegmentModalHeightRatio, getSegmentModalCenterY, ScreenSize } from '@constants/screenSizeConfig';
+import { getCounterDetailVerticalBands, getScreenSize, getIconSize, getTextClass, getSubModalHeightRatio, getSubModalCenterY, getSubModalHandleWidth, getSubModalTopEdgePercent, getSegmentModalHeightRatio, getSegmentModalCenterY, ScreenSize } from '@constants/screenSizeConfig';
 import { getTooltipEnabledSetting } from '@storage/settings';
 import { screenStyles, safeAreaEdges } from '@styles/screenStyles';
 import { useCounter } from '@hooks/useCounter';
@@ -103,7 +103,7 @@ const CounterDetail = () => {
   const hasParent = !!counter?.parentProjectId;
 
   // SubCounterModal 크기 및 위치 계산 (화면 크기별)
-  const subModalWidth = width * getSubModalWidthRatio(screenSize);
+  const subModalWidth = width * 0.9;
   const subModalHeight = height * getSubModalHeightRatio(screenSize);
   const subModalCenterY = getSubModalCenterY(screenSize);
   const subModalHandleWidth = getSubModalHandleWidth(screenSize);
