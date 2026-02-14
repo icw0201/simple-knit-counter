@@ -144,11 +144,10 @@ export default function StoreUpdatePrompt() {
     return null;
   }
 
-  const storeVersionText = update.storeVersion ? ` (최신: v${update.storeVersion})` : '';
   const description =
     update.mode === 'onestore'
-      ? `새 버전이 출시됐어요${storeVersionText}.\n지금 원스토어로 이동할까요?`
-      : `새 버전이 출시됐어요${storeVersionText}.\n지금 플레이스토어로 이동할까요?`;
+      ? '새 버전이 출시됐어요.\n지금 원스토어로 이동할까요?'
+      : '새 버전이 출시됐어요.\n지금 플레이스토어로 이동할까요?';
 
   return (
     <>
