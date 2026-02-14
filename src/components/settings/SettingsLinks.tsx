@@ -1,7 +1,13 @@
 // src/components/settings/SettingsLinks.tsx
 import React from 'react';
 import { View, Linking } from 'react-native';
+import DeviceInfo from 'react-native-device-info';
 import InAppReview from 'react-native-in-app-review';
+import {
+  ONE_STORE_INSTALLER_PACKAGE,
+  ONE_STORE_URL,
+  PLAY_STORE_URL,
+} from '@constants/storeUrls';
 import IconBox from './IconBox';
 
 interface SettingsLinksProps {}
@@ -16,20 +22,19 @@ const SettingsLinks: React.FC<SettingsLinksProps> = () => {
    */
   const handlePress = async (type: 'review' | 'contact') => {
     if (type === 'review') {
-      // 원스토어 리뷰 링크 : https://onesto.re/0001001132
-      // 플레이스토어 리뷰 링크 : https://play.google.com/store/apps/details?id=com.simpleknitcounter&pcampaignid=web_share
       try {
         if (InAppReview.isAvailable()) {
           await InAppReview.RequestInAppReview();
           return;
         }
       } catch (error) {
-        // In-App Review 호출 실패 시 아래 딥링크로 폴백
+        // In-App Review 호출 실패 시 스토어 링크로 폴백
       }
 
-      Linking.openURL(
-        'https://play.google.com/store/apps/details?id=com.simpleknitcounter&pcampaignid=web_share'
-      ).catch(() => {
+      const installer = await DeviceInfo.getInstallerPackageName().catch(() => null);
+      const reviewUrl =
+        installer === ONE_STORE_INSTALLER_PACKAGE ? ONE_STORE_URL : PLAY_STORE_URL;
+      Linking.openURL(reviewUrl).catch(() => {
         // 에러 처리 (필요시 추가)
       });
     } else if (type === 'contact') {
