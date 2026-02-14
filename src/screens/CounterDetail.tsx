@@ -11,7 +11,7 @@ import { getHeaderRightWithActivateInfoSettings } from '@navigation/HeaderOption
 
 import { CounterTouchArea, CounterDirection, CounterActions, CounterModals, SubCounterModal, ProgressBar, TimeDisplay, SegmentRecordModal } from '@components/counter';
 import Tooltip from '@components/common/Tooltip';
-import { getScreenSize, getIconSize, getTextClass, getGapClass, getSubModalWidthRatio, getSubModalHeightRatio, getSubModalTop, getSegmentModalHeightRatio, getSegmentModalTop, ScreenSize } from '@constants/screenSizeConfig';
+import { getScreenSize, getIconSize, getTextClass, getGapClass, getSubModalWidthRatio, getSubModalHeightRatio, getSubModalTop, getSubModalHandleWidth, getSegmentModalHeightRatio, getSegmentModalTop, ScreenSize } from '@constants/screenSizeConfig';
 import { getTooltipEnabledSetting } from '@storage/settings';
 import { screenStyles, safeAreaEdges } from '@styles/screenStyles';
 import { useCounter } from '@hooks/useCounter';
@@ -89,13 +89,10 @@ const CounterDetail = () => {
     handleSectionModalToggle,
     handleSectionUndo,
     // 패딩 탑 애니메이션
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- 추후 애니메이션 스타일에 재사용 예정
     paddingTopAnim,
     updatePaddingTopAnimation,
   } = useCounter({ counterId });
-
-  // NOTE: paddingTopAnim은 추후 사용 예정(현재는 사용처 없음)
-  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-  void paddingTopAnim;
 
   // 패딩 탑 애니메이션 업데이트
   // 최초 진입 시에는 애니메이션 없이 즉시 설정하고, 이후에는 subModalIsOpen 변경 시에만 애니메이션
@@ -129,6 +126,7 @@ const CounterDetail = () => {
   const subModalWidth = width * getSubModalWidthRatio(screenSize);
   const subModalHeight = height * getSubModalHeightRatio(screenSize);
   const subModalTop = getSubModalTop(screenSize);
+  const subModalHandleWidth = getSubModalHandleWidth(screenSize);
 
   // 구간 기록 모달 크기 및 위치 계산 (LARGE 화면에서만 사용)
   const segmentModalWidth = subModalWidth;
@@ -291,6 +289,7 @@ const CounterDetail = () => {
         onReset={handleSubReset}
         onEdit={handleSubEdit}
         onRule={handleSubRule}
+        handleWidth={subModalHandleWidth}
         subCount={subCount}
         subRule={subRule}
         subRuleIsActive={subRuleIsActive}
