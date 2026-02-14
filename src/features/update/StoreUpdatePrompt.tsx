@@ -3,6 +3,11 @@ import { AppState, Linking, Platform, type AppStateStatus } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 import SpInAppUpdates, { type NeedsUpdateResponse } from 'sp-react-native-in-app-updates';
 import { ConfirmModal } from '@components/common/modals';
+import {
+  ONE_STORE_INSTALLER_PACKAGE,
+  ONE_STORE_URL,
+  PLAY_STORE_URL,
+} from '@constants/storeUrls';
 import { getDismissedStoreVersion, setDismissedStoreVersion } from '@storage/updatePrompt';
 
 type UpdateState = {
@@ -10,10 +15,6 @@ type UpdateState = {
   mode?: 'play' | 'onestore';
   storeVersion?: string;
 };
-
-const ONE_STORE_URL = 'https://onesto.re/0001001132';
-const PLAY_STORE_URL =
-  'https://play.google.com/store/apps/details?id=com.simpleknitcounter&pcampaignid=web_share';
 
 /**
  * 스토어 업데이트 권장 프롬프트 (Android)
@@ -33,7 +34,7 @@ export default function StoreUpdatePrompt() {
   const isAndroid = Platform.OS === 'android';
 
   const isOnestoreInstaller = (pkg: string | null | undefined) => {
-    return pkg === 'com.skt.skaf.A000Z00040';
+    return pkg === ONE_STORE_INSTALLER_PACKAGE;
   };
 
   const getUpdateMode = (): 'play' | 'onestore' | undefined => {
@@ -70,11 +71,12 @@ export default function StoreUpdatePrompt() {
     if (now - lastCheckedAtRef.current < SIX_HOURS) {
       return;
     }
-    lastCheckedAtRef.current = now;
 
     try {
       const curVersion = DeviceInfo.getVersion(); // "x.x.x"
       const result: NeedsUpdateResponse = await inAppUpdates.checkNeedsUpdate({ curVersion });
+      lastCheckedAtRef.current = now; // Update only after successful check      // 체크가 성공적으로 끝났을 때만 쿨다운 갱신 (실패 시 재시도 가능)
+      lastCheckedAtRef.current = now;
 
       if (!result.shouldUpdate) {
         return;
@@ -91,6 +93,7 @@ export default function StoreUpdatePrompt() {
       setUpdate({ shouldShow: true, mode, storeVersion });
     } catch {
       // 체크 실패 시에는 아무것도 노출하지 않음 (사용자 번거로움 방지)
+      // 타임스탬프를 갱신하지 않아 일시적 오류 시 다음 기회에 재시도 가능
     }
   };
 
