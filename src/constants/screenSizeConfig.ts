@@ -171,6 +171,19 @@ export const getSubModalTop = (screenSize: ScreenSize): DimensionValue => {
 };
 
 /**
+ * 화면 크기에 따른 서브 모달 핸들 너비를 반환합니다.
+ * LARGE가 아닐 때는 콘텐츠 공간 확보를 위해 핸들을 더 얇게 사용합니다.
+ */
+export const getSubModalHandleWidth = (screenSize: ScreenSize): number => {
+  const subModalHandleWidthConfig: Record<ScreenSize, number> = {
+    [ScreenSize.COMPACT]: 24,
+    [ScreenSize.SMALL]: 24,
+    [ScreenSize.LARGE]: 30,
+  };
+  return subModalHandleWidthConfig[screenSize];
+};
+
+/**
  * 화면 크기에 따른 구간 기록 모달 height 비율을 반환합니다.
  * @param screenSize - 화면 크기
  * @returns height 비율 (0.0 ~ 1.0, LARGE일 때만 0.15)
