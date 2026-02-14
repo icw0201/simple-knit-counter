@@ -81,7 +81,7 @@ export const getGapClass = (screenSize: ScreenSize): string => {
   const gapConfig = {
     [ScreenSize.COMPACT]: 'mt-2 mb-2',          // 컴팩트: 작은 간격
     [ScreenSize.SMALL]: 'mt-3 mb-3',            // 작음: 중간 간격
-    [ScreenSize.LARGE]: 'mt-8 mb-8',          // 큼: 큰 간격
+    [ScreenSize.LARGE]: 'mt-2 mb-2',          // 큼: 큰 간격
   };
   return gapConfig[screenSize];
 };
@@ -135,8 +135,8 @@ export const getSubModalTextMarginClass = (screenSize: ScreenSize): string => {
  */
 export const getSubModalWidthRatio = (screenSize: ScreenSize): number => {
   const subModalWidthRatioConfig = {
-    [ScreenSize.COMPACT]: 1.0,    // 컴팩트: 100%
-    [ScreenSize.SMALL]: 1.0,      // 작음: 100%
+    [ScreenSize.COMPACT]: 0.9,    // 컴팩트: 100%
+    [ScreenSize.SMALL]: 0.9,      // 작음: 100%
     [ScreenSize.LARGE]: 0.9,      // 큼: 90%
   };
   return subModalWidthRatioConfig[screenSize];
@@ -149,9 +149,9 @@ export const getSubModalWidthRatio = (screenSize: ScreenSize): number => {
  */
 export const getSubModalHeightRatio = (screenSize: ScreenSize): number => {
   const subModalHeightRatioConfig = {
-    [ScreenSize.COMPACT]: 0.45,   // 컴팩트: 45%
-    [ScreenSize.SMALL]: 0.45,     // 작음: 45%
-    [ScreenSize.LARGE]: 0.27,     // 큼: 27%
+    [ScreenSize.COMPACT]: 0.30,   // 컴팩트: 45%
+    [ScreenSize.SMALL]: 0.30,     // 작음: 45%
+    [ScreenSize.LARGE]: 0.22,     // 큼: 27%
   };
   return subModalHeightRatioConfig[screenSize];
 };
@@ -163,9 +163,9 @@ export const getSubModalHeightRatio = (screenSize: ScreenSize): number => {
  */
 export const getSubModalTop = (screenSize: ScreenSize): DimensionValue => {
   const subModalTopConfig: Record<ScreenSize, DimensionValue> = {
-    [ScreenSize.COMPACT]: '80%',  // 컴팩트: 80%
+    [ScreenSize.COMPACT]: '85%',  // 컴팩트: 80%
     [ScreenSize.SMALL]: '85%',    // 작음: 85%
-    [ScreenSize.LARGE]: '80%',    // 큼: 80%
+    [ScreenSize.LARGE]: '85%',    // 큼: 80%
   };
   return subModalTopConfig[screenSize];
 };
@@ -207,7 +207,7 @@ export const getSegmentModalTop = (screenSize: ScreenSize): DimensionValue => {
   const segmentModalTopConfig: Record<ScreenSize, DimensionValue> = {
     [ScreenSize.COMPACT]: 0,      // 컴팩트: 사용 안 함
     [ScreenSize.SMALL]: 0,        // 작음: 사용 안 함
-    [ScreenSize.LARGE]: '53%',   // 큼: 53% (80% - 13% - 14%)
+    [ScreenSize.LARGE]: '23%',   // 큼: 53% (80% - 13% - 14%)
   };
   return segmentModalTopConfig[screenSize];
 };

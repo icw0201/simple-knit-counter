@@ -221,49 +221,50 @@ const CounterDetail = () => {
           />
         )}
 
-        {/* 시간 표시 컴포넌트 */}
-        {counter.timerIsActive && screenSize !== ScreenSize.COMPACT && !(screenSize === ScreenSize.SMALL && (counter.subModalIsOpen ?? false)) && (
-          <TimeDisplay
-            screenSize={screenSize}
-            timerIsPlaying={counter.timerIsPlaying ?? false}
-            elapsedTime={counter.elapsedTime ?? 0}
-            onPress={toggleTimerIsPlaying}
-          />
-        )}
-
-        {/* 방향 표시 이미지 영역 */}
-        <CounterDirection
-          mascotIsActive={mascotIsActive}
-          wayIsChange={wayIsChange}
-          way={way}
-          currentCount={counter.count}
-          repeatRules={counter.repeatRules || []}
-          imageWidth={imageWidth}
-          imageHeight={imageHeight}
-          screenSize={screenSize}
-          onToggleWay={toggleWay}
-        />
-
-        {/* 현재 카운트 표시 */}
-        <View pointerEvents="none" className={gapClass}>
-          <Text
-            className={`${textClass} font-bold text-black`}
-          >
-            {counter.count}
-          </Text>
-        </View>
-
-        {/* 액션 버튼들 - SMALL 화면에서 SubCounterModal이 열려있으면 숨김 */}
-        {!(screenSize === ScreenSize.SMALL && subModalIsOpen) && (
-          <View className={gapClass}>
-            <CounterActions
-              screenSize={screenSize}
-              iconSize={iconSize}
-              onReset={() => setActiveModal('reset')}
-              onEdit={handleEditOpen}
-            />
+        {/* 네 개만 감쌈: 타이머 0%, 방향·숫자·버튼 30%부터 */}
+        <View className="flex-1 w-full items-center justify-start">
+          <View className="w-full items-center" style={{ height: '35%' }}>
+            {counter.timerIsActive && screenSize !== ScreenSize.COMPACT && !(screenSize === ScreenSize.SMALL && (counter.subModalIsOpen ?? false)) && (
+              <TimeDisplay
+                screenSize={screenSize}
+                timerIsPlaying={counter.timerIsPlaying ?? false}
+                elapsedTime={counter.elapsedTime ?? 0}
+                onPress={toggleTimerIsPlaying}
+              />
+            )}
           </View>
-        )}
+
+          <CounterDirection
+            mascotIsActive={mascotIsActive}
+            wayIsChange={wayIsChange}
+            way={way}
+            currentCount={counter.count}
+            repeatRules={counter.repeatRules || []}
+            imageWidth={imageWidth}
+            imageHeight={imageHeight}
+            screenSize={screenSize}
+            onToggleWay={toggleWay}
+          />
+
+          <View pointerEvents="none" className={gapClass}>
+            <Text
+              className={`${textClass} font-bold text-black`}
+            >
+              {counter.count}
+            </Text>
+          </View>
+
+          {!(screenSize === ScreenSize.SMALL && subModalIsOpen) && (
+            <View className={gapClass}>
+              <CounterActions
+                screenSize={screenSize}
+                iconSize={iconSize}
+                onReset={() => setActiveModal('reset')}
+                onEdit={handleEditOpen}
+              />
+            </View>
+          )}
+        </View>
       </Animated.View>
 
       {/* 구간 기록 모달 - LARGE 화면에서만 표시 */}
