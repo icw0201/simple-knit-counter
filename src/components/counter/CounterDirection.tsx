@@ -4,7 +4,7 @@ import { View, Image, Pressable, Text } from 'react-native';
 import { Way, RepeatRule } from '@storage/types';
 import { directionImages } from '@assets/images';
 import EmphasisBubbleIcon from '@assets/images/way/emphasis_bubble.svg';
-import { ScreenSize, getGapClass } from '@constants/screenSizeConfig';
+import { ScreenSize } from '@constants/screenSizeConfig';
 import { isRuleApplied, isDarkColor } from '@utils/ruleUtils';
 import { calculateInitialFontSize } from '@utils/textUtils';
 
@@ -50,7 +50,7 @@ const CounterDirection: React.FC<CounterDirectionProps> = ({
   repeatRules,
   imageWidth,
   imageHeight,
-  screenSize,
+  screenSize: _screenSize,
   onToggleWay,
 }) => {
   /**
@@ -147,7 +147,7 @@ const CounterDirection: React.FC<CounterDirectionProps> = ({
   }
 
   return (
-    <View className={getGapClass(screenSize)} style={{ height: imageHeight }}>
+    <View style={{ height: imageHeight }}>
       <Pressable onPress={wayIsChange ? onToggleWay : undefined}>
         <View className="relative" style={{ width: imageWidth, height: imageHeight }}>
           {/* 규칙이 적용되는 경우: bubble 이미지 (way 이미지 아래, y축으로 위에 위치) */}

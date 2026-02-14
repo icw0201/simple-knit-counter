@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Text, View, LayoutChangeEvent, Pressable } from 'react-native';
-import { ScreenSize, getTimeDisplayTextClass, getGapClass } from '@constants/screenSizeConfig';
+import { ScreenSize, getTimeDisplayTextClass } from '@constants/screenSizeConfig';
 import { formatElapsedTime } from '@utils/timeUtils';
 import TimerBackgroundIcon from '@assets/images/timer_background.svg';
 
@@ -51,7 +51,7 @@ const TimeDisplay: React.FC<TimeDisplayProps> = ({ screenSize, timerIsPlaying, e
     setDimensions({ width, height });
   };
 
-  // 화면 크기에 따른 패딩 클래스
+  // 화면 크기에 따른 패딩 클래스 (컴포넌트 크기)
   const paddingClass = screenSize === ScreenSize.SMALL ? 'px-3 py-1.5' : 'px-4 py-2';
 
   // 배경색 결정: timerIsPlaying이 false면 light gray, true면 red-orange-300
@@ -64,7 +64,7 @@ const TimeDisplay: React.FC<TimeDisplayProps> = ({ screenSize, timerIsPlaying, e
   return (
     <Pressable
       onPress={onPress}
-      className={`items-center justify-center ${getGapClass(screenSize)} ${paddingClass} relative`}
+      className={`items-center justify-center ${paddingClass} relative`}
       onLayout={onLayout}
     >
       {/* 배경 - SVG로 깎인 모양 구현 */}

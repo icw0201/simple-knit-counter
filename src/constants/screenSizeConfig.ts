@@ -73,20 +73,6 @@ export const getTextClass = (screenSize: ScreenSize): string => {
 };
 
 /**
- * 화면 크기에 따른 gap 클래스를 반환합니다.
- * @param screenSize - 화면 크기
- * @returns gap 클래스
- */
-export const getGapClass = (screenSize: ScreenSize): string => {
-  const gapConfig = {
-    [ScreenSize.COMPACT]: 'mt-2 mb-2',          // 컴팩트: 작은 간격
-    [ScreenSize.SMALL]: 'mt-3 mb-3',            // 작음: 중간 간격
-    [ScreenSize.LARGE]: 'mt-2 mb-2',          // 큼: 큰 간격
-  };
-  return gapConfig[screenSize];
-};
-
-/**
  * 화면 크기에 따른 TimeDisplay 텍스트 클래스를 반환합니다.
  * @param screenSize - 화면 크기
  * @returns 텍스트 클래스
