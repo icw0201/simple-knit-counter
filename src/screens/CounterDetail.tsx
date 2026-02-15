@@ -11,10 +11,11 @@ import { getHeaderRightWithActivateInfoSettings } from '@navigation/HeaderOption
 
 import { CounterTouchArea, CounterDirection, CounterActions, CounterModals, SubCounterModal, ProgressBar, TimeDisplay, SegmentRecordModal } from '@components/counter';
 import Tooltip from '@components/common/Tooltip';
-import { getCounterDetailVerticalBands, getScreenSize, getIconSize, getTextClass, getSubModalHeightRatio, getSubModalCenterY, getSubModalHandleWidth, getSegmentModalHeightRatio, getSegmentModalCenterY, ScreenSize } from '@constants/screenSizeConfig';
+import { getScreenSize, getIconSize, getTextClass, ScreenSize } from '@constants/screenSizeConfig';
 import { getTooltipEnabledSetting } from '@storage/settings';
 import { screenStyles, safeAreaEdges } from '@styles/screenStyles';
 import { useCounter } from '@hooks/useCounter';
+import { getContentSectionFlexes, getCounterDetailModalLayout, getCounterDetailVerticalPercents, getCounterDetailVerticalPx, getCounterDetailVisibility, getProgressBarHeightPx } from '@utils/counterDetailLayout';
 
 
 /**
@@ -49,10 +50,7 @@ const CounterDetail = () => {
   const screenSize = getScreenSize(screenSizeJudgeHeight);
   const iconSize = getIconSize(screenSize);
   const textClass = getTextClass(screenSize);
-
-  // ProgressBar.tsx의 heightClass(h-3/h-5/h-7) 기준(px)
-  const progressBarHeightPx =
-    screenSize === ScreenSize.COMPACT ? 12 : screenSize === ScreenSize.SMALL ? 20 : 28;
+  const progressBarHeightPx = getProgressBarHeightPx(screenSize);
 
 
   // 카운터 비즈니스 로직 훅
@@ -110,51 +108,34 @@ const CounterDetail = () => {
     setLayoutHeight((prev) => (prev !== nextHeight ? nextHeight : prev));
   }, []);
 
-  // SubCounterModal 크기 및 위치 계산 (화면 크기별)
-  const subModalWidth = width * 0.9;
-  const subModalHeight = contentAreaHeight * getSubModalHeightRatio(screenSize);
-  const subModalCenterY = (contentAreaHeight * getSubModalCenterY(screenSize)) / 100;
-  const subModalHandleWidth = getSubModalHandleWidth(screenSize);
-
-  // 구간 기록 모달 크기 및 위치 계산 (LARGE 화면에서만 사용)
-  const segmentModalWidth = subModalWidth;
-  const segmentModalHeight = contentAreaHeight * getSegmentModalHeightRatio(screenSize);
-  const segmentModalCenterY = (contentAreaHeight * getSegmentModalCenterY(screenSize)) / 100;
-
   const { timerEndPercent, contentStartPercent, contentEndPercent } =
-    getCounterDetailVerticalBands(screenSize);
-
-  const showTimeDisplay =
-    (counter?.timerIsActive ?? false) &&
-    (screenSize === ScreenSize.LARGE ||
-      (screenSize !== ScreenSize.COMPACT && !(screenSize === ScreenSize.SMALL && subModalIsOpen)));
-  const showCounterActions =
-    screenSize === ScreenSize.LARGE || (screenSize === ScreenSize.SMALL && !subModalIsOpen);
-
-  const directionSectionFlex = 0.35;
-  const countSectionFlex = mascotIsActive
-    ? (showCounterActions ? 0.45 : 0.75)
-    : (showCounterActions ? 0.6 : 1);
-  const actionsSectionFlex = mascotIsActive ? 0.3 : 0.4;
-
-  // 타이머가 안 보이는 경우(COMPACT, 또는 SMALL의 OFF/보조 모달 OPEN) 콘텐츠를 0%부터 시작
-  const shouldStartContentFromTop =
-    !showTimeDisplay && (screenSize === ScreenSize.COMPACT || screenSize === ScreenSize.SMALL);
-  const effectiveTimerEndPercent = shouldStartContentFromTop ? 0 : timerEndPercent;
-  const effectiveContentStartPercent = shouldStartContentFromTop ? 0 : contentStartPercent;
-
-  // bands %는 contentAreaHeight(SafeArea 내부) 기준으로 px 변환
-  // 타이머 비표시에서는 타이머/갭을 0으로 두되, ProgressBar 높이 보정은 콘텐츠 높이에 반영
-  const timerHeightPx = shouldStartContentFromTop
-    ? 0
-    : Math.max(0, (contentAreaHeight * effectiveTimerEndPercent) / 100 - progressBarHeightPx);
-  const gapBetweenTimerAndContentPx = shouldStartContentFromTop
-    ? 0
-    : (contentAreaHeight * (effectiveContentStartPercent - effectiveTimerEndPercent)) / 100;
-  const contentHeightPx = shouldStartContentFromTop
-    ? (contentAreaHeight * contentEndPercent) / 100 - progressBarHeightPx
-    : (contentAreaHeight * (contentEndPercent - effectiveContentStartPercent)) / 100;
-  const bottomReservedHeightPx = contentAreaHeight - progressBarHeightPx - (timerHeightPx + gapBetweenTimerAndContentPx + contentHeightPx);
+    getCounterDetailVerticalPercents(screenSize);
+  const {
+    subModalWidth,
+    subModalHeight,
+    subModalCenterY,
+    subModalHandleWidth,
+    segmentModalWidth,
+    segmentModalHeight,
+    segmentModalCenterY,
+  } = getCounterDetailModalLayout(contentAreaHeight, width, screenSize);
+  const { showTimeDisplay, showCounterActions, shouldStartContentFromTop } =
+    getCounterDetailVisibility({
+      screenSize,
+      timerIsActive: counter?.timerIsActive ?? false,
+      subModalIsOpen,
+    });
+  const { directionSectionFlex, countSectionFlex, actionsSectionFlex } =
+    getContentSectionFlexes(mascotIsActive, showCounterActions);
+  const { timerHeightPx, gapBetweenTimerAndContentPx, contentHeightPx, bottomReservedHeightPx } =
+    getCounterDetailVerticalPx({
+      contentAreaHeight,
+      progressBarHeightPx,
+      timerEndPercent,
+      contentStartPercent,
+      contentEndPercent,
+      shouldStartContentFromTop,
+    });
 
   /**
    * 화면 포커스 시 실행되는 효과
@@ -177,11 +158,9 @@ const CounterDetail = () => {
       return;
     }
 
-    const currentScreenSize = screenSize;
-
     navigation.setOptions({
       title: counter.title,
-      headerShown: currentScreenSize !== ScreenSize.COMPACT,
+      headerShown: screenSize !== ScreenSize.COMPACT,
       headerRight: () =>
         getHeaderRightWithActivateInfoSettings(
           navigation,
