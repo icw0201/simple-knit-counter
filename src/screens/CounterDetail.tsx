@@ -11,7 +11,7 @@ import { getHeaderRightWithActivateInfoSettings } from '@navigation/HeaderOption
 
 import { CounterTouchArea, CounterDirection, CounterActions, CounterModals, SubCounterModal, ProgressBar, TimeDisplay, SegmentRecordModal } from '@components/counter';
 import Tooltip from '@components/common/Tooltip';
-import { getCounterDetailVerticalBands, getScreenSize, getIconSize, getTextClass, getSubModalHeightRatio, getSubModalCenterY, getSubModalHandleWidth, getSubModalTopEdgePercent, getSegmentModalHeightRatio, getSegmentModalCenterY, ScreenSize } from '@constants/screenSizeConfig';
+import { getCounterDetailVerticalBands, getScreenSize, getIconSize, getTextClass, getSubModalHeightRatio, getSubModalCenterY, getSubModalHandleWidth, getSegmentModalHeightRatio, getSegmentModalCenterY, ScreenSize } from '@constants/screenSizeConfig';
 import { getTooltipEnabledSetting } from '@storage/settings';
 import { screenStyles, safeAreaEdges } from '@styles/screenStyles';
 import { useCounter } from '@hooks/useCounter';
@@ -116,32 +116,17 @@ const CounterDetail = () => {
   const { timerEndPercent, contentStartPercent, contentEndPercent } =
     getCounterDetailVerticalBands(screenSize);
 
-  // 서브 모달 height는 window 기준으로 전달되므로, contentAreaHeight와 다를 때만 보정 (config의 getSubModalTopEdgePercent 활용).
-  const subModalTopEdgePercent = getSubModalTopEdgePercent(screenSize);
-  const effectiveContentEndPercent =
-    contentAreaHeight > 0
-      ? 85 - (height / contentAreaHeight) * (85 - subModalTopEdgePercent)
-      : contentEndPercent;
-
-  // bands %는 contentAreaHeight(SafeArea 내부) 기준으로 px 변환 (서브 모달과 동일 좌표계)
-  const timerHeightPx = Math.max(
-    0,
-    (contentAreaHeight * timerEndPercent) / 100 - progressBarHeightPx
-  );
-  const gapBetweenTimerAndContentPx = Math.max(
-    0,
-    (contentAreaHeight * (contentStartPercent - timerEndPercent)) / 100
-  );
-  const contentHeightPx = Math.max(
-    0,
-    (contentAreaHeight * (effectiveContentEndPercent - contentStartPercent)) / 100
-  );
-  const bottomReservedHeightPx = Math.max(
-    0,
+  // bands %는 contentAreaHeight(SafeArea 내부) 기준으로 px 변환 (config 값 그대로 사용)
+  const timerHeightPx =
+    (contentAreaHeight * timerEndPercent) / 100 - progressBarHeightPx;
+  const gapBetweenTimerAndContentPx =
+    (contentAreaHeight * (contentStartPercent - timerEndPercent)) / 100;
+  const contentHeightPx =
+    (contentAreaHeight * (contentEndPercent - contentStartPercent)) / 100;
+  const bottomReservedHeightPx =
     contentAreaHeight -
-      progressBarHeightPx -
-      (timerHeightPx + gapBetweenTimerAndContentPx + contentHeightPx)
-  );
+    progressBarHeightPx -
+    (timerHeightPx + gapBetweenTimerAndContentPx + contentHeightPx);
 
   // getCounterDetailVerticalBands(screenSize) 기준 통일 레이아웃 (화면 크기별 %는 config에서 정의)
   const contentWrapperStyle = {
@@ -274,9 +259,9 @@ const CounterDetail = () => {
 
           {/* 방향/숫자/버튼 (bands의 contentStartPercent ~ contentEndPercent). mascotIsActive일 때만 디렉션, 아니면 숫자·버튼 0.6 : 0.4 */}
           <View className="w-full flex-1 items-center" style={contentContainerStyle}>
-            <View className="w-full flex-1">
+            <View className="w-full flex-1 bg-green-100">
               {mascotIsActive && (
-                <View className="items-center justify-center w-full" style={{ flex: 0.25 }}>
+                <View className="items-center justify-center w-full bg-red-500" style={{ flex: 0.35 }}>
                   <CounterDirection
                     mascotIsActive={mascotIsActive}
                     wayIsChange={wayIsChange}
@@ -291,14 +276,14 @@ const CounterDetail = () => {
                 </View>
               )}
               <View
-                className="items-center justify-center w-full"
-                style={{ flex: mascotIsActive ? 0.45 : 0.4 }}
+                className="items-center justify-center w-full bg-orange-200/40"
+                style={{ flex: mascotIsActive ? 0.45 : 0.6 }}
                 pointerEvents="none"
               >
                 <Text className={`${textClass} font-bold text-black`}>{counter.count}</Text>
               </View>
               {showCounterActions && (
-                <View className="items-center justify-center w-full" style={{ flex: mascotIsActive ? 0.3 : 0.6 }}>
+                <View className="items-center justify-center w-full" style={{ flex: mascotIsActive ? 0.3 : 0.4 }}>
                   <CounterActions
                     screenSize={screenSize}
                     iconSize={iconSize}

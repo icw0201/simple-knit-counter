@@ -204,27 +204,16 @@ export type CounterDetailVerticalBands = {
   contentEndPercent: number;
 };
 
-/**
- * 서브 모달(SlideModal)의 centerY(세로 중앙) 기준으로 실제 상단 위치를 퍼센트로 반환합니다.
- * SlideModal이 translateY: -height/2 를 쓰므로 상단 = centerY% - (height 비율/2).
- * 컨텐츠 영역이 이 퍼센트까지 끝나야 서브 모달과 겹치지 않음.
- */
-export const getSubModalTopEdgePercent = (screenSize: ScreenSize): number => {
-  const centerYPercent = 85; // getSubModalCenterY 전부 '85%'
-  const heightRatio = getSubModalHeightRatio(screenSize);
-  return centerYPercent - (heightRatio * 100) / 2;
-};
 
 /**
  * CounterDetail의 타이머/메인 컨텐츠(방향·숫자·버튼) 세로 구간을 화면 퍼센트로 지정합니다.
- * contentEndPercent는 서브 모달 상단(중앙 85% - height/2)과 맞춥니다.
+ * contentEndPercent는 원하면 getSubModalTopEdgePercent(screenSize)로 맞출 수 있음 (서브 모달 상단과 정렬).
  */
 export const getCounterDetailVerticalBands = (screenSize: ScreenSize): CounterDetailVerticalBands => {
-  const contentEndPercent = getSubModalTopEdgePercent(screenSize);
   const config: Record<ScreenSize, CounterDetailVerticalBands> = {
-    [ScreenSize.COMPACT]: { timerEndPercent: 20, contentStartPercent: 35, contentEndPercent },
-    [ScreenSize.SMALL]: { timerEndPercent: 20, contentStartPercent: 35, contentEndPercent },
-    [ScreenSize.LARGE]: { timerEndPercent: 23, contentStartPercent: 36, contentEndPercent },
+    [ScreenSize.COMPACT]: { timerEndPercent: 20, contentStartPercent: 35, contentEndPercent: 70 },
+    [ScreenSize.SMALL]: { timerEndPercent: 20, contentStartPercent: 35, contentEndPercent: 70 },
+    [ScreenSize.LARGE]: { timerEndPercent: 23, contentStartPercent: 28.5, contentEndPercent: 74 },
   };
   return config[screenSize];
 };
