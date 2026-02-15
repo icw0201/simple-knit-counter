@@ -213,7 +213,7 @@ export const getCounterDetailVerticalBands = (screenSize: ScreenSize): CounterDe
   const config: Record<ScreenSize, CounterDetailVerticalBands> = {
     [ScreenSize.COMPACT]: { timerEndPercent: 20, contentStartPercent: 35, contentEndPercent: 70 },
     [ScreenSize.SMALL]: { timerEndPercent: 20, contentStartPercent: 35, contentEndPercent: 70 },
-    [ScreenSize.LARGE]: { timerEndPercent: 23, contentStartPercent: 28.5, contentEndPercent: 74 },
+    [ScreenSize.LARGE]: { timerEndPercent: 14, contentStartPercent: 28.5, contentEndPercent: 74 },
   };
   return config[screenSize];
 };

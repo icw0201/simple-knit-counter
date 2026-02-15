@@ -140,7 +140,7 @@ const CounterDetail = () => {
     width: '100%' as const,
     height: timerHeightPx,
     alignItems: 'center' as const,
-    justifyContent: 'flex-start' as const,
+    justifyContent: 'center' as const,
   };
   const contentContainerStyle = {
     width: '100%' as const,
@@ -243,7 +243,7 @@ const CounterDetail = () => {
 
         <View className="flex-1 w-full items-center justify-start" style={contentWrapperStyle}>
           {/* 타이머 영역 (bands의 timerEndPercent 기준) */}
-          <View className="w-full items-center" style={timerContainerStyle}>
+          <View className="w-full items-center bg-yellow-100" style={timerContainerStyle}>
             {showTimeDisplay && (
               <TimeDisplay
                 screenSize={screenSize}
