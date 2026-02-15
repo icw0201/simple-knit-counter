@@ -42,9 +42,11 @@ const CounterDetail = () => {
   const { height, width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const [layoutHeight, setLayoutHeight] = useState(0);
+  // ScreenSize 판정은 헤더 표시/숨김에 영향을 받지 않는 window 기준 높이로 고정
+  const screenSizeJudgeHeight = height - insets.bottom;
   // 모달/메인 배치는 실제 렌더 높이(onLayout)를 기준으로 계산
   const contentAreaHeight = layoutHeight > 0 ? layoutHeight : height - insets.bottom;
-  const screenSize = getScreenSize(contentAreaHeight);
+  const screenSize = getScreenSize(screenSizeJudgeHeight);
   const iconSize = getIconSize(screenSize);
   const textClass = getTextClass(screenSize);
 
@@ -175,7 +177,7 @@ const CounterDetail = () => {
       return;
     }
 
-    const currentScreenSize = getScreenSize(contentAreaHeight);
+    const currentScreenSize = screenSize;
 
     navigation.setOptions({
       title: counter.title,
@@ -191,7 +193,7 @@ const CounterDetail = () => {
           hasParent ? undefined : () => navigation.navigate('InfoScreen', { itemId: counter.id })
         ),
     });
-  }, [navigation, counter, mascotIsActive, contentAreaHeight, width, toggleMascotIsActive, toggleTimerIsActive, hasParent]);
+  }, [navigation, counter, mascotIsActive, screenSize, width, toggleMascotIsActive, toggleTimerIsActive, hasParent]);
 
 
   // 카운터 데이터가 없으면 렌더링하지 않음
