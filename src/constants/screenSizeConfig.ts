@@ -132,7 +132,7 @@ const getSubModalCenterYPercent = (screenSize: ScreenSize): number => {
   const subModalCenterYPercentConfig: Record<ScreenSize, number> = {
     [ScreenSize.COMPACT]: 85,
     [ScreenSize.SMALL]: 85,
-    [ScreenSize.LARGE]: 85,
+    [ScreenSize.LARGE]: 87,
   };
   return subModalCenterYPercentConfig[screenSize];
 };
@@ -178,7 +178,7 @@ const getSegmentModalCenterYPercent = (screenSize: ScreenSize): number => {
   const segmentModalCenterYPercentConfig: Record<ScreenSize, number> = {
     [ScreenSize.COMPACT]: 0,
     [ScreenSize.SMALL]: 0,
-    [ScreenSize.LARGE]: 23,
+    [ScreenSize.LARGE]: 21,
   };
   return segmentModalCenterYPercentConfig[screenSize];
 };
