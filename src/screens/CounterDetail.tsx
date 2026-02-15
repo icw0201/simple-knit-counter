@@ -129,23 +129,6 @@ const CounterDetail = () => {
     (timerHeightPx + gapBetweenTimerAndContentPx + contentHeightPx);
 
   // getCounterDetailVerticalBands(screenSize) 기준 통일 레이아웃 (화면 크기별 %는 config에서 정의)
-  const contentWrapperStyle = {
-    position: 'absolute' as const,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    top: progressBarHeightPx,
-  };
-  const timerContainerStyle = {
-    width: '100%' as const,
-    height: timerHeightPx,
-    alignItems: 'center' as const,
-    justifyContent: 'center' as const,
-  };
-  const contentContainerStyle = {
-    width: '100%' as const,
-    height: contentHeightPx,
-  };
 
   const showTimeDisplay =
     (counter?.timerIsActive ?? false) &&
@@ -241,9 +224,9 @@ const CounterDetail = () => {
           />
         )}
 
-        <View className="flex-1 w-full items-center justify-start" style={contentWrapperStyle}>
+        <View className="absolute left-0 right-0 bottom-0 w-full items-center justify-start" style={{ top: progressBarHeightPx }}>
           {/* 타이머 영역 (bands의 timerEndPercent 기준) */}
-          <View className="w-full items-center bg-yellow-100" style={timerContainerStyle}>
+          <View className="w-full items-center justify-center bg-yellow-100" style={{ height: timerHeightPx }}>
             {showTimeDisplay && (
               <TimeDisplay
                 screenSize={screenSize}
@@ -258,7 +241,7 @@ const CounterDetail = () => {
           <View style={{ height: gapBetweenTimerAndContentPx }} />
 
           {/* 방향/숫자/버튼 (bands의 contentStartPercent ~ contentEndPercent). mascotIsActive일 때만 디렉션, 아니면 숫자·버튼 0.6 : 0.4 */}
-          <View className="w-full flex-1 items-center" style={contentContainerStyle}>
+          <View className="w-full flex-1 items-center" style={{ height: contentHeightPx }}>
             <View className="w-full flex-1 bg-green-100">
               {mascotIsActive && (
                 <View className="items-center justify-center w-full bg-red-500" style={{ flex: 0.35 }}>
