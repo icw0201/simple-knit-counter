@@ -23,7 +23,7 @@ export const getScreenSize = (height: number): ScreenSize => {
   if (height <= 300) {
     return ScreenSize.COMPACT;
   }
-  if (height <= 450) {
+  if (height <= 500) {
     return ScreenSize.SMALL;
   }
   return ScreenSize.LARGE;
