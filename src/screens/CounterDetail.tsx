@@ -136,6 +136,8 @@ const CounterDetail = () => {
       contentEndPercent,
       shouldStartContentFromTop,
     });
+  const countSectionHeightPx = contentHeightPx * countSectionFlex;
+  const countTextFontSizePx = Math.max(0, countSectionHeightPx * 0.8);
 
   /**
    * 화면 포커스 시 실행되는 효과
@@ -261,7 +263,12 @@ const CounterDetail = () => {
                 style={{ flex: countSectionFlex }}
                 pointerEvents="none"
               >
-                <Text className={`${textClass} font-bold text-black`}>{counter.count}</Text>
+                <Text
+                  className={`${textClass} font-bold text-black`}
+                  style={{ fontSize: countTextFontSizePx, lineHeight: countTextFontSizePx }}
+                >
+                  {counter.count}
+                </Text>
               </View>
               {showCounterActions && (
                 <View className="items-center justify-center w-full" style={{ flex: actionsSectionFlex }}>
