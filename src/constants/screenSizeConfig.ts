@@ -251,13 +251,20 @@ export type CounterDetailVerticalBands = {
  * contentEndPercent는 원하면 getSubModalTopEdgePercent(screenSize)로 맞출 수 있음 (서브 모달 상단과 정렬).
  */
 export const getCounterDetailVerticalBands = (screenSize: ScreenSize): CounterDetailVerticalBands => {
+  const smallTimerEndPercent = 20;
+  const smallContentStartPercent = smallTimerEndPercent + PERCENT_GAP;
+  const smallContentEndPercent = getSubModalTopEdgePercent(ScreenSize.SMALL) - PERCENT_GAP;
   const largeTimerEndPercent = getSegmentModalTopEdgePercent(ScreenSize.LARGE) - PERCENT_GAP;
   const largeContentStartPercent = getSegmentModalBottomEdgePercent(ScreenSize.LARGE) + PERCENT_GAP;
   const largeContentEndPercent = getSubModalTopEdgePercent(ScreenSize.LARGE) - PERCENT_GAP;
 
   const config: Record<ScreenSize, CounterDetailVerticalBands> = {
     [ScreenSize.COMPACT]: { timerEndPercent: 20, contentStartPercent: 35, contentEndPercent: 70 },
-    [ScreenSize.SMALL]: { timerEndPercent: 20, contentStartPercent: 35, contentEndPercent: 70 },
+    [ScreenSize.SMALL]: {
+      timerEndPercent: smallTimerEndPercent,
+      contentStartPercent: smallContentStartPercent,
+      contentEndPercent: smallContentEndPercent,
+    },
     [ScreenSize.LARGE]: {
       timerEndPercent: largeTimerEndPercent,
       contentStartPercent: largeContentStartPercent,

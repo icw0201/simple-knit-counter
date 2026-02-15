@@ -122,26 +122,36 @@ const CounterDetail = () => {
   const { timerEndPercent, contentStartPercent, contentEndPercent } =
     getCounterDetailVerticalBands(screenSize);
 
-  // bands %는 contentAreaHeight(SafeArea 내부) 기준으로 px 변환 (config 값 그대로 사용)
-  const timerHeightPx =
-    (contentAreaHeight * timerEndPercent) / 100 - progressBarHeightPx;
-  const gapBetweenTimerAndContentPx =
-    (contentAreaHeight * (contentStartPercent - timerEndPercent)) / 100;
-  const contentHeightPx =
-    (contentAreaHeight * (contentEndPercent - contentStartPercent)) / 100;
-  const bottomReservedHeightPx =
-    contentAreaHeight -
-    progressBarHeightPx -
-    (timerHeightPx + gapBetweenTimerAndContentPx + contentHeightPx);
-
-  // getCounterDetailVerticalBands(screenSize) 기준 통일 레이아웃 (화면 크기별 %는 config에서 정의)
-
   const showTimeDisplay =
     (counter?.timerIsActive ?? false) &&
     (screenSize === ScreenSize.LARGE ||
       (screenSize !== ScreenSize.COMPACT && !(screenSize === ScreenSize.SMALL && subModalIsOpen)));
   const showCounterActions =
     screenSize === ScreenSize.LARGE || !(screenSize === ScreenSize.SMALL && subModalIsOpen);
+
+  const directionSectionFlex = 0.35;
+  const countSectionFlex = mascotIsActive
+    ? (showCounterActions ? 0.45 : 0.75)
+    : (showCounterActions ? 0.6 : 1);
+  const actionsSectionFlex = mascotIsActive ? 0.3 : 0.4;
+
+  // SMALL에서 타이머가 안 보이는 경우(사용자 OFF 또는 보조 모달 OPEN) 콘텐츠를 0%부터 시작
+  const shouldStartContentFromTop = screenSize === ScreenSize.SMALL && !showTimeDisplay;
+  const effectiveTimerEndPercent = shouldStartContentFromTop ? 0 : timerEndPercent;
+  const effectiveContentStartPercent = shouldStartContentFromTop ? 0 : contentStartPercent;
+
+  // bands %는 contentAreaHeight(SafeArea 내부) 기준으로 px 변환
+  // SMALL + 타이머 비표시에서는 타이머/갭을 0으로 두되, ProgressBar 높이 보정은 콘텐츠 높이에 반영
+  const timerHeightPx = shouldStartContentFromTop
+    ? 0
+    : Math.max(0, (contentAreaHeight * effectiveTimerEndPercent) / 100 - progressBarHeightPx);
+  const gapBetweenTimerAndContentPx = shouldStartContentFromTop
+    ? 0
+    : (contentAreaHeight * (effectiveContentStartPercent - effectiveTimerEndPercent)) / 100;
+  const contentHeightPx = shouldStartContentFromTop
+    ? (contentAreaHeight * contentEndPercent) / 100 - progressBarHeightPx
+    : (contentAreaHeight * (contentEndPercent - effectiveContentStartPercent)) / 100;
+  const bottomReservedHeightPx = contentAreaHeight - progressBarHeightPx - (timerHeightPx + gapBetweenTimerAndContentPx + contentHeightPx);
 
   /**
    * 화면 포커스 시 실행되는 효과
@@ -250,7 +260,7 @@ const CounterDetail = () => {
           <View className="w-full items-center" style={{ height: contentHeightPx }}>
             <View className="w-full flex-1 bg-green-100">
               {mascotIsActive && (
-                <View className="items-center justify-center w-full bg-red-500/40" style={{ flex: 0.35 }}>
+                <View className="items-center justify-center w-full bg-red-500/40" style={{ flex: directionSectionFlex }}>
                   <CounterDirection
                     mascotIsActive={mascotIsActive}
                     wayIsChange={wayIsChange}
@@ -266,13 +276,13 @@ const CounterDetail = () => {
               )}
               <View
                 className="items-center justify-center w-full bg-orange-200/40"
-                style={{ flex: mascotIsActive ? 0.45 : 0.6 }}
+                style={{ flex: countSectionFlex }}
                 pointerEvents="none"
               >
                 <Text className={`${textClass} font-bold text-black`}>{counter.count}</Text>
               </View>
               {showCounterActions && (
-                <View className="items-center justify-center w-full" style={{ flex: mascotIsActive ? 0.3 : 0.4 }}>
+                <View className="items-center justify-center w-full" style={{ flex: actionsSectionFlex }}>
                   <CounterActions
                     screenSize={screenSize}
                     iconSize={iconSize}
