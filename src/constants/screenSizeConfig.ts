@@ -1,7 +1,5 @@
 // src/constants/screenSizeConfig.ts
 
-import { DimensionValue } from 'react-native';
-
 /**
  * 화면 크기에 따른 UI 요소 크기 분류
  * 컴팩트, 작음, 중간, 큼으로 구분하여 반응형 UI 제공
@@ -11,6 +9,8 @@ export enum ScreenSize {
   SMALL = 'SMALL',       // 450 이하 (작은 화면)
   LARGE = 'LARGE',       // 450 초과 (큰 화면)
 }
+
+const PERCENT_GAP = 0;
 
 
 /**
@@ -128,19 +128,23 @@ export const getSubModalHeightRatio = (screenSize: ScreenSize): number => {
   return subModalHeightRatioConfig[screenSize];
 };
 
+const getSubModalCenterYPercent = (screenSize: ScreenSize): number => {
+  const subModalCenterYPercentConfig: Record<ScreenSize, number> = {
+    [ScreenSize.COMPACT]: 85,
+    [ScreenSize.SMALL]: 85,
+    [ScreenSize.LARGE]: 85,
+  };
+  return subModalCenterYPercentConfig[screenSize];
+};
+
 /**
  * 화면 크기에 따른 서브 모달 세로 중앙 위치를 반환합니다.
  * SlideModal에서 centerY로 사용하며, translateY: -height/2 로 실제 상단이 정해짐.
  * @param screenSize - 화면 크기
- * @returns 세로 중앙 위치 (DimensionValue, 예: '85%')
+ * @returns 세로 중앙 위치 퍼센트(예: 85)
  */
-export const getSubModalCenterY = (screenSize: ScreenSize): DimensionValue => {
-  const subModalCenterYConfig: Record<ScreenSize, DimensionValue> = {
-    [ScreenSize.COMPACT]: '85%',
-    [ScreenSize.SMALL]: '85%',
-    [ScreenSize.LARGE]: '85%',
-  };
-  return subModalCenterYConfig[screenSize];
+export const getSubModalCenterY = (screenSize: ScreenSize): number => {
+  return getSubModalCenterYPercent(screenSize);
 };
 
 /**
@@ -170,19 +174,56 @@ export const getSegmentModalHeightRatio = (screenSize: ScreenSize): number => {
   return segmentModalHeightRatioConfig[screenSize];
 };
 
+const getSegmentModalCenterYPercent = (screenSize: ScreenSize): number => {
+  const segmentModalCenterYPercentConfig: Record<ScreenSize, number> = {
+    [ScreenSize.COMPACT]: 0,
+    [ScreenSize.SMALL]: 0,
+    [ScreenSize.LARGE]: 23,
+  };
+  return segmentModalCenterYPercentConfig[screenSize];
+};
+
 /**
  * 화면 크기에 따른 구간 기록 모달 세로 중앙 위치를 반환합니다.
  * SlideModal에서 centerY로 사용함.
  * @param screenSize - 화면 크기
- * @returns 세로 중앙 위치 (DimensionValue, LARGE일 때만 '23%')
+ * @returns 세로 중앙 위치 퍼센트 (LARGE일 때만 23)
  */
-export const getSegmentModalCenterY = (screenSize: ScreenSize): DimensionValue => {
-  const segmentModalCenterYConfig: Record<ScreenSize, DimensionValue> = {
-    [ScreenSize.COMPACT]: 0,      // 컴팩트: 사용 안 함
-    [ScreenSize.SMALL]: 0,        // 작음: 사용 안 함
-    [ScreenSize.LARGE]: '23%',
-  };
-  return segmentModalCenterYConfig[screenSize];
+export const getSegmentModalCenterY = (screenSize: ScreenSize): number => {
+  if (screenSize !== ScreenSize.LARGE) {
+    return 0;
+  }
+  return getSegmentModalCenterYPercent(screenSize);
+};
+
+/**
+ * 서브 모달의 상단 경계(%)를 반환합니다.
+ * 동일 좌표계에서 메인 콘텐츠 종료 지점 계산에 사용합니다.
+ */
+export const getSubModalTopEdgePercent = (screenSize: ScreenSize): number => {
+  const centerPercent = getSubModalCenterYPercent(screenSize);
+  const heightPercent = getSubModalHeightRatio(screenSize) * 100;
+  return centerPercent - (heightPercent / 2);
+};
+
+/**
+ * 구간 기록 모달의 하단 경계(%)를 반환합니다.
+ * 동일 좌표계에서 메인 콘텐츠 시작 지점 계산에 사용합니다.
+ */
+export const getSegmentModalBottomEdgePercent = (screenSize: ScreenSize): number => {
+  const centerPercent = getSegmentModalCenterYPercent(screenSize);
+  const heightPercent = getSegmentModalHeightRatio(screenSize) * 100;
+  return centerPercent + (heightPercent / 2);
+};
+
+/**
+ * 구간 기록 모달의 상단 경계(%)를 반환합니다.
+ * 타이머 종료 지점과 정렬할 때 사용합니다.
+ */
+export const getSegmentModalTopEdgePercent = (screenSize: ScreenSize): number => {
+  const centerPercent = getSegmentModalCenterYPercent(screenSize);
+  const heightPercent = getSegmentModalHeightRatio(screenSize) * 100;
+  return centerPercent - (heightPercent / 2);
 };
 
 /**
@@ -210,10 +251,18 @@ export type CounterDetailVerticalBands = {
  * contentEndPercent는 원하면 getSubModalTopEdgePercent(screenSize)로 맞출 수 있음 (서브 모달 상단과 정렬).
  */
 export const getCounterDetailVerticalBands = (screenSize: ScreenSize): CounterDetailVerticalBands => {
+  const largeTimerEndPercent = getSegmentModalTopEdgePercent(ScreenSize.LARGE) - PERCENT_GAP;
+  const largeContentStartPercent = getSegmentModalBottomEdgePercent(ScreenSize.LARGE) + PERCENT_GAP;
+  const largeContentEndPercent = getSubModalTopEdgePercent(ScreenSize.LARGE) - PERCENT_GAP;
+
   const config: Record<ScreenSize, CounterDetailVerticalBands> = {
     [ScreenSize.COMPACT]: { timerEndPercent: 20, contentStartPercent: 35, contentEndPercent: 70 },
     [ScreenSize.SMALL]: { timerEndPercent: 20, contentStartPercent: 35, contentEndPercent: 70 },
-    [ScreenSize.LARGE]: { timerEndPercent: 14, contentStartPercent: 28.5, contentEndPercent: 74 },
+    [ScreenSize.LARGE]: {
+      timerEndPercent: largeTimerEndPercent,
+      contentStartPercent: largeContentStartPercent,
+      contentEndPercent: largeContentEndPercent,
+    },
   };
   return config[screenSize];
 };

@@ -1,7 +1,7 @@
 // src/screens/CounterDetail.tsx
 
 import { useLayoutEffect, useCallback, useState } from 'react';
-import { View, Text, useWindowDimensions, Animated } from 'react-native';
+import { View, Text, useWindowDimensions, Animated, LayoutChangeEvent } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -38,11 +38,13 @@ const CounterDetail = () => {
   const route = useRoute();
   const { counterId } = route.params as { counterId: string };
 
-  // 화면 크기 정보 (서브 모달과 같은 좌표계: SafeArea 내부 높이 사용)
+  // 화면 크기 정보 (실제 렌더 영역과 동일한 좌표계 사용)
   const { height, width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
-  const contentAreaHeight = height - insets.top - insets.bottom;
-  const screenSize = getScreenSize(height);
+  const [layoutHeight, setLayoutHeight] = useState(0);
+  // 모달/메인 배치는 실제 렌더 높이(onLayout)를 기준으로 계산
+  const contentAreaHeight = layoutHeight > 0 ? layoutHeight : height - insets.bottom;
+  const screenSize = getScreenSize(contentAreaHeight);
   const iconSize = getIconSize(screenSize);
   const textClass = getTextClass(screenSize);
 
@@ -101,17 +103,21 @@ const CounterDetail = () => {
   const imageWidth = iconSize * 1.4;
   const imageHeight = iconSize * (90 / 189) * 1.4;
   const hasParent = !!counter?.parentProjectId;
+  const handleLayout = useCallback((event: LayoutChangeEvent) => {
+    const { height: nextHeight } = event.nativeEvent.layout;
+    setLayoutHeight((prev) => (prev !== nextHeight ? nextHeight : prev));
+  }, []);
 
   // SubCounterModal 크기 및 위치 계산 (화면 크기별)
   const subModalWidth = width * 0.9;
-  const subModalHeight = height * getSubModalHeightRatio(screenSize);
-  const subModalCenterY = getSubModalCenterY(screenSize);
+  const subModalHeight = contentAreaHeight * getSubModalHeightRatio(screenSize);
+  const subModalCenterY = (contentAreaHeight * getSubModalCenterY(screenSize)) / 100;
   const subModalHandleWidth = getSubModalHandleWidth(screenSize);
 
   // 구간 기록 모달 크기 및 위치 계산 (LARGE 화면에서만 사용)
   const segmentModalWidth = subModalWidth;
-  const segmentModalHeight = height * getSegmentModalHeightRatio(screenSize);
-  const segmentModalCenterY = getSegmentModalCenterY(screenSize);
+  const segmentModalHeight = contentAreaHeight * getSegmentModalHeightRatio(screenSize);
+  const segmentModalCenterY = (contentAreaHeight * getSegmentModalCenterY(screenSize)) / 100;
 
   const { timerEndPercent, contentStartPercent, contentEndPercent } =
     getCounterDetailVerticalBands(screenSize);
@@ -158,7 +164,7 @@ const CounterDetail = () => {
       return;
     }
 
-    const currentScreenSize = getScreenSize(height);
+    const currentScreenSize = getScreenSize(contentAreaHeight);
 
     navigation.setOptions({
       title: counter.title,
@@ -174,7 +180,7 @@ const CounterDetail = () => {
           hasParent ? undefined : () => navigation.navigate('InfoScreen', { itemId: counter.id })
         ),
     });
-  }, [navigation, counter, mascotIsActive, height, width, toggleMascotIsActive, toggleTimerIsActive, hasParent]);
+  }, [navigation, counter, mascotIsActive, contentAreaHeight, width, toggleMascotIsActive, toggleTimerIsActive, hasParent]);
 
 
   // 카운터 데이터가 없으면 렌더링하지 않음
@@ -184,7 +190,7 @@ const CounterDetail = () => {
 
   return (
     <SafeAreaView style={screenStyles.flex1} edges={safeAreaEdges}>
-      <View className="flex-1 bg-white">
+      <View className="flex-1 bg-white" onLayout={handleLayout}>
 
       {/* 좌우 터치 레이어 */}
       <CounterTouchArea onAdd={handleAdd} onSubtract={handleSubtract} />
@@ -241,10 +247,10 @@ const CounterDetail = () => {
           <View style={{ height: gapBetweenTimerAndContentPx }} />
 
           {/* 방향/숫자/버튼 (bands의 contentStartPercent ~ contentEndPercent). mascotIsActive일 때만 디렉션, 아니면 숫자·버튼 0.6 : 0.4 */}
-          <View className="w-full flex-1 items-center" style={{ height: contentHeightPx }}>
+          <View className="w-full items-center" style={{ height: contentHeightPx }}>
             <View className="w-full flex-1 bg-green-100">
               {mascotIsActive && (
-                <View className="items-center justify-center w-full bg-red-500" style={{ flex: 0.35 }}>
+                <View className="items-center justify-center w-full bg-red-500/40" style={{ flex: 0.35 }}>
                   <CounterDirection
                     mascotIsActive={mascotIsActive}
                     wayIsChange={wayIsChange}
