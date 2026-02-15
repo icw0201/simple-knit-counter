@@ -127,7 +127,7 @@ const CounterDetail = () => {
     (screenSize === ScreenSize.LARGE ||
       (screenSize !== ScreenSize.COMPACT && !(screenSize === ScreenSize.SMALL && subModalIsOpen)));
   const showCounterActions =
-    screenSize === ScreenSize.LARGE || !(screenSize === ScreenSize.SMALL && subModalIsOpen);
+    screenSize === ScreenSize.LARGE || (screenSize === ScreenSize.SMALL && !subModalIsOpen);
 
   const directionSectionFlex = 0.35;
   const countSectionFlex = mascotIsActive
@@ -135,13 +135,14 @@ const CounterDetail = () => {
     : (showCounterActions ? 0.6 : 1);
   const actionsSectionFlex = mascotIsActive ? 0.3 : 0.4;
 
-  // SMALL에서 타이머가 안 보이는 경우(사용자 OFF 또는 보조 모달 OPEN) 콘텐츠를 0%부터 시작
-  const shouldStartContentFromTop = screenSize === ScreenSize.SMALL && !showTimeDisplay;
+  // 타이머가 안 보이는 경우(COMPACT, 또는 SMALL의 OFF/보조 모달 OPEN) 콘텐츠를 0%부터 시작
+  const shouldStartContentFromTop =
+    !showTimeDisplay && (screenSize === ScreenSize.COMPACT || screenSize === ScreenSize.SMALL);
   const effectiveTimerEndPercent = shouldStartContentFromTop ? 0 : timerEndPercent;
   const effectiveContentStartPercent = shouldStartContentFromTop ? 0 : contentStartPercent;
 
   // bands %는 contentAreaHeight(SafeArea 내부) 기준으로 px 변환
-  // SMALL + 타이머 비표시에서는 타이머/갭을 0으로 두되, ProgressBar 높이 보정은 콘텐츠 높이에 반영
+  // 타이머 비표시에서는 타이머/갭을 0으로 두되, ProgressBar 높이 보정은 콘텐츠 높이에 반영
   const timerHeightPx = shouldStartContentFromTop
     ? 0
     : Math.max(0, (contentAreaHeight * effectiveTimerEndPercent) / 100 - progressBarHeightPx);
