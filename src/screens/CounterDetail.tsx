@@ -224,7 +224,7 @@ const CounterDetail = () => {
 
         <View className="absolute left-0 right-0 bottom-0 w-full items-center justify-start" style={{ top: progressBarHeightPx }}>
           {/* 타이머 영역 (bands의 timerEndPercent 기준) */}
-          <View className="w-full items-center justify-center bg-yellow-100" style={{ height: timerHeightPx }}>
+          <View className="w-full items-center justify-center" style={{ height: timerHeightPx }}>
             {showTimeDisplay && (
               <TimeDisplay
                 screenSize={screenSize}
@@ -240,9 +240,9 @@ const CounterDetail = () => {
 
           {/* 방향/숫자/버튼 (bands의 contentStartPercent ~ contentEndPercent). mascotIsActive일 때만 디렉션, 아니면 숫자·버튼 0.6 : 0.4 */}
           <View className="w-full items-center" style={{ height: contentHeightPx }}>
-            <View className="w-full flex-1 bg-green-100">
+            <View className="w-full flex-1">
               {mascotIsActive && (
-                <View className="items-center justify-center w-full bg-red-500/40" style={{ flex: directionSectionFlex }}>
+                <View className="items-center justify-center w-full" style={{ flex: directionSectionFlex }}>
                   <CounterDirection
                     mascotIsActive={mascotIsActive}
                     wayIsChange={wayIsChange}
@@ -257,7 +257,7 @@ const CounterDetail = () => {
                 </View>
               )}
               <View
-                className="items-center justify-center w-full bg-orange-200/40"
+                className="items-center justify-center w-full"
                 style={{ flex: countSectionFlex }}
                 pointerEvents="none"
               >
