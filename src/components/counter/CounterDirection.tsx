@@ -20,13 +20,6 @@ interface CounterDirectionProps {
   onToggleWay: () => void;
 }
 
-// 버블 이미지 위치 상수
-const BUBBLE_TOP_OFFSET_RATIO = -0.8; // 버블 이미지의 상단 오프셋 비율 (이미지 높이 대비)
-const BUBBLE_LEFT_OFFSET_RATIO = 0.05; // 버블 이미지의 좌측 오프셋 비율 (이미지 너비 대비)
-const BUBBLE_STACK_TOP_OFFSET_RATIO = 0.08; // 다중 버블 스택 시 상단 오프셋 비율
-const BUBBLE_STACK_LEFT_OFFSET_RATIO = 0.04; // 다중 버블 스택 시 좌측 오프셋 비율
-const LABEL_TOP_OFFSET_RATIO = -1.3; // 라벨의 상단 오프셋 비율 (말풍선 위쪽)
-
 // 버블 이미지 크기 상수
 const BUBBLE_SIZE_SCALE = 1.15; // 버블 이미지 크기 배율
 
@@ -36,6 +29,7 @@ const TEXT_CONTAINER_WIDTH_RATIO = 0.6; // 텍스트 컨테이너의 너비 비�
 
 // 규칙 순회 간격
 const RULE_ROTATION_INTERVAL_MS = 2000; // 규칙 순회 간격 (밀리초)
+const DIRECTION_VERTICAL_OFFSET_RATIO = 0.18; // 방향 컴포넌트 세로 오프셋 (이미지 높이 비율)
 
 /**
  * 카운터 방향 표시 컴포넌트
@@ -148,7 +142,10 @@ const CounterDirection: React.FC<CounterDirectionProps> = ({
 
   return (
     <View style={{ height: imageHeight }}>
-      <Pressable onPress={wayIsChange ? onToggleWay : undefined}>
+      <Pressable
+        onPress={wayIsChange ? onToggleWay : undefined}
+        style={{ transform: [{ translateY: imageHeight * DIRECTION_VERTICAL_OFFSET_RATIO }] }}
+      >
         <View className="relative" style={{ width: imageWidth, height: imageHeight }}>
           {/* 규칙이 적용되는 경우: bubble 이미지 (way 이미지 아래, y축으로 위에 위치) */}
           {isRuleAppliedToCurrentCount && currentRule && (
@@ -160,8 +157,8 @@ const CounterDirection: React.FC<CounterDirectionProps> = ({
                   const bubbleWidth = imageWidth * BUBBLE_SIZE_SCALE;
                   const bubbleHeight = imageHeight * BUBBLE_SIZE_SCALE;
                   // 원래 버블의 중앙 x 좌표를 유지하도록 left 위치 조정
-                  const originalCenterX = imageWidth * BUBBLE_LEFT_OFFSET_RATIO + imageWidth / 2;
-                  const newLeft = originalCenterX - bubbleWidth / 2 - imageWidth * BUBBLE_STACK_LEFT_OFFSET_RATIO * offset;
+                  const originalCenterX = imageWidth * 0.05 + imageWidth / 2;
+                  const newLeft = originalCenterX - bubbleWidth / 2 - imageWidth * 0.04 * offset;
                   return (
                     // 미리보기 버블
                     <View
@@ -170,7 +167,7 @@ const CounterDirection: React.FC<CounterDirectionProps> = ({
                         position: 'absolute',
                         width: bubbleWidth,
                         height: bubbleHeight,
-                        top: imageHeight * BUBBLE_TOP_OFFSET_RATIO - imageHeight * BUBBLE_STACK_TOP_OFFSET_RATIO * offset,
+                        top: imageHeight * -0.8 - imageHeight * 0.08 * offset,
                         left: newLeft,
                         zIndex: -offset,
                       }}
@@ -188,7 +185,7 @@ const CounterDirection: React.FC<CounterDirectionProps> = ({
                 <View
                   className="absolute left-0 right-0 items-center"
                   style={{
-                    top: imageHeight * LABEL_TOP_OFFSET_RATIO,
+                    top: imageHeight * -1.3,
                   }}
                 >
                   <Text className="text-sm text-darkgray text-center font-bold">
@@ -202,9 +199,9 @@ const CounterDirection: React.FC<CounterDirectionProps> = ({
                   position: 'absolute',
                   width: imageWidth * BUBBLE_SIZE_SCALE,
                   height: imageHeight * BUBBLE_SIZE_SCALE,
-                  top: imageHeight * BUBBLE_TOP_OFFSET_RATIO,
+                  top: imageHeight * -0.8,
                   // 원래 버블의 중앙 x 좌표를 유지하도록 left 위치 조정
-                  left: imageWidth * BUBBLE_LEFT_OFFSET_RATIO + imageWidth / 2 - (imageWidth * BUBBLE_SIZE_SCALE) / 2,
+                  left: imageWidth * 0.05 + imageWidth / 2 - (imageWidth * BUBBLE_SIZE_SCALE) / 2,
                   zIndex: 0, // way 이미지보다 아래
                 }}
               >
@@ -218,7 +215,7 @@ const CounterDirection: React.FC<CounterDirectionProps> = ({
               <View
                 style={{
                   position: 'absolute',
-                  top: imageHeight * BUBBLE_TOP_OFFSET_RATIO,
+                  top: imageHeight * -0.8,
                   left: imageWidth * TEXT_CONTAINER_LEFT_RATIO,
                   width: imageWidth * TEXT_CONTAINER_WIDTH_RATIO,
                   height: imageHeight,
