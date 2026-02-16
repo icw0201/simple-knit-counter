@@ -19,7 +19,7 @@ const Settings = () => {
 
         <SettingsLinks />
 
-        <SettingsVersion version="1.2.3" />
+        <SettingsVersion version="1.2.4" />
       </ScrollView>
 
     </View>
