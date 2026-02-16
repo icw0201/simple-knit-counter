@@ -4,7 +4,6 @@ import { View, Image, Pressable, Text } from 'react-native';
 import { Way, RepeatRule } from '@storage/types';
 import { directionImages } from '@assets/images';
 import EmphasisBubbleIcon from '@assets/images/way/emphasis_bubble.svg';
-import { ScreenSize } from '@constants/screenSizeConfig';
 import { isRuleApplied, isDarkColor } from '@utils/ruleUtils';
 import { calculateInitialFontSize } from '@utils/textUtils';
 
@@ -16,7 +15,6 @@ interface CounterDirectionProps {
   repeatRules: RepeatRule[];
   imageWidth: number;
   imageHeight: number;
-  screenSize: ScreenSize;
   onToggleWay: () => void;
 }
 
@@ -44,7 +42,6 @@ const CounterDirection: React.FC<CounterDirectionProps> = ({
   repeatRules,
   imageWidth,
   imageHeight,
-  screenSize: _screenSize,
   onToggleWay,
 }) => {
   /**

@@ -261,7 +261,6 @@ const CounterDetail = () => {
                     repeatRules={counter.repeatRules || []}
                     imageWidth={imageWidth}
                     imageHeight={imageHeight}
-                    screenSize={screenSize}
                     onToggleWay={toggleWay}
                   />
                 </View>
