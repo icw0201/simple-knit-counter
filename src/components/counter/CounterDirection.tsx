@@ -177,13 +177,15 @@ const CounterDirection: React.FC<CounterDirectionProps> = ({
                     </View>
                   );
                 })}
-              {/* 다중 규칙일 때 라벨 표시 (말풍선 위쪽에 분리) */}
+              {/* 다중 규칙일 때 라벨 표시 (말풍선 위쪽에 분리, 터치 통과 → 아래 Pressable 전달) */}
               {appliedRules.length > 1 && (
                 <View
                   className="absolute left-0 right-0 items-center"
                   style={{
                     top: imageHeight * -1.3,
+                    zIndex: 10,
                   }}
+                  pointerEvents="none"
                 >
                   <Text className="text-sm text-darkgray text-center font-bold">
                     {currentRuleIndex + 1}/{appliedRules.length}
