@@ -41,6 +41,22 @@ export const getIconSize = (screenSize: ScreenSize): number => {
 };
 
 /**
+ * 화면 크기에 따른 ProgressBar 높이(px)를 반환합니다.
+ */
+export const getProgressBarHeightPx = (screenSize: ScreenSize): number => {
+  const config = { [ScreenSize.COMPACT]: 12, [ScreenSize.SMALL]: 20, [ScreenSize.LARGE]: 28 };
+  return config[screenSize];
+};
+
+/**
+ * 화면 크기에 따른 ProgressBar Tailwind height 클래스를 반환합니다.
+ */
+export const getProgressBarHeightClass = (screenSize: ScreenSize): string => {
+  const config = { [ScreenSize.COMPACT]: 'h-3', [ScreenSize.SMALL]: 'h-5', [ScreenSize.LARGE]: 'h-7' };
+  return config[screenSize];
+};
+
+/**
  * 화면 크기에 따른 서브 아이콘 크기를 반환합니다.
  * @param screenSize - 화면 크기
  * @returns 서브 아이콘 크기

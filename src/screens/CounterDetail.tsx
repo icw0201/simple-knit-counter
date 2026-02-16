@@ -11,11 +11,11 @@ import { getHeaderRightWithActivateInfoSettings } from '@navigation/HeaderOption
 
 import { CounterTouchArea, CounterDirection, CounterActions, CounterModals, SubCounterModal, ProgressBar, TimeDisplay, SegmentRecordModal } from '@components/counter';
 import Tooltip from '@components/common/Tooltip';
-import { getScreenSize, getIconSize, getTextClass, ScreenSize } from '@constants/screenSizeConfig';
+import { getScreenSize, getIconSize, getProgressBarHeightPx, getTextClass, ScreenSize } from '@constants/screenSizeConfig';
 import { getTooltipEnabledSetting } from '@storage/settings';
 import { screenStyles, safeAreaEdges } from '@styles/screenStyles';
 import { useCounter } from '@hooks/useCounter';
-import { getContentSectionFlexes, getCounterDetailModalLayout, getCounterDetailVerticalPercents, getCounterDetailVerticalPx, getCounterDetailVisibility, getProgressBarHeightPx } from '@utils/counterDetailLayout';
+import { getContentSectionFlexes, getCounterDetailModalLayout, getCounterDetailVerticalPercents, getCounterDetailVerticalPx, getCounterDetailVisibility } from '@utils/counterDetailLayout';
 
 
 /**

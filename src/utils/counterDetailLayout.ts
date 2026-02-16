@@ -44,16 +44,6 @@ export type ContentSectionFlexes = {
   actionsSectionFlex: number;
 };
 
-export const getProgressBarHeightPx = (screenSize: ScreenSize): number => {
-  if (screenSize === ScreenSize.COMPACT) {
-    return 12;
-  }
-  if (screenSize === ScreenSize.SMALL) {
-    return 20;
-  }
-  return 28;
-};
-
 export const getCounterDetailVisibility = ({
   screenSize,
   timerIsActive,
