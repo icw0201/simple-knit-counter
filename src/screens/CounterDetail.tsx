@@ -42,12 +42,16 @@ const CounterDetail = () => {
   // 화면 크기 정보 (실제 렌더 영역과 동일한 좌표계 사용)
   const { height, width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
+  const ESTIMATED_HEADER_HEIGHT = 56;
   const [layoutHeight, setLayoutHeight] = useState(0);
   // ScreenSize 판정은 헤더 표시/숨김에 영향을 받지 않는 window 기준 높이로 고정
   const screenSizeJudgeHeight = height - insets.bottom;
-  // 모달/메인 배치는 실제 렌더 높이(onLayout)를 기준으로 계산
-  const contentAreaHeight = layoutHeight > 0 ? layoutHeight : height - insets.bottom;
   const screenSize = getScreenSize(screenSizeJudgeHeight);
+  // 모달/메인 배치는 실제 렌더 높이(onLayout)를 기준으로 계산.
+  // onLayout 전 초기값: 헤더 표시 시 예상 헤더 높이를 빼서 점프 완화
+  const contentAreaHeight = layoutHeight > 0
+    ? layoutHeight
+    : Math.max(0, height - insets.bottom - (screenSize !== ScreenSize.COMPACT ? ESTIMATED_HEADER_HEIGHT : 0));
   const iconSize = getIconSize(screenSize);
   const textClass = getTextClass(screenSize);
   const progressBarHeightPx = getProgressBarHeightPx(screenSize);

@@ -87,20 +87,6 @@ export const getTimeDisplayTextClass = (screenSize: ScreenSize): string => {
 };
 
 /**
- * 화면 크기에 따른 TimeDisplay 최소 높이를 반환합니다.
- * @param screenSize - 화면 크기
- * @returns 최소 높이 (픽셀)
- */
-export const getTimeDisplayMinHeight = (screenSize: ScreenSize): number => {
-  const timeDisplayMinHeightConfig = {
-    [ScreenSize.COMPACT]: 0,              // 컴팩트: 사용 안 함
-    [ScreenSize.SMALL]: 20,                // 작음: 작은 높이
-    [ScreenSize.LARGE]: 20,                // 큼: 기본 높이
-  };
-  return timeDisplayMinHeightConfig[screenSize];
-};
-
-/**
  * 화면 크기에 따른 서브 모달 텍스트 마진 클래스를 반환합니다.
  * @param screenSize - 화면 크기
  * @returns 텍스트 마진 클래스
@@ -187,7 +173,7 @@ const getSegmentModalCenterYPercent = (screenSize: ScreenSize): number => {
  * 화면 크기에 따른 구간 기록 모달 세로 중앙 위치를 반환합니다.
  * SlideModal에서 centerY로 사용함.
  * @param screenSize - 화면 크기
- * @returns 세로 중앙 위치 퍼센트 (LARGE일 때만 23)
+ * @returns 세로 중앙 위치 퍼센트 (LARGE일 때만 21)
  */
 export const getSegmentModalCenterY = (screenSize: ScreenSize): number => {
   if (screenSize !== ScreenSize.LARGE) {
