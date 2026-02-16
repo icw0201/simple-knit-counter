@@ -2,14 +2,13 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
-import { Platform, Vibration, Animated, AppState } from 'react-native';
+import { Platform, Vibration, AppState } from 'react-native';
 import HapticFeedback from 'react-native-haptic-feedback';
 import Sound from 'react-native-sound';
 
 import { getStoredItems, updateItem } from '@storage/storage';
 import { Way, Counter, SectionRecord, EditLogType } from '@storage/types';
 import { getSoundSetting, getVibrationSetting, getAutoPlayElapsedTimeSetting } from '@storage/settings';
-import { PADDING_TOP_MULTIPLIER, PADDING_TOP_RATIO } from '@constants/screenSizeConfig';
 import { getCurrentTime } from '@utils/timeUtils';
 
 interface UseCounterProps {
@@ -66,9 +65,6 @@ interface UseCounterReturn {
   handleSectionModalToggle: () => void;
   handleSectionUndo: () => void;
 
-  // 패딩 탑 애니메이션
-  paddingTopAnim: Animated.Value;
-  updatePaddingTopAnimation: (height: number, subModalIsOpen: boolean, options?: { animate?: boolean }) => void;
 }
 
 /**
@@ -103,11 +99,6 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
   // 설정 상태
   const [soundSetting, setSoundSettingState] = useState(true);
   const [vibrationSetting, setVibrationSettingState] = useState(true);
-
-  // 패딩 탑 애니메이션 상태
-  const paddingTopAnim = useRef(new Animated.Value(0)).current;
-  const isInitialized = useRef(false);
-  const prevSubModalIsOpen = useRef<boolean | null>(null); // null로 초기화하여 첫 실행과 구분
 
   // 카운터 동작 상태
   const [wayIsChange, setWayIsChange] = useState<boolean>(false);
@@ -297,41 +288,6 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
       clickSoundRef.current?.release();
     };
   }, []);
-
-  /**
-   * 패딩 탑 애니메이션 관리
-   */
-  const updatePaddingTopAnimation = useCallback((height: number, subModalIsOpen: boolean, options?: { animate?: boolean }) => {
-    const shouldAnimate = options?.animate ?? true;
-    const targetPaddingTop = subModalIsOpen
-      ? PADDING_TOP_MULTIPLIER * height  // 열려있으면 0.085 * height
-      : PADDING_TOP_MULTIPLIER * PADDING_TOP_RATIO * height; // 닫혀있으면 0.17 * height
-
-    // 첫 실행이거나 초기화되지 않은 경우
-    if (prevSubModalIsOpen.current === null) {
-      // 초기 설정 시에는 애니메이션 없이 즉시 설정
-      paddingTopAnim.setValue(targetPaddingTop);
-      isInitialized.current = true;
-    } else if (prevSubModalIsOpen.current !== subModalIsOpen) {
-      // subModalIsOpen이 변경된 경우에만 애니메이션 적용
-      if (shouldAnimate) {
-        Animated.timing(paddingTopAnim, {
-          toValue: targetPaddingTop,
-          duration: 300,
-          useNativeDriver: false,
-        }).start();
-      } else {
-        // shouldAnimate가 false인 경우 (강제로 애니메이션 비활성화)
-        paddingTopAnim.setValue(targetPaddingTop);
-      }
-    } else {
-      // height만 변경된 경우에는 즉시 설정 (애니메이션 없음)
-      paddingTopAnim.setValue(targetPaddingTop);
-    }
-
-    // 이전 값 업데이트
-    prevSubModalIsOpen.current = subModalIsOpen;
-  }, [paddingTopAnim]);
 
   /**
    * 카운터 상태 동기화
@@ -1013,7 +969,5 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     handleSectionUndo,
 
     // 패딩 탑 애니메이션
-    paddingTopAnim,
-    updatePaddingTopAnimation,
   };
 };

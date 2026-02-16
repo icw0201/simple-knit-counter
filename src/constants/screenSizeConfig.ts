@@ -1,7 +1,5 @@
 // src/constants/screenSizeConfig.ts
 
-import { DimensionValue } from 'react-native';
-
 /**
  * 화면 크기에 따른 UI 요소 크기 분류
  * 컴팩트, 작음, 중간, 큼으로 구분하여 반응형 UI 제공
@@ -11,7 +9,6 @@ export enum ScreenSize {
   SMALL = 'SMALL',       // 450 이하 (작은 화면)
   LARGE = 'LARGE',       // 450 초과 (큰 화면)
 }
-
 
 /**
  * 현재 화면 크기를 판단하여 적절한 ScreenSize 열거값을 반환합니다.
@@ -23,7 +20,7 @@ export const getScreenSize = (height: number): ScreenSize => {
   if (height <= 300) {
     return ScreenSize.COMPACT;
   }
-  if (height <= 450) {
+  if (height <= 500) {
     return ScreenSize.SMALL;
   }
   return ScreenSize.LARGE;
@@ -41,6 +38,22 @@ export const getIconSize = (screenSize: ScreenSize): number => {
     [ScreenSize.LARGE]: 64,     // 큼: 큰 아이콘
   };
   return iconSizeConfig[screenSize];
+};
+
+/**
+ * 화면 크기에 따른 ProgressBar 높이(px)를 반환합니다.
+ */
+export const getProgressBarHeightPx = (screenSize: ScreenSize): number => {
+  const config = { [ScreenSize.COMPACT]: 12, [ScreenSize.SMALL]: 20, [ScreenSize.LARGE]: 28 };
+  return config[screenSize];
+};
+
+/**
+ * 화면 크기에 따른 ProgressBar Tailwind height 클래스를 반환합니다.
+ */
+export const getProgressBarHeightClass = (screenSize: ScreenSize): string => {
+  const config = { [ScreenSize.COMPACT]: 'h-3', [ScreenSize.SMALL]: 'h-5', [ScreenSize.LARGE]: 'h-7' };
+  return config[screenSize];
 };
 
 /**
@@ -73,20 +86,6 @@ export const getTextClass = (screenSize: ScreenSize): string => {
 };
 
 /**
- * 화면 크기에 따른 gap 클래스를 반환합니다.
- * @param screenSize - 화면 크기
- * @returns gap 클래스
- */
-export const getGapClass = (screenSize: ScreenSize): string => {
-  const gapConfig = {
-    [ScreenSize.COMPACT]: 'mt-2 mb-2',          // 컴팩트: 작은 간격
-    [ScreenSize.SMALL]: 'mt-3 mb-3',            // 작음: 중간 간격
-    [ScreenSize.LARGE]: 'mt-8 mb-8',          // 큼: 큰 간격
-  };
-  return gapConfig[screenSize];
-};
-
-/**
  * 화면 크기에 따른 TimeDisplay 텍스트 클래스를 반환합니다.
  * @param screenSize - 화면 크기
  * @returns 텍스트 클래스
@@ -98,20 +97,6 @@ export const getTimeDisplayTextClass = (screenSize: ScreenSize): string => {
     [ScreenSize.LARGE]: 'text-2xl',       // 큼: 큰 글씨
   };
   return timeDisplayTextClassConfig[screenSize];
-};
-
-/**
- * 화면 크기에 따른 TimeDisplay 최소 높이를 반환합니다.
- * @param screenSize - 화면 크기
- * @returns 최소 높이 (픽셀)
- */
-export const getTimeDisplayMinHeight = (screenSize: ScreenSize): number => {
-  const timeDisplayMinHeightConfig = {
-    [ScreenSize.COMPACT]: 0,              // 컴팩트: 사용 안 함
-    [ScreenSize.SMALL]: 20,                // 작음: 작은 높이
-    [ScreenSize.LARGE]: 20,                // 큼: 기본 높이
-  };
-  return timeDisplayMinHeightConfig[screenSize];
 };
 
 /**
@@ -129,45 +114,36 @@ export const getSubModalTextMarginClass = (screenSize: ScreenSize): string => {
 };
 
 /**
- * 화면 크기에 따른 서브 모달 width 비율을 반환합니다.
- * @param screenSize - 화면 크기
- * @returns width 비율 (0.0 ~ 1.0)
- */
-export const getSubModalWidthRatio = (screenSize: ScreenSize): number => {
-  const subModalWidthRatioConfig = {
-    [ScreenSize.COMPACT]: 1.0,    // 컴팩트: 100%
-    [ScreenSize.SMALL]: 1.0,      // 작음: 100%
-    [ScreenSize.LARGE]: 0.9,      // 큼: 90%
-  };
-  return subModalWidthRatioConfig[screenSize];
-};
-
-/**
  * 화면 크기에 따른 서브 모달 height 비율을 반환합니다.
  * @param screenSize - 화면 크기
  * @returns height 비율 (0.0 ~ 1.0)
  */
 export const getSubModalHeightRatio = (screenSize: ScreenSize): number => {
   const subModalHeightRatioConfig = {
-    [ScreenSize.COMPACT]: 0.45,   // 컴팩트: 45%
-    [ScreenSize.SMALL]: 0.45,     // 작음: 45%
-    [ScreenSize.LARGE]: 0.27,     // 큼: 27%
+    [ScreenSize.COMPACT]: 0.30,   // 컴팩트: 30%
+    [ScreenSize.SMALL]: 0.30,     // 작음: 30%
+    [ScreenSize.LARGE]: 0.22,     // 큼: 22%
   };
   return subModalHeightRatioConfig[screenSize];
 };
 
-/**
- * 화면 크기에 따른 서브 모달 top 위치를 반환합니다.
- * @param screenSize - 화면 크기
- * @returns top 위치 (DimensionValue)
- */
-export const getSubModalTop = (screenSize: ScreenSize): DimensionValue => {
-  const subModalTopConfig: Record<ScreenSize, DimensionValue> = {
-    [ScreenSize.COMPACT]: '80%',  // 컴팩트: 80%
-    [ScreenSize.SMALL]: '85%',    // 작음: 85%
-    [ScreenSize.LARGE]: '80%',    // 큼: 80%
+const getSubModalCenterYPercent = (screenSize: ScreenSize): number => {
+  const subModalCenterYPercentConfig: Record<ScreenSize, number> = {
+    [ScreenSize.COMPACT]: 85,
+    [ScreenSize.SMALL]: 85,
+    [ScreenSize.LARGE]: 87,
   };
-  return subModalTopConfig[screenSize];
+  return subModalCenterYPercentConfig[screenSize];
+};
+
+/**
+ * 화면 크기에 따른 서브 모달 세로 중앙 위치를 반환합니다.
+ * SlideModal에서 centerY로 사용하며, translateY: -height/2 로 실제 상단이 정해짐.
+ * @param screenSize - 화면 크기
+ * @returns 세로 중앙 위치 퍼센트(예: 85)
+ */
+export const getSubModalCenterY = (screenSize: ScreenSize): number => {
+  return getSubModalCenterYPercent(screenSize);
 };
 
 /**
@@ -197,35 +173,109 @@ export const getSegmentModalHeightRatio = (screenSize: ScreenSize): number => {
   return segmentModalHeightRatioConfig[screenSize];
 };
 
-/**
- * 화면 크기에 따른 구간 기록 모달 top 위치를 반환합니다.
- * SubCounterModal 위에 배치되며, SubCounterModal 상단(80%)에서 구간 기록 모달 높이(15%)와 간격(12%)을 뺀 값입니다.
- * @param screenSize - 화면 크기
- * @returns top 위치 (DimensionValue, LARGE일 때만 '53%')
- */
-export const getSegmentModalTop = (screenSize: ScreenSize): DimensionValue => {
-  const segmentModalTopConfig: Record<ScreenSize, DimensionValue> = {
-    [ScreenSize.COMPACT]: 0,      // 컴팩트: 사용 안 함
-    [ScreenSize.SMALL]: 0,        // 작음: 사용 안 함
-    [ScreenSize.LARGE]: '53%',   // 큼: 53% (80% - 13% - 14%)
+const getSegmentModalCenterYPercent = (screenSize: ScreenSize): number => {
+  const segmentModalCenterYPercentConfig: Record<ScreenSize, number> = {
+    [ScreenSize.COMPACT]: 0,
+    [ScreenSize.SMALL]: 0,
+    [ScreenSize.LARGE]: 21,
   };
-  return segmentModalTopConfig[screenSize];
+  return segmentModalCenterYPercentConfig[screenSize];
 };
 
-// ===== 패딩 탑 애니메이션 상수 =====
+/**
+ * 화면 크기에 따른 구간 기록 모달 세로 중앙 위치를 반환합니다.
+ * SlideModal에서 centerY로 사용함.
+ * @param screenSize - 화면 크기
+ * @returns 세로 중앙 위치 퍼센트 (LARGE일 때만 21)
+ */
+export const getSegmentModalCenterY = (screenSize: ScreenSize): number => {
+  if (screenSize !== ScreenSize.LARGE) {
+    return 0;
+  }
+  return getSegmentModalCenterYPercent(screenSize);
+};
+
+/**
+ * 서브 모달의 상단 경계(%)를 반환합니다.
+ * 동일 좌표계에서 메인 콘텐츠 종료 지점 계산에 사용합니다.
+ */
+export const getSubModalTopEdgePercent = (screenSize: ScreenSize): number => {
+  const centerPercent = getSubModalCenterYPercent(screenSize);
+  const heightPercent = getSubModalHeightRatio(screenSize) * 100;
+  return centerPercent - (heightPercent / 2);
+};
+
+/**
+ * 구간 기록 모달의 하단 경계(%)를 반환합니다.
+ * 동일 좌표계에서 메인 콘텐츠 시작 지점 계산에 사용합니다.
+ */
+export const getSegmentModalBottomEdgePercent = (screenSize: ScreenSize): number => {
+  const centerPercent = getSegmentModalCenterYPercent(screenSize);
+  const heightPercent = getSegmentModalHeightRatio(screenSize) * 100;
+  return centerPercent + (heightPercent / 2);
+};
+
+/**
+ * 구간 기록 모달의 상단 경계(%)를 반환합니다.
+ * 타이머 종료 지점과 정렬할 때 사용합니다.
+ */
+export const getSegmentModalTopEdgePercent = (screenSize: ScreenSize): number => {
+  const centerPercent = getSegmentModalCenterYPercent(screenSize);
+  const heightPercent = getSegmentModalHeightRatio(screenSize) * 100;
+  return centerPercent - (heightPercent / 2);
+};
 
 /**
  * 구간 기록 모달 실행 취소 버튼 아이콘 크기
  * 서브 아이콘 LARGE 크기와 동일 (44)
  */
-export const SEGMENT_UNDO_ICON_SIZE = 44;
+export const SEGMENT_UNDO_ICON_SIZE = getSubIconSize(ScreenSize.LARGE);
+
+// ===== CounterDetail 세로 구간(%) =====
+
+export type CounterDetailVerticalBands = {
+  /**
+   * ProgressBar 바로 아래를 0%로 봤을 때가 아니라,
+   * "화면 전체 높이" 기준 퍼센트(%)입니다.
+   * CounterDetail에서는 ProgressBar 높이(px)를 빼서 실제 높이를 계산해 사용합니다.
+   */
+  timerEndPercent: number;      // 0% ~ timerEndPercent
+  contentStartPercent: number;  // contentStartPercent ~ contentEndPercent
+  contentEndPercent: number;
+};
+
 
 /**
- * 패딩 탑 배수 (기본값)
+ * CounterDetail의 타이머/메인 컨텐츠(방향·숫자·버튼) 세로 구간을 화면 퍼센트로 지정합니다.
+ * contentEndPercent는 원하면 getSubModalTopEdgePercent(screenSize)로 맞출 수 있음 (서브 모달 상단과 정렬).
  */
-export const PADDING_TOP_MULTIPLIER = 0;
+export const getCounterDetailVerticalBands = (screenSize: ScreenSize): CounterDetailVerticalBands => {
+  const compactTimerEndPercent = 0;
+  const compactContentStartPercent = 0;
+  const compactContentEndPercent = getSubModalTopEdgePercent(ScreenSize.COMPACT);
+  const smallTimerEndPercent = 20;
+  const smallContentStartPercent = smallTimerEndPercent;
+  const smallContentEndPercent = getSubModalTopEdgePercent(ScreenSize.SMALL);
+  const largeTimerEndPercent = getSegmentModalTopEdgePercent(ScreenSize.LARGE);
+  const largeContentStartPercent = getSegmentModalBottomEdgePercent(ScreenSize.LARGE);
+  const largeContentEndPercent = getSubModalTopEdgePercent(ScreenSize.LARGE);
 
-/**
- * SubCounterModal 열릴 때 패딩 탑 배수 (2배)
- */
-export const PADDING_TOP_RATIO = 2;
+  const config: Record<ScreenSize, CounterDetailVerticalBands> = {
+    [ScreenSize.COMPACT]: {
+      timerEndPercent: compactTimerEndPercent,
+      contentStartPercent: compactContentStartPercent,
+      contentEndPercent: compactContentEndPercent,
+    },
+    [ScreenSize.SMALL]: {
+      timerEndPercent: smallTimerEndPercent,
+      contentStartPercent: smallContentStartPercent,
+      contentEndPercent: smallContentEndPercent,
+    },
+    [ScreenSize.LARGE]: {
+      timerEndPercent: largeTimerEndPercent,
+      contentStartPercent: largeContentStartPercent,
+      contentEndPercent: largeContentEndPercent,
+    },
+  };
+  return config[screenSize];
+};

@@ -1,8 +1,8 @@
 // src/screens/CounterDetail.tsx
 
-import { useLayoutEffect, useCallback, useEffect, useRef, useState } from 'react';
-import { View, Text, useWindowDimensions, Animated } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useLayoutEffect, useCallback, useState } from 'react';
+import { View, Text, useWindowDimensions, Animated, LayoutChangeEvent } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '@navigation/AppNavigator';
@@ -11,10 +11,11 @@ import { getHeaderRightWithActivateInfoSettings } from '@navigation/HeaderOption
 
 import { CounterTouchArea, CounterDirection, CounterActions, CounterModals, SubCounterModal, ProgressBar, TimeDisplay, SegmentRecordModal } from '@components/counter';
 import Tooltip from '@components/common/Tooltip';
-import { getScreenSize, getIconSize, getTextClass, getGapClass, getSubModalWidthRatio, getSubModalHeightRatio, getSubModalTop, getSubModalHandleWidth, getSegmentModalHeightRatio, getSegmentModalTop, ScreenSize } from '@constants/screenSizeConfig';
+import { getScreenSize, getIconSize, getProgressBarHeightPx, getTextClass, ScreenSize } from '@constants/screenSizeConfig';
 import { getTooltipEnabledSetting } from '@storage/settings';
 import { screenStyles, safeAreaEdges } from '@styles/screenStyles';
 import { useCounter } from '@hooks/useCounter';
+import { getContentSectionFlexes, getCounterDetailModalLayout, getCounterDetailVerticalPercents, getCounterDetailVerticalPx, getCounterDetailVisibility } from '@utils/counterDetailLayout';
 
 
 /**
@@ -38,12 +39,22 @@ const CounterDetail = () => {
   const route = useRoute();
   const { counterId } = route.params as { counterId: string };
 
-  // 화면 크기 정보
+  // 화면 크기 정보 (실제 렌더 영역과 동일한 좌표계 사용)
   const { height, width } = useWindowDimensions();
-  const screenSize = getScreenSize(height);
+  const insets = useSafeAreaInsets();
+  const ESTIMATED_HEADER_HEIGHT = 56;
+  const [layoutHeight, setLayoutHeight] = useState(0);
+  // ScreenSize 판정은 헤더 표시/숨김에 영향을 받지 않는 window 기준 높이로 고정
+  const screenSizeJudgeHeight = height - insets.bottom;
+  const screenSize = getScreenSize(screenSizeJudgeHeight);
+  // 모달/메인 배치는 실제 렌더 높이(onLayout)를 기준으로 계산.
+  // onLayout 전 초기값: 헤더 표시 시 예상 헤더 높이를 빼서 점프 완화
+  const contentAreaHeight = layoutHeight > 0
+    ? layoutHeight
+    : Math.max(0, height - insets.bottom - (screenSize !== ScreenSize.COMPACT ? ESTIMATED_HEADER_HEIGHT : 0));
   const iconSize = getIconSize(screenSize);
   const textClass = getTextClass(screenSize);
-  const gapClass = getGapClass(screenSize);
+  const progressBarHeightPx = getProgressBarHeightPx(screenSize);
 
 
   // 카운터 비즈니스 로직 훅
@@ -88,50 +99,53 @@ const CounterDetail = () => {
     // 구간 기록 모달
     handleSectionModalToggle,
     handleSectionUndo,
-    // 패딩 탑 애니메이션
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- 추후 애니메이션 스타일에 재사용 예정
-    paddingTopAnim,
-    updatePaddingTopAnimation,
   } = useCounter({ counterId });
 
-  // 패딩 탑 애니메이션 업데이트
-  // 최초 진입 시에는 애니메이션 없이 즉시 설정하고, 이후에는 subModalIsOpen 변경 시에만 애니메이션
-  const didInitPadding = useRef(false);
-  const prevCounterId = useRef<string | null>(null);
-  const [isPaddingReady, setPaddingReady] = useState(false);
   const [tooltipEnabled, setTooltipEnabled] = useState(true);
-  useEffect(() => {
-    if (!counter) { return; }
-
-    // 최초 진입(또는 다른 카운터로 전환) 시에는 애니메이션 없이 즉시 설정
-    if (!didInitPadding.current || prevCounterId.current !== counter.id) {
-      updatePaddingTopAnimation(height, subModalIsOpen, { animate: false });
-      didInitPadding.current = true;
-      prevCounterId.current = counter.id;
-      setPaddingReady(true);
-      return;
-    }
-
-    // 이후에는 상태 변경 시에만 애니메이션 적용
-    updatePaddingTopAnimation(height, subModalIsOpen, { animate: true });
-    setPaddingReady(true);
-  }, [counter, subModalIsOpen, height, updatePaddingTopAnimation]);
 
   // 방향 이미지 크기 계산 (원본 비율 90 / 189 유지)
   const imageWidth = iconSize * 1.4;
   const imageHeight = iconSize * (90 / 189) * 1.4;
   const hasParent = !!counter?.parentProjectId;
+  const handleLayout = useCallback((event: LayoutChangeEvent) => {
+    const { height: nextHeight } = event.nativeEvent.layout;
+    setLayoutHeight((prev) => (prev !== nextHeight ? nextHeight : prev));
+  }, []);
 
-  // SubCounterModal 크기 및 위치 계산 (화면 크기별)
-  const subModalWidth = width * getSubModalWidthRatio(screenSize);
-  const subModalHeight = height * getSubModalHeightRatio(screenSize);
-  const subModalTop = getSubModalTop(screenSize);
-  const subModalHandleWidth = getSubModalHandleWidth(screenSize);
-
-  // 구간 기록 모달 크기 및 위치 계산 (LARGE 화면에서만 사용)
-  const segmentModalWidth = subModalWidth;
-  const segmentModalHeight = height * getSegmentModalHeightRatio(screenSize);
-  const segmentModalTop = getSegmentModalTop(screenSize);
+  const { timerEndPercent, contentStartPercent, contentEndPercent } =
+    getCounterDetailVerticalPercents(screenSize);
+  const {
+    subModalWidth,
+    subModalHeight,
+    subModalCenterY,
+    subModalHandleWidth,
+    segmentModalWidth,
+    segmentModalHeight,
+    segmentModalCenterY,
+  } = getCounterDetailModalLayout(contentAreaHeight, width, screenSize);
+  const { showTimeDisplay, showCounterActions, shouldStartContentFromTop } =
+    getCounterDetailVisibility({
+      screenSize,
+      timerIsActive: counter?.timerIsActive ?? false,
+      subModalIsOpen,
+    });
+  const { directionSectionFlex, countSectionFlex, actionsSectionFlex } =
+    getContentSectionFlexes(mascotIsActive, showCounterActions);
+  const { timerHeightPx, gapBetweenTimerAndContentPx, contentHeightPx, bottomReservedHeightPx } =
+    getCounterDetailVerticalPx({
+      contentAreaHeight,
+      progressBarHeightPx,
+      timerEndPercent,
+      contentStartPercent,
+      contentEndPercent,
+      shouldStartContentFromTop,
+    });
+  const countSectionHeightPx = contentHeightPx * countSectionFlex;
+  const digitCount = Math.max(1, String(counter?.count ?? 0).length);
+  const CHAR_WIDTH_RATIO = 0.6; // 숫자 1글자 너비 ≈ fontSize * 비율
+  const maxFontSizeByHeight = countSectionHeightPx * 0.8;
+  const maxFontSizeByWidth = (width * 0.5) / (digitCount * CHAR_WIDTH_RATIO);
+  const countTextFontSizePx = Math.max(0, Math.min(maxFontSizeByHeight, maxFontSizeByWidth));
 
   /**
    * 화면 포커스 시 실행되는 효과
@@ -154,11 +168,9 @@ const CounterDetail = () => {
       return;
     }
 
-    const currentScreenSize = getScreenSize(height);
-
     navigation.setOptions({
       title: counter.title,
-      headerShown: currentScreenSize !== ScreenSize.COMPACT,
+      headerShown: screenSize !== ScreenSize.COMPACT,
       headerRight: () =>
         getHeaderRightWithActivateInfoSettings(
           navigation,
@@ -170,7 +182,7 @@ const CounterDetail = () => {
           hasParent ? undefined : () => navigation.navigate('InfoScreen', { itemId: counter.id })
         ),
     });
-  }, [navigation, counter, mascotIsActive, height, width, toggleMascotIsActive, toggleTimerIsActive, hasParent]);
+  }, [navigation, counter, mascotIsActive, screenSize, width, toggleMascotIsActive, toggleTimerIsActive, hasParent]);
 
 
   // 카운터 데이터가 없으면 렌더링하지 않음
@@ -180,7 +192,7 @@ const CounterDetail = () => {
 
   return (
     <SafeAreaView style={screenStyles.flex1} edges={safeAreaEdges}>
-      <View className="flex-1 bg-white">
+      <View className="flex-1 bg-white" onLayout={handleLayout}>
 
       {/* 좌우 터치 레이어 */}
       <CounterTouchArea onAdd={handleAdd} onSubtract={handleSubtract} />
@@ -191,8 +203,7 @@ const CounterDetail = () => {
         style={[
           screenStyles.pointerEventsBoxNone,
           {
-            paddingTop: -50,
-            opacity: isPaddingReady ? 1 : 0,
+            opacity: 1,
           },
         ]}
       >
@@ -221,49 +232,67 @@ const CounterDetail = () => {
           />
         )}
 
-        {/* 시간 표시 컴포넌트 */}
-        {counter.timerIsActive && screenSize !== ScreenSize.COMPACT && !(screenSize === ScreenSize.SMALL && (counter.subModalIsOpen ?? false)) && (
-          <TimeDisplay
-            screenSize={screenSize}
-            timerIsPlaying={counter.timerIsPlaying ?? false}
-            elapsedTime={counter.elapsedTime ?? 0}
-            onPress={toggleTimerIsPlaying}
-          />
-        )}
-
-        {/* 방향 표시 이미지 영역 */}
-        <CounterDirection
-          mascotIsActive={mascotIsActive}
-          wayIsChange={wayIsChange}
-          way={way}
-          currentCount={counter.count}
-          repeatRules={counter.repeatRules || []}
-          imageWidth={imageWidth}
-          imageHeight={imageHeight}
-          screenSize={screenSize}
-          onToggleWay={toggleWay}
-        />
-
-        {/* 현재 카운트 표시 */}
-        <View pointerEvents="none" className={gapClass}>
-          <Text
-            className={`${textClass} font-bold text-black`}
-          >
-            {counter.count}
-          </Text>
-        </View>
-
-        {/* 액션 버튼들 - SMALL 화면에서 SubCounterModal이 열려있으면 숨김 */}
-        {!(screenSize === ScreenSize.SMALL && subModalIsOpen) && (
-          <View className={gapClass}>
-            <CounterActions
-              screenSize={screenSize}
-              iconSize={iconSize}
-              onReset={() => setActiveModal('reset')}
-              onEdit={handleEditOpen}
-            />
+        <View className="absolute left-0 right-0 bottom-0 w-full items-center justify-start" style={{ top: progressBarHeightPx }}>
+          {/* 타이머 영역 (bands의 timerEndPercent 기준) */}
+          <View className="w-full items-center justify-center" style={{ height: timerHeightPx }}>
+            {showTimeDisplay && (
+              <TimeDisplay
+                screenSize={screenSize}
+                timerIsPlaying={counter.timerIsPlaying ?? false}
+                elapsedTime={counter.elapsedTime ?? 0}
+                onPress={toggleTimerIsPlaying}
+              />
+            )}
           </View>
-        )}
+
+          {/* 구간 기록 모달 자리 (bands의 contentStartPercent - timerEndPercent) */}
+          <View style={{ height: gapBetweenTimerAndContentPx }} />
+
+          {/* 방향/숫자/버튼 (bands의 contentStartPercent ~ contentEndPercent). mascotIsActive일 때만 디렉션, 아니면 숫자·버튼 0.6 : 0.4 */}
+          <View className="w-full items-center" style={{ height: contentHeightPx }}>
+            <View className="w-full flex-1">
+              {mascotIsActive && (
+                <View className="items-center justify-center w-full" style={{ flex: directionSectionFlex }}>
+                  <CounterDirection
+                    mascotIsActive={mascotIsActive}
+                    wayIsChange={wayIsChange}
+                    way={way}
+                    currentCount={counter.count}
+                    repeatRules={counter.repeatRules || []}
+                    imageWidth={imageWidth}
+                    imageHeight={imageHeight}
+                    onToggleWay={toggleWay}
+                  />
+                </View>
+              )}
+              <View
+                className="items-center justify-center w-full"
+                style={{ flex: countSectionFlex }}
+                pointerEvents="none"
+              >
+                <Text
+                  className={`${textClass} font-bold text-black`}
+                  style={{ fontSize: countTextFontSizePx, lineHeight: countTextFontSizePx }}
+                >
+                  {counter.count}
+                </Text>
+              </View>
+              {showCounterActions && (
+                <View className="items-center justify-center w-full" style={{ flex: actionsSectionFlex }}>
+                  <CounterActions
+                    screenSize={screenSize}
+                    iconSize={iconSize}
+                    onReset={() => setActiveModal('reset')}
+                    onEdit={handleEditOpen}
+                  />
+                </View>
+              )}
+            </View>
+          </View>
+
+          {/* 서브 모달 아래 영역 예약 (bands 기준 나머지) */}
+          <View style={{ height: bottomReservedHeightPx }} />
+        </View>
       </Animated.View>
 
       {/* 구간 기록 모달 - LARGE 화면에서만 표시 */}
@@ -275,7 +304,7 @@ const CounterDetail = () => {
           screenSize={screenSize}
           width={segmentModalWidth}
           height={segmentModalHeight}
-          top={segmentModalTop}
+          centerY={segmentModalCenterY}
           sectionRecords={counter.sectionRecords}
         />
       )}
@@ -296,7 +325,7 @@ const CounterDetail = () => {
         screenSize={screenSize}
         width={subModalWidth}
         height={subModalHeight}
-        top={subModalTop}
+        centerY={subModalCenterY}
       />
 
       {/* 모달들 */}
