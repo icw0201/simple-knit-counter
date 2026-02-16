@@ -10,9 +10,6 @@ export enum ScreenSize {
   LARGE = 'LARGE',       // 450 초과 (큰 화면)
 }
 
-const PERCENT_GAP = 0;
-
-
 /**
  * 현재 화면 크기를 판단하여 적절한 ScreenSize 열거값을 반환합니다.
  * @param height - 화면 높이
@@ -239,13 +236,13 @@ export type CounterDetailVerticalBands = {
 export const getCounterDetailVerticalBands = (screenSize: ScreenSize): CounterDetailVerticalBands => {
   const compactTimerEndPercent = 0;
   const compactContentStartPercent = 0;
-  const compactContentEndPercent = getSubModalTopEdgePercent(ScreenSize.COMPACT) - PERCENT_GAP;
+  const compactContentEndPercent = getSubModalTopEdgePercent(ScreenSize.COMPACT);
   const smallTimerEndPercent = 20;
-  const smallContentStartPercent = smallTimerEndPercent + PERCENT_GAP;
-  const smallContentEndPercent = getSubModalTopEdgePercent(ScreenSize.SMALL) - PERCENT_GAP;
-  const largeTimerEndPercent = getSegmentModalTopEdgePercent(ScreenSize.LARGE) - PERCENT_GAP;
-  const largeContentStartPercent = getSegmentModalBottomEdgePercent(ScreenSize.LARGE) + PERCENT_GAP;
-  const largeContentEndPercent = getSubModalTopEdgePercent(ScreenSize.LARGE) - PERCENT_GAP;
+  const smallContentStartPercent = smallTimerEndPercent;
+  const smallContentEndPercent = getSubModalTopEdgePercent(ScreenSize.SMALL);
+  const largeTimerEndPercent = getSegmentModalTopEdgePercent(ScreenSize.LARGE);
+  const largeContentStartPercent = getSegmentModalBottomEdgePercent(ScreenSize.LARGE);
+  const largeContentEndPercent = getSubModalTopEdgePercent(ScreenSize.LARGE);
 
   const config: Record<ScreenSize, CounterDetailVerticalBands> = {
     [ScreenSize.COMPACT]: {
