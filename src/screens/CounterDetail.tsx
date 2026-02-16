@@ -141,7 +141,11 @@ const CounterDetail = () => {
       shouldStartContentFromTop,
     });
   const countSectionHeightPx = contentHeightPx * countSectionFlex;
-  const countTextFontSizePx = Math.max(0, countSectionHeightPx * 0.8);
+  const digitCount = Math.max(1, String(counter?.count ?? 0).length);
+  const CHAR_WIDTH_RATIO = 0.6; // 숫자 1글자 너비 ≈ fontSize * 비율
+  const maxFontSizeByHeight = countSectionHeightPx * 0.8;
+  const maxFontSizeByWidth = (width * 0.5) / (digitCount * CHAR_WIDTH_RATIO);
+  const countTextFontSizePx = Math.max(0, Math.min(maxFontSizeByHeight, maxFontSizeByWidth));
 
   /**
    * 화면 포커스 시 실행되는 효과
