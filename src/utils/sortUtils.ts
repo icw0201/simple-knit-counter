@@ -61,6 +61,32 @@ export const getProgressPercentage = (item: Item): number => {
   return 0;
 };
 
+// 아이템의 소요시간(초)을 계산합니다.
+// - counter: 자신의 elapsedTime 사용
+// - project: 하위 카운터들의 elapsedTime 합
+export const getElapsedTimeValue = (item: Item): number => {
+  if (item.type === 'counter') {
+    const counter = item as Counter;
+    return counter.elapsedTime ?? 0;
+  }
+
+  if (item.type === 'project') {
+    const project = item as Project;
+    const allItems = getStoredItems();
+    const childCounters = allItems.filter(
+      (i): i is Counter => i.type === 'counter' && project.counterIds.includes(i.id)
+    );
+
+    if (childCounters.length === 0) {
+      return 0;
+    }
+
+    return childCounters.reduce((sum, counter) => sum + (counter.elapsedTime ?? 0), 0);
+  }
+
+  return 0;
+};
+
 //아이템이 완료되었는지 확인합니다.
 //진행률이 100% 이상이면 완료된 것으로 간주합니다.
 export const isItemCompleted = (item: Item): boolean => {
@@ -127,11 +153,9 @@ const compareItems = (a: Item, b: Item, criteria: SortCriteria, order: SortOrder
       bValue = getProgressPercentage(b);
       break;
 
-    // TODO: elapsedTime 정렬 기능 구현
     case 'elapsedTime':
-      // 미구현 상태
-      aValue = 0;
-      bValue = 0;
+      aValue = getElapsedTimeValue(a);
+      bValue = getElapsedTimeValue(b);
       break;
   }
 

@@ -1,12 +1,10 @@
-// src/navigation/HeaderOptions.tsx
-
 import React from 'react';
-import { ChevronLeft, Settings, Trash2, Info, ArrowDownUp } from 'lucide-react-native';
+import { ChevronLeft, Settings, Trash2, Info, ArrowDownUp, Timer } from 'lucide-react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from './AppNavigator';
 
-import { View, Image, TouchableOpacity } from 'react-native';
-import { activateIcons } from '@assets/images';
+import { View, TouchableOpacity } from 'react-native';
+import ActivateToggle from '@components/common/ActivateToggle';
 
 export const getDefaultHeaderLeft = (
   navigation: any
@@ -82,18 +80,26 @@ export const getHeaderRightWithActivateInfoSettings = (
   navigation: NativeStackNavigationProp<RootStackParamList>,
   mascotIsActive: boolean,
   onActivatePress: () => void,
+  timerIsActive: boolean,
+  onTimerPress: () => void,
+  counterId: string,
   onInfoPress?: () => void
 ): React.JSX.Element => {
   return (
     <View className="flex-row items-center">
-      {/* 활성 아이콘 */}
-      <TouchableOpacity onPress={onActivatePress}>
-        <Image
-          source={activateIcons[mascotIsActive ? 'active' : 'inactive']}
-          style={{ width: 23, height: 23, marginRight: 13 }}
-          resizeMode="contain"
-        />
+      {/* Timer 아이콘 */}
+      <TouchableOpacity onPress={onTimerPress} style={{ marginRight: 13 }}>
+        <Timer size={24} color={timerIsActive ? 'black' : '#B8B8B8'} />
       </TouchableOpacity>
+
+      {/* 활성 아이콘 */}
+      <View style={{ marginRight: 13 }}>
+        <ActivateToggle
+          mascotIsActive={mascotIsActive}
+          onToggle={onActivatePress}
+          onLongPress={() => navigation.navigate('WaySetting', { counterId })}
+        />
+      </View>
 
       {/* Info 버튼 (선택적) */}
       {onInfoPress && (
@@ -103,7 +109,7 @@ export const getHeaderRightWithActivateInfoSettings = (
       )}
 
       {/* 설정 */}
-      <TouchableOpacity onPress={() => navigation.navigate('Setting')}>
+      <TouchableOpacity onPress={() => navigation.navigate('Setting')} style={{ marginRight: 4 }}>
         <Settings size={24} color="black" />
       </TouchableOpacity>
     </View>

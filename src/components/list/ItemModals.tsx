@@ -86,7 +86,6 @@ const ItemModals: React.FC<ItemModalsProps> = ({
         onConfirm={onDeleteConfirm}
         confirmText="삭제"
         cancelText="취소"
-        confirmButtonStyle="danger"
       />
 
       {/* 중복 이름 확인 모달 */}
@@ -98,7 +97,6 @@ const ItemModals: React.FC<ItemModalsProps> = ({
         onConfirm={onDuplicateConfirm}
         confirmText="생성"
         cancelText="취소"
-        confirmButtonStyle="primary"
       />
     </>
   );

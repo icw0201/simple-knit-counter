@@ -8,7 +8,7 @@ const STORAGE_KEY = 'knit_items';
 const DATA_VERSION_KEY = 'data_version';
 
 // 데이터 버전 관리
-export const CURRENT_DATA_VERSION = 3; // 새 프로퍼티 추가 마이그레이션
+export const CURRENT_DATA_VERSION = 4; // repeatRules 배열로 변경, way를 Counter로 이동, RepeatRule에 color 필드 추가
 
 /**
  * 버전 1: 기존 'active' 상태를 'auto'로 마이그레이션
@@ -51,8 +51,10 @@ const migrateV2_ActivateModeToWayIsChangeAndMascotIsActive = (items: Item[]): It
  * - targetCount: 0 (목표 없음)
  * - elapsedTime: 0 (초 단위, 0 ~ 359999)
  * - timerIsActive: false
+ * - timerIsPlaying: false (V4에서 추가)
  * - subCount, subRule, subRuleIsActive, subModalIsOpen (보조 카운터 필드)
- * - repeatRuleIsActive, repeatRuleNumber, repeatRuleStartNumber, repeatRuleEndNumber (반복 규칙 필드)
+ * - repeatRules (반복 규칙 필드 - V4에서 배열로 변경됨)
+ * - way (V4에서 info.way에서 counter.way로 이동)
  * - sectionRecords, sectionModalIsOpen (구간 기록 필드)
  * @param items 마이그레이션할 아이템 배열
  * @returns 마이그레이션된 아이템 배열
@@ -61,14 +63,18 @@ const migrateV3_AddNewProperties = (items: Item[]): Item[] => {
   return items.map((item) => {
     if (item.type === 'counter') {
       const counter = item as any;
+      // 이전 버전의 불필요한 필드 제거 (activateMode는 V2에서 제거되어야 하지만 안전을 위해)
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { activateMode, ...rest } = counter;
 
       // 새로 추가된 프로퍼티들의 기본값 설정
       return {
-        ...counter,
+        ...rest,
         // 타이머 및 목표 관련 프로퍼티
         targetCount: counter.targetCount ?? 0,
         elapsedTime: counter.elapsedTime ?? 0,
         timerIsActive: counter.timerIsActive ?? false,
+        timerIsPlaying: counter.timerIsPlaying ?? false,
 
         // 보조 카운터 필드들 (필수 프로퍼티)
         subCount: counter.subCount ?? 0,
@@ -77,14 +83,57 @@ const migrateV3_AddNewProperties = (items: Item[]): Item[] => {
         subModalIsOpen: counter.subModalIsOpen ?? false,
 
         // 마스코트 반복 규칙 필드들 (필수 프로퍼티)
-        repeatRuleIsActive: counter.repeatRuleIsActive ?? false,
-        repeatRuleNumber: counter.repeatRuleNumber ?? 0,
-        repeatRuleStartNumber: counter.repeatRuleStartNumber ?? 0,
-        repeatRuleEndNumber: counter.repeatRuleEndNumber ?? 0,
+        repeatRules: counter.repeatRules ?? [],
 
         // 구간 기록 필드들 (필수 프로퍼티)
         sectionRecords: counter.sectionRecords ?? [],
         sectionModalIsOpen: counter.sectionModalIsOpen ?? false,
+      };
+    }
+    return item;
+  });
+};
+
+
+/**
+ * 버전 4: 반복 규칙을 배열로 변경, way를 Counter로 이동, RepeatRule에 color 필드 추가 (필수)
+ * 1. 기존: repeatRuleIsActive, repeatRuleNumber, repeatRuleStartNumber, repeatRuleEndNumber
+ *    신규: repeatRules: RepeatRule[] (color 필드 포함, 필수)
+ * 2. way를 info.way에서 counter.way로 이동
+ * 3. 이전 버전에서는 항상 초기값이었으므로 빈 배열 반환
+ * @param items 마이그레이션할 아이템 배열
+ * @returns 마이그레이션된 아이템 배열
+ */
+const migrateV4_RepeatRulesToArrayAndMoveWay = (items: Item[]): Item[] => {
+  return items.map((item) => {
+    if (item.type === 'counter') {
+      const counter = item as any;
+      // 이전 버전의 불필요한 필드 제거 (repeatRuleIsActive, repeatRuleNumber 등)
+      const rest = { ...counter };
+      delete rest.repeatRuleIsActive;
+      delete rest.repeatRuleNumber;
+      delete rest.repeatRuleStartNumber;
+      delete rest.repeatRuleEndNumber;
+
+      const info = rest.info;
+      delete rest.info;
+
+      // 1. 반복 규칙을 배열로 변환
+      // 이전 버전에서는 항상 초기값이었으므로 빈 배열 반환
+      const repeatRules: any[] = [];
+
+      // 2. way를 info에서 counter로 이동
+      const way = info?.way;
+      const updatedInfo = info ? { ...info } : undefined;
+      if (updatedInfo && 'way' in updatedInfo) {
+        delete updatedInfo.way;
+      }
+
+      return {
+        ...rest,
+        repeatRules,
+        way,
+        info: updatedInfo,
       };
     }
     return item;
@@ -112,6 +161,11 @@ const runMigrations = (items: Item[], fromVersion: number, toVersion: number): I
 
   if (fromVersion < 3 && toVersion >= 3) {
     migratedItems = migrateV3_AddNewProperties(migratedItems);
+  }
+
+  if (fromVersion < 4 && toVersion >= 4) {
+    migratedItems = migrateV3_AddNewProperties(migratedItems); // 기본값 설정
+    migratedItems = migrateV4_RepeatRulesToArrayAndMoveWay(migratedItems); // repeatRules 배열, way 이동, color 필드 추가
   }
 
   return migratedItems;

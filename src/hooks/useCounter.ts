@@ -1,15 +1,15 @@
 // src/hooks/useCounter.ts
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useFocusEffect } from '@react-navigation/native';
-import { Platform, Vibration, Animated, AppState } from 'react-native';
+import { useFocusEffect, useIsFocused } from '@react-navigation/native';
+import { Platform, Vibration, AppState } from 'react-native';
 import HapticFeedback from 'react-native-haptic-feedback';
 import Sound from 'react-native-sound';
 
 import { getStoredItems, updateItem } from '@storage/storage';
-import { Way, Counter } from '@storage/types';
-import { getSoundSetting, getVibrationSetting } from '@storage/settings';
-import { PADDING_TOP_MULTIPLIER, PADDING_TOP_RATIO } from '@constants/screenSizeConfig';
+import { Way, Counter, SectionRecord, EditLogType } from '@storage/types';
+import { getSoundSetting, getVibrationSetting, getAutoPlayElapsedTimeSetting } from '@storage/settings';
+import { getCurrentTime } from '@utils/timeUtils';
 
 interface UseCounterProps {
   counterId: string;
@@ -44,6 +44,8 @@ interface UseCounterReturn {
   handleTargetCountConfirm: (value: string) => void;
   toggleMascotIsActive: () => void;
   toggleWay: () => void;
+  toggleTimerIsActive: () => void;
+  toggleTimerIsPlaying: () => void;
   showErrorModal: (message: string) => void;
   setErrorModalVisible: (visible: boolean) => void;
   setActiveModal: (modal: 'reset' | 'edit' | 'limit' | 'rule' | 'subReset' | 'subEdit' | 'subLimit' | 'targetCount' | null) => void;
@@ -59,9 +61,10 @@ interface UseCounterReturn {
   handleSubRuleConfirm: (rule: number, isRuleActive: boolean) => void;
   handleSubModalToggle: () => void;
 
-  // 패딩 탑 애니메이션
-  paddingTopAnim: Animated.Value;
-  updatePaddingTopAnimation: (height: number, subModalIsOpen: boolean, options?: { animate?: boolean }) => void;
+  // 구간 기록 모달 액션 함수
+  handleSectionModalToggle: () => void;
+  handleSectionUndo: () => void;
+
 }
 
 /**
@@ -77,6 +80,8 @@ interface UseCounterReturn {
  * - 에러 처리
  */
 export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => {
+  // 화면 포커스 상태 확인
+  const isFocused = useIsFocused();
 
   // 카운터 데이터 상태
   const [counter, setCounter] = useState<Counter | null>(null);
@@ -94,11 +99,6 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
   // 설정 상태
   const [soundSetting, setSoundSettingState] = useState(true);
   const [vibrationSetting, setVibrationSettingState] = useState(true);
-
-  // 패딩 탑 애니메이션 상태
-  const paddingTopAnim = useRef(new Animated.Value(0)).current;
-  const isInitialized = useRef(false);
-  const prevSubModalIsOpen = useRef<boolean | null>(null); // null로 초기화하여 첫 실행과 구분
 
   // 카운터 동작 상태
   const [wayIsChange, setWayIsChange] = useState<boolean>(false);
@@ -118,7 +118,7 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
       setCounter(latest);
       setWayIsChange(latest.wayIsChange ?? false);
       setMascotIsActive(latest.mascotIsActive ?? false);
-      setWay(latest.info?.way ?? 'front');
+      setWay(latest.way ?? 'front');
       setCurrentCount(String(latest.count));
     }
   }, [counterId]);
@@ -153,7 +153,7 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
       );
 
       if (latest) {
-        // title과 info만 업데이트(헤더/표시용), 조작 가능한 필드들은 유지
+        // title, info, mascotIsActive, wayIsChange, repeatRules 등 메타데이터 업데이트(헤더/표시용), 조작 가능한 필드들은 유지
         setCounter(prevCounter => {
           if (!prevCounter) {
             return latest;
@@ -162,9 +162,30 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
             ...prevCounter,
             title: latest.title,
             info: latest.info,
+            mascotIsActive: latest.mascotIsActive ?? false,
+            wayIsChange: latest.wayIsChange ?? false,
+            repeatRules: latest.repeatRules ?? [],
           };
         });
-        setWay(latest.info?.way ?? 'front');
+        setWay(latest.way ?? 'front');
+        setMascotIsActive(latest.mascotIsActive ?? false);
+        setWayIsChange(latest.wayIsChange ?? false);
+
+        // 카운터 진입 시 타이머 재생 상태 설정
+        // 카운터가 활성화된 상태 & 설정에서 자동재생 켜짐 -> true, 꺼짐 -> false
+        if (latest.timerIsActive) {
+          const autoPlaySetting = getAutoPlayElapsedTimeSetting();
+          const shouldPlay = autoPlaySetting;
+          if (latest.timerIsPlaying !== shouldPlay) {
+            updateItem(latest.id, { timerIsPlaying: shouldPlay });
+            setCounter(prev => {
+              if (!prev) {
+                return prev;
+              }
+              return { ...prev, timerIsPlaying: shouldPlay };
+            });
+          }
+        }
       }
     }, [counterId, loadSettings]) // counter 의존성 제거
   );
@@ -187,9 +208,27 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
         return;
       }
 
-      // 백그라운드 진입: 현재 메모리 상태를 MMKV에 저장 (방어적 저장)
+      // 백그라운드 진입: MMKV에서 최신 데이터를 읽어서 저장 (다른 화면에서 변경된 내용 보존)
       if (nextState === 'background') {
-        updateItem(counter.id, counter);
+        const items = getStoredItems();
+        const persisted = items.find(
+          (item): item is Counter => item.id === counterId && item.type === 'counter'
+        );
+        if (persisted) {
+          // MMKV의 최신 데이터를 사용 (다른 화면에서 변경된 내용 포함)
+          const memoryTimestamp = counter.updatedAt ?? 0;
+          const persistedTimestamp = persisted.updatedAt ?? 0;
+          if (persistedTimestamp >= memoryTimestamp) {
+            // MMKV 데이터가 더 최신이거나 같으면 MMKV 데이터를 저장 (이미 저장되어 있지만 확실히 하기 위해)
+            updateItem(counter.id, persisted);
+          } else {
+            // 메모리가 더 최신이면 메모리 데이터를 저장
+            updateItem(counter.id, counter);
+          }
+        } else {
+          // MMKV에 없으면 메모리 상태를 저장
+          updateItem(counter.id, counter);
+        }
         return;
       }
 
@@ -229,7 +268,13 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
    * 사운드 파일 로드 및 초기화
    */
   useEffect(() => {
-    const sound = new Sound(require('../assets/sounds/click_cut.mp3'), (error) => {
+    // Android: res/raw에 있는 파일명을 사용 (확장자는 있어도 되고, 내부에서 소문자/확장자 제거 처리)
+    // iOS: 앱 번들에 파일을 포함시킨 뒤 파일명으로 로드해야 합니다.
+    const filename = Platform.OS === 'android'
+      ? 'src_assets_sounds_click_cut.mp3'
+      : 'click_cut.mp3';
+
+    const sound = new Sound(filename, Sound.MAIN_BUNDLE, (error) => {
       if (error) {
         setErrorMessage('사운드 로드 실패:\n' + error.message);
         setErrorModalVisible(true);
@@ -245,41 +290,6 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
   }, []);
 
   /**
-   * 패딩 탑 애니메이션 관리
-   */
-  const updatePaddingTopAnimation = useCallback((height: number, subModalIsOpen: boolean, options?: { animate?: boolean }) => {
-    const shouldAnimate = options?.animate ?? true;
-    const targetPaddingTop = subModalIsOpen
-      ? PADDING_TOP_MULTIPLIER * height  // 열려있으면 0.085 * height
-      : PADDING_TOP_MULTIPLIER * PADDING_TOP_RATIO * height; // 닫혀있으면 0.17 * height
-
-    // 첫 실행이거나 초기화되지 않은 경우
-    if (prevSubModalIsOpen.current === null) {
-      // 초기 설정 시에는 애니메이션 없이 즉시 설정
-      paddingTopAnim.setValue(targetPaddingTop);
-      isInitialized.current = true;
-    } else if (prevSubModalIsOpen.current !== subModalIsOpen) {
-      // subModalIsOpen이 변경된 경우에만 애니메이션 적용
-      if (shouldAnimate) {
-        Animated.timing(paddingTopAnim, {
-          toValue: targetPaddingTop,
-          duration: 300,
-          useNativeDriver: false,
-        }).start();
-      } else {
-        // shouldAnimate가 false인 경우 (강제로 애니메이션 비활성화)
-        paddingTopAnim.setValue(targetPaddingTop);
-      }
-    } else {
-      // height만 변경된 경우에는 즉시 설정 (애니메이션 없음)
-      paddingTopAnim.setValue(targetPaddingTop);
-    }
-
-    // 이전 값 업데이트
-    prevSubModalIsOpen.current = subModalIsOpen;
-  }, [paddingTopAnim]);
-
-  /**
    * 카운터 상태 동기화
    */
   useEffect(() => {
@@ -289,10 +299,41 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     if (counter?.mascotIsActive !== undefined) {
       setMascotIsActive(counter.mascotIsActive);
     }
-    if (counter?.info?.way) {
-      setWay(counter.info.way);
+    if (counter?.way) {
+      setWay(counter.way);
     }
   }, [counter]);
+
+  /**
+   * 타이머 재생 중 소요 시간 증가
+   * timerIsActive가 true이고 timerIsPlaying이 true일 때만 동작
+   * 화면에 포커스가 있을 때만 동작 (다른 화면으로 이동하면 일시정지)
+   */
+  useEffect(() => {
+    if (!counter || !counter.timerIsActive || !counter.timerIsPlaying || !isFocused) {
+      return;
+    }
+
+    const intervalId = setInterval(() => {
+      // 최신 counter 값을 가져오기 위해 함수형 업데이트 사용
+      setCounter(prev => {
+        if (!prev || !prev.timerIsActive || !prev.timerIsPlaying || !isFocused) {
+          return prev;
+        }
+
+        // 최대값: 9999시간 59분 59초 = 35999999초
+        const MAX_ELAPSED_TIME = 35999999;
+        const newElapsedTime = Math.min(prev.elapsedTime + 1, MAX_ELAPSED_TIME);
+        updateItem(prev.id, { elapsedTime: newElapsedTime });
+        return { ...prev, elapsedTime: newElapsedTime };
+      });
+    }, 1000); // 1초마다 실행
+
+    return () => {
+      clearInterval(intervalId);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [counter?.timerIsActive, counter?.timerIsPlaying, counter?.id, isFocused]);
 
   /**
    * 에러 모달 표시
@@ -349,27 +390,80 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
   }, [wayIsChange, way]);
 
   /**
-   * mascotIsActive 토글 (wayIsChange도 함께 토글)
+   * mascotIsActive 토글
    */
   const toggleMascotIsActive = useCallback(() => {
     const newMascotIsActive = !mascotIsActive;
-    const newWayIsChange = !wayIsChange;
 
     setMascotIsActive(newMascotIsActive);
-    setWayIsChange(newWayIsChange);
 
     if (counter) {
       updateItem(counter.id, {
         mascotIsActive: newMascotIsActive,
-        wayIsChange: newWayIsChange,
       });
       setCounter({
         ...counter,
         mascotIsActive: newMascotIsActive,
-        wayIsChange: newWayIsChange,
       });
     }
-  }, [mascotIsActive, wayIsChange, counter]);
+  }, [mascotIsActive, counter]);
+
+  /**
+   * 타이머 활성화 토글 함수
+   */
+  const toggleTimerIsActive = useCallback(() => {
+    if (!counter) {
+      return;
+    }
+
+    const newTimerIsActive = !counter.timerIsActive;
+    // 타이머 활성화 시 설정의 "타이머 자동 재생" 설정값을 따름, 비활성화 시는 기존 값 유지
+    let newTimerIsPlaying = counter.timerIsPlaying;
+    if (newTimerIsActive) {
+      const autoPlaySetting = getAutoPlayElapsedTimeSetting();
+      newTimerIsPlaying = autoPlaySetting;
+    }
+    updateItem(counter.id, { timerIsActive: newTimerIsActive, timerIsPlaying: newTimerIsPlaying });
+    setCounter({ ...counter, timerIsActive: newTimerIsActive, timerIsPlaying: newTimerIsPlaying });
+  }, [counter]);
+
+  /**
+   * 타이머 재생 상태 토글 함수
+   */
+  const toggleTimerIsPlaying = useCallback(() => {
+    if (!counter) {
+      return;
+    }
+
+    const newTimerIsPlaying = !counter.timerIsPlaying;
+    updateItem(counter.id, { timerIsPlaying: newTimerIsPlaying });
+    setCounter({ ...counter, timerIsPlaying: newTimerIsPlaying });
+  }, [counter]);
+
+  /**
+   * 구간 기록 추가 (최신 3개만 유지)
+   * 실행 취소를 위해 이전 상태 정보도 함께 저장
+   */
+  const addSectionRecord = useCallback((editContent: EditLogType, editedCount: number, editedMainCount?: number): SectionRecord[] => {
+    if (!counter) {
+      return [];
+    }
+
+    const newRecord: SectionRecord = {
+      time: getCurrentTime(),
+      editedCount,
+      editedMainCount,
+      editContent,
+      // 실행 취소를 위한 이전 상태 저장
+      previousCount: counter.count,
+      previousSubCount: counter.subCount,
+      previousWay: counter.way,
+      previousSubRuleIsActive: counter.subRuleIsActive,
+    };
+    const currentRecords = counter?.sectionRecords ?? [];
+    // 최신 기록을 앞에 추가하고 최신 3개만 유지
+    return [newRecord, ...currentRecords].slice(0, 3);
+  }, [counter]);
 
   /**
    * 방향 토글 (wayIsChange가 true일 때만 동작)
@@ -383,31 +477,14 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     setWay(newWay);
 
     if (counter) {
-      const updatedInfo = { ...counter.info, way: newWay as Way };
-      updateItem(counter.id, { info: updatedInfo });
-      setCounter({ ...counter, info: updatedInfo });
+      // way 변경 시 구간 기록 추가 (editedCount: front=0, back=1)
+      const editContent = newWay === 'front' ? 'way_change_front' : 'way_change_back';
+      const updatedSectionRecords = addSectionRecord(editContent, newWay === 'front' ? 0 : 1);
+
+      updateItem(counter.id, { way: newWay as Way, sectionRecords: updatedSectionRecords });
+      setCounter({ ...counter, way: newWay as Way, sectionRecords: updatedSectionRecords });
     }
-  }, [way, counter, wayIsChange]);
-
-  /**
-   * 카운트 업데이트 및 자동 방향 전환
-   */
-  const updateCountAndMaybeWay = useCallback((newCount: number) => {
-    if (!counter) {
-      return;
-    }
-
-    const diff = Math.abs(counter.count - newCount);
-
-    const newWay = wayIsChange && diff % 2 === 1
-      ? way === 'front' ? 'back' : 'front'
-      : way;
-
-    const updatedInfo = { ...counter.info, way: newWay as Way };
-
-    updateItem(counter.id, { count: newCount, info: updatedInfo });
-    setCounter({ ...counter, count: newCount, info: updatedInfo });
-  }, [counter, wayIsChange, way]);
+  }, [way, counter, wayIsChange, addSectionRecord]);
 
   /**
    * 숫자 증가 처리
@@ -424,14 +501,18 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     }
 
     const newWay = getReversedWayIfWayIsChange();
-    const updatedInfo = newWay ? { ...counter.info, way: newWay as Way } : counter.info;
+    const updatedSectionRecords = addSectionRecord('count_increase', newCount, newCount);
 
-    updateItem(counter.id, { count: newCount, info: updatedInfo });
-    setCounter({ ...counter, count: newCount, info: updatedInfo });
+    const updateData: any = { count: newCount, sectionRecords: updatedSectionRecords };
+    if (newWay) {
+      updateData.way = newWay as Way;
+    }
+    updateItem(counter.id, updateData);
+    setCounter({ ...counter, count: newCount, way: newWay ?? counter.way, sectionRecords: updatedSectionRecords });
 
     triggerHaptics();
     playSound();
-  }, [counter, getReversedWayIfWayIsChange, triggerHaptics, playSound]);
+  }, [counter, getReversedWayIfWayIsChange, triggerHaptics, playSound, addSectionRecord]);
 
   /**
    * 숫자 감소 처리
@@ -448,14 +529,18 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     }
 
     const newWay = getReversedWayIfWayIsChange();
-    const updatedInfo = newWay ? { ...counter.info, way: newWay as Way } : counter.info;
+    const updatedSectionRecords = addSectionRecord('count_decrease', newCount, newCount);
 
-    updateItem(counter.id, { count: newCount, info: updatedInfo });
-    setCounter({ ...counter, count: newCount, info: updatedInfo });
+    const updateData: any = { count: newCount, sectionRecords: updatedSectionRecords };
+    if (newWay) {
+      updateData.way = newWay as Way;
+    }
+    updateItem(counter.id, updateData);
+    setCounter({ ...counter, count: newCount, way: newWay ?? counter.way, sectionRecords: updatedSectionRecords });
 
     triggerHaptics();
     playSound();
-  }, [counter, getReversedWayIfWayIsChange, triggerHaptics, playSound]);
+  }, [counter, getReversedWayIfWayIsChange, triggerHaptics, playSound, addSectionRecord]);
 
   /**
    * 편집 모달 열기
@@ -487,9 +572,22 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
       return;
     }
 
-    updateCountAndMaybeWay(newValue);
+    // 변화가 없는 경우 구간 기록 저장하지 않음
+    if (newValue === counter.count) {
+      handleClose();
+      return;
+    }
+
+    const updatedSectionRecords = addSectionRecord('count_edit', counter.subCount, newValue);
+    const diff = Math.abs(counter.count - newValue);
+    const newWay = wayIsChange && diff % 2 === 1
+      ? way === 'front' ? 'back' : 'front'
+      : way;
+
+    updateItem(counter.id, { count: newValue, way: newWay as Way, sectionRecords: updatedSectionRecords });
+    setCounter({ ...counter, count: newValue, way: newWay as Way, sectionRecords: updatedSectionRecords });
     handleClose();
-  }, [counter, updateCountAndMaybeWay, handleClose]);
+  }, [counter, wayIsChange, way, addSectionRecord, handleClose]);
 
   /**
    * 초기화 모달에서 확인 시 카운트를 0으로 리셋
@@ -499,9 +597,22 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
       return;
     }
 
-    updateCountAndMaybeWay(0);
+    // 이미 0인 경우 구간 기록 저장하지 않음
+    if (counter.count === 0) {
+      handleClose();
+      return;
+    }
+
+    const updatedSectionRecords = addSectionRecord('count_reset', counter.subCount, 0);
+    const diff = Math.abs(counter.count - 0);
+    const newWay = wayIsChange && diff % 2 === 1
+      ? way === 'front' ? 'back' : 'front'
+      : way;
+
+    updateItem(counter.id, { count: 0, way: newWay as Way, sectionRecords: updatedSectionRecords });
+    setCounter({ ...counter, count: 0, way: newWay as Way, sectionRecords: updatedSectionRecords });
     handleClose();
-  }, [counter, updateCountAndMaybeWay, handleClose]);
+  }, [counter, wayIsChange, way, addSectionRecord, handleClose]);
 
   /**
    * 목표 단수 편집 모달 열기
@@ -561,18 +672,19 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
 
     // way 변경 로직 적용 (본 카운터가 증가할 때)
     const newWay = newMainCount > counter.count ? getReversedWayIfWayIsChange() : null;
-    const updatedInfo = newWay ? { ...counter.info, way: newWay as Way } : counter.info;
 
+    const updatedSectionRecords = addSectionRecord('sub_count_increase', newSubCount, newMainCount);
     const updatedCounter = {
       ...counter,
       subCount: newSubCount,
       count: newMainCount,
-      info: updatedInfo,
+      way: newWay ?? counter.way,
+      sectionRecords: updatedSectionRecords,
     };
 
     await updateItem(counter.id, updatedCounter);
     setCounter(updatedCounter);
-  }, [counter, playSound, triggerHaptics, getReversedWayIfWayIsChange]);
+  }, [counter, playSound, triggerHaptics, getReversedWayIfWayIsChange, addSectionRecord]);
 
   const handleSubSubtract = useCallback(async () => {
     if (!counter) {
@@ -589,15 +701,17 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     triggerHaptics();
 
     const newSubCount = counter.subCount - 1;
+    const updatedSectionRecords = addSectionRecord('sub_count_decrease', newSubCount, counter.count);
 
     const updatedCounter = {
       ...counter,
       subCount: newSubCount,
+      sectionRecords: updatedSectionRecords,
     };
 
     await updateItem(counter.id, updatedCounter);
     setCounter(updatedCounter);
-  }, [counter, playSound, triggerHaptics]);
+  }, [counter, playSound, triggerHaptics, addSectionRecord]);
 
   const handleSubReset = useCallback(() => {
     setActiveModal('subReset');
@@ -617,15 +731,23 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
       return;
     }
 
+    // 이미 0인 경우 구간 기록 저장하지 않음
+    if (counter.subCount === 0) {
+      handleClose();
+      return;
+    }
+
+    const updatedSectionRecords = addSectionRecord('sub_count_reset', 0, counter.count);
     const updatedCounter = {
       ...counter,
       subCount: 0,
+      sectionRecords: updatedSectionRecords,
     };
 
     updateItem(counter.id, updatedCounter);
     setCounter(updatedCounter);
     handleClose();
-  }, [counter, handleClose]);
+  }, [counter, handleClose, addSectionRecord]);
 
   // 보조 카운터 편집 확인
   const handleSubEditConfirm = useCallback((value: string) => {
@@ -643,32 +765,39 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
       newSubCount = 0;
       newMainCount = counter.count + 1;
 
-    // 본 카운터가 9999를 넘으면 리밋 모달 표시하고 증가하지 않음
-    if (newMainCount > 9999) {
-      // 현재 모달을 먼저 닫고, 그 다음에 리밋 모달 표시
-      handleClose();
-      setTimeout(() => {
-        setActiveModal('limit');
-      }, 100); // 모달 닫기 애니메이션 후에 리밋 모달 표시
-      return;
+      // 본 카운터가 9999를 넘으면 리밋 모달 표시하고 증가하지 않음
+      if (newMainCount > 9999) {
+        // 현재 모달을 먼저 닫고, 그 다음에 리밋 모달 표시
+        handleClose();
+        setTimeout(() => {
+          setActiveModal('limit');
+        }, 100); // 모달 닫기 애니메이션 후에 리밋 모달 표시
+        return;
+      }
     }
+
+    // 변화가 없는 경우 구간 기록 저장하지 않음
+    if (newSubCount === counter.subCount && newMainCount === counter.count) {
+      handleClose();
+      return;
     }
 
     // way 변경 로직 적용 (본 카운터가 증가할 때)
     const newWay = newMainCount > counter.count ? getReversedWayIfWayIsChange() : null;
-    const updatedInfo = newWay ? { ...counter.info, way: newWay as Way } : counter.info;
 
+    const updatedSectionRecords = addSectionRecord('sub_count_edit', newSubCount, newMainCount);
     const updatedCounter = {
       ...counter,
       subCount: newSubCount,
       count: newMainCount,
-      info: updatedInfo,
+      way: newWay ?? counter.way,
+      sectionRecords: updatedSectionRecords,
     };
 
     updateItem(counter.id, updatedCounter);
     setCounter(updatedCounter);
     handleClose();
-  }, [counter, handleClose, getReversedWayIfWayIsChange]);
+  }, [counter, handleClose, getReversedWayIfWayIsChange, addSectionRecord]);
 
   // 보조 카운터 규칙 확인
   const handleSubRuleConfirm = useCallback((rule: number, isRuleActive: boolean) => {
@@ -691,18 +820,36 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
       newMainCount = counter.count + 1;
     }
 
+    // 변화가 없는 경우 구간 기록 저장하지 않음 (이미 활성화/비활성화 상태인 경우)
+    if (isRuleActive === counter.subRuleIsActive && rule === counter.subRule) {
+      handleClose();
+      return;
+    }
+
+    // way 변경 로직 적용 (본 카운터가 증가할 때)
+    const newWay = newMainCount > counter.count ? getReversedWayIfWayIsChange() : null;
+
+    // 규칙 활성화/비활성화에 따라 구간 기록 추가
+    // 단수/코수가 바뀌는 경우에만 숫자 정보 전달 (표시 형식이 달라짐)
+    const hasCountChange = newSubCount !== counter.subCount || newMainCount !== counter.count;
+    const updatedSectionRecords = isRuleActive
+      ? addSectionRecord('sub_rule_activate', hasCountChange ? newSubCount : counter.subCount, hasCountChange ? newMainCount : undefined)
+      : addSectionRecord('sub_rule_deactivate', counter.subCount, counter.count);
+
     const updatedCounter = {
       ...counter,
       subRule: rule,
       subRuleIsActive: isRuleActive,
       subCount: newSubCount,
       count: newMainCount,
+      way: newWay ?? counter.way,
+      sectionRecords: updatedSectionRecords,
     };
 
     updateItem(counter.id, updatedCounter);
     setCounter(updatedCounter);
     handleClose();
-  }, [counter, handleClose, showErrorModal]);
+  }, [counter, handleClose, showErrorModal, addSectionRecord, getReversedWayIfWayIsChange]);
 
   // 보조 카운터 모달 토글
   const handleSubModalToggle = useCallback(async () => {
@@ -718,6 +865,58 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     await updateItem(counter.id, updatedCounter);
     setCounter(updatedCounter);
   }, [counter]);
+
+  // 구간 기록 모달 토글
+  const handleSectionModalToggle = useCallback(async () => {
+    if (!counter) {
+      return;
+    }
+
+    const updatedCounter = {
+      ...counter,
+      sectionModalIsOpen: !counter.sectionModalIsOpen,
+    };
+
+    await updateItem(counter.id, updatedCounter);
+    setCounter(updatedCounter);
+  }, [counter]);
+
+  // 구간 기록 실행 취소 (최신 기록 제거 및 이전 상태로 복원)
+  const handleSectionUndo = useCallback(async () => {
+    if (!counter || !counter.sectionRecords || counter.sectionRecords.length === 0) {
+      return;
+    }
+
+    // 최신 기록 가져오기 (첫 번째 항목)
+    const latestRecord = counter.sectionRecords[0];
+
+    // 이전 상태로 복원
+    const restoredCount = latestRecord.previousCount ?? counter.count;
+    const restoredSubCount = latestRecord.previousSubCount ?? counter.subCount;
+    const restoredWay = latestRecord.previousWay ?? counter.way;
+    const restoredSubRuleIsActive = latestRecord.previousSubRuleIsActive ?? counter.subRuleIsActive;
+
+    // 최신 기록 제거 (첫 번째 항목 제거)
+    const updatedSectionRecords = counter.sectionRecords.slice(1);
+
+    // 카운터 상태 업데이트
+    const updatedCounter = {
+      ...counter,
+      count: restoredCount,
+      subCount: restoredSubCount,
+      way: restoredWay ?? counter.way,
+      subRuleIsActive: restoredSubRuleIsActive,
+      sectionRecords: updatedSectionRecords,
+    };
+
+    await updateItem(counter.id, updatedCounter);
+    setCounter(updatedCounter);
+
+    // way 상태도 업데이트
+    if (restoredWay) {
+      setWay(restoredWay);
+    }
+  }, [counter, setWay]);
 
   return {
     // 상태
@@ -748,6 +947,8 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     handleTargetCountConfirm,
     toggleMascotIsActive,
     toggleWay,
+    toggleTimerIsActive,
+    toggleTimerIsPlaying,
     showErrorModal,
     setErrorModalVisible,
     setActiveModal,
@@ -763,8 +964,10 @@ export const useCounter = ({ counterId }: UseCounterProps): UseCounterReturn => 
     handleSubRuleConfirm,
     handleSubModalToggle,
 
+    // 구간 기록 모달 액션 함수
+    handleSectionModalToggle,
+    handleSectionUndo,
+
     // 패딩 탑 애니메이션
-    paddingTopAnim,
-    updatePaddingTopAnimation,
   };
 };

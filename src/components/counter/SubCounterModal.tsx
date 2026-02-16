@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text } from 'react-native';
-import { SlideModal } from '../common/modals/SlideModal/SlideModal';
+import { SlideModal } from '@components/common/modals/SlideModal/SlideModal';
 import SubCounterAction from './SubCounterAction';
 import SubCounterTouchArea from './SubCounterTouchArea';
 import { getSubIconSize, getSubModalTextMarginClass, ScreenSize } from '@constants/screenSizeConfig';
@@ -22,7 +22,7 @@ interface SubCounterModalProps {
   screenSize: ScreenSize;
   width: number;
   height: number;
-  top: DimensionValue;
+  centerY: DimensionValue;
 }
 
 // ===== 메인 컴포넌트 =====
@@ -41,7 +41,7 @@ export const SubCounterModal: React.FC<SubCounterModalProps> = ({
   screenSize,
   width,
   height,
-  top,
+  centerY,
 }) => {
   // 아이콘 크기 및 간격 정보
   const iconSize = getSubIconSize(screenSize);
@@ -55,7 +55,7 @@ export const SubCounterModal: React.FC<SubCounterModalProps> = ({
       handleWidth={handleWidth}
       backgroundColor="white"
       padding={0}
-      top={top}
+      centerY={centerY}
     >
       {/* 터치 영역 - 배경 100% 차지 */}
       <SubCounterTouchArea
@@ -65,7 +65,7 @@ export const SubCounterModal: React.FC<SubCounterModalProps> = ({
       />
 
       {/* 콘텐츠 영역 */}
-      <View className="flex-1 items-center justify-center" style={{ paddingLeft: handleWidth }}>
+      <View className="flex-1 items-center justify-center">
 
       <View pointerEvents="none">
         <Text className={`text-4xl font-bold text-black ${textMarginClass}`}>

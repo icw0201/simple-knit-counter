@@ -55,7 +55,6 @@ const CounterModals: React.FC<CounterModalsProps> = ({
         onConfirm={onResetConfirm}
         confirmText="초기화"
         cancelText="취소"
-        confirmButtonStyle="danger"
       />
 
       {/* 카운트 편집 모달 */}
@@ -85,7 +84,6 @@ const CounterModals: React.FC<CounterModalsProps> = ({
         onConfirm={onClose}
         confirmText="확인"
         cancelText=""
-        confirmButtonStyle="primary"
       />
 
       {/* 보조 카운터 초기화 확인 모달 */}
@@ -97,7 +95,6 @@ const CounterModals: React.FC<CounterModalsProps> = ({
         onConfirm={onSubResetConfirm}
         confirmText="초기화"
         cancelText="취소"
-        confirmButtonStyle="danger"
       />
 
       {/* 보조 카운터 편집 모달 */}
@@ -118,7 +115,6 @@ const CounterModals: React.FC<CounterModalsProps> = ({
         onConfirm={onClose}
         confirmText="확인"
         cancelText=""
-        confirmButtonStyle="primary"
       />
 
       {/* 보조 카운터 규칙 모달 */}
@@ -139,7 +135,6 @@ const CounterModals: React.FC<CounterModalsProps> = ({
         onConfirm={onErrorModalClose}
         confirmText="확인"
         cancelText=""
-        confirmButtonStyle="primary"
       />
     </>
   );

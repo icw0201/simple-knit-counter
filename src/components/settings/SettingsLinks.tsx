@@ -1,7 +1,14 @@
 // src/components/settings/SettingsLinks.tsx
 import React from 'react';
 import { View, Linking } from 'react-native';
-import RoundedBox from '@components/common/RoundedBox';
+import DeviceInfo from 'react-native-device-info';
+import InAppReview from 'react-native-in-app-review';
+import {
+  ONE_STORE_INSTALLER_PACKAGE,
+  ONE_STORE_URL,
+  PLAY_STORE_URL,
+} from '@constants/storeUrls';
+import IconBox from './IconBox';
 
 interface SettingsLinksProps {}
 
@@ -13,10 +20,21 @@ const SettingsLinks: React.FC<SettingsLinksProps> = () => {
    * 외부 링크 열기 (리뷰/문의)
    * @param type - 링크 타입 ('review' | 'contact')
    */
-  const handlePress = (type: 'review' | 'contact') => {
+  const handlePress = async (type: 'review' | 'contact') => {
     if (type === 'review') {
-      // 원스토어 리뷰 링크 https://play.google.com/store/apps/details?id=com.simpleknitcounter&pcampaignid=web_share
-      Linking.openURL('https://onesto.re/0001001132').catch(() => {
+      try {
+        if (InAppReview.isAvailable()) {
+          await InAppReview.RequestInAppReview();
+          return;
+        }
+      } catch (error) {
+        // In-App Review 호출 실패 시 스토어 링크로 폴백
+      }
+
+      const installer = await DeviceInfo.getInstallerPackageName().catch(() => null);
+      const reviewUrl =
+        installer === ONE_STORE_INSTALLER_PACKAGE ? ONE_STORE_URL : PLAY_STORE_URL;
+      Linking.openURL(reviewUrl).catch(() => {
         // 에러 처리 (필요시 추가)
       });
     } else if (type === 'contact') {
@@ -32,24 +50,14 @@ const SettingsLinks: React.FC<SettingsLinksProps> = () => {
   };
   return (
     <View className="mb-8">
-      <RoundedBox
+      <IconBox
         title="별점 남기기"
-        layoutStyle="Icon"
-        colorStyle="C"
         iconName="star"
-        isButton
-        rounded="2xl"
-        containerClassName="mb-4"
         onPress={() => handlePress('review')}
       />
-      <RoundedBox
+      <IconBox
         title="문의하기"
-        layoutStyle="Icon"
-        colorStyle="C"
         iconName="mail"
-        isButton
-        rounded="2xl"
-        containerClassName="mb-4"
         onPress={() => handlePress('contact')}
       />
     </View>

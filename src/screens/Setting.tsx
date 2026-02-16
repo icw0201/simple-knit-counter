@@ -3,6 +3,7 @@ import React from 'react';
 import { View, ScrollView } from 'react-native';
 
 import { SettingsCheckBoxes, SettingsLinks, SettingsVersion } from '@components/settings';
+import { screenStyles } from '@styles/screenStyles';
 
 /**
  * 설정 화면 컴포넌트
@@ -13,19 +14,12 @@ const Settings = () => {
   return (
     <View className="flex-1">
       {/* 설정 옵션들 */}
-      <ScrollView
-        contentContainerStyle={{
-          paddingBottom: 20,
-          justifyContent: 'center',
-          flexGrow: 1,
-        }}
-        className="p-4"
-      >
+      <ScrollView contentContainerStyle={screenStyles.scrollViewContentCentered}>
         <SettingsCheckBoxes />
 
         <SettingsLinks />
 
-        <SettingsVersion version="1.2.0" />
+        <SettingsVersion version="1.3.0" />
       </ScrollView>
 
     </View>

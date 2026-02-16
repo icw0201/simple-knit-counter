@@ -8,6 +8,8 @@ import {
   setSortOrderSetting,
   getMoveCompletedToBottomSetting,
   setMoveCompletedToBottomSetting,
+  getShowElapsedTimeInListSetting,
+  setShowElapsedTimeInListSetting,
 } from '@storage/settings';
 import {
   SORT_CRITERIA_MAP,
@@ -41,6 +43,9 @@ const SortDropdown: React.FC<SortDropdownProps> = ({
   const [hideCompleted, setHideCompleted] = useState<boolean>(() => {
     return getMoveCompletedToBottomSetting();
   });
+  const [showElapsedTimeInList, setShowElapsedTimeInList] = useState<boolean>(() => {
+    return getShowElapsedTimeInListSetting();
+  });
 
   // visible이 true가 될 때마다 storage에서 최신 값 가져오기
   useEffect(() => {
@@ -48,9 +53,11 @@ const SortDropdown: React.FC<SortDropdownProps> = ({
       const criteria = getSortCriteriaSetting();
       const order = getSortOrderSetting();
       const moveCompleted = getMoveCompletedToBottomSetting();
+      const showElapsedTime = getShowElapsedTimeInListSetting();
       setSelectedSortBy(SORT_CRITERIA_REVERSE_MAP[criteria] || '생성일');
       setSelectedOrder(SORT_ORDER_REVERSE_MAP[order] || '내림차순');
       setHideCompleted(moveCompleted);
+      setShowElapsedTimeInList(showElapsedTime);
     }
   }, [visible]);
 
@@ -82,6 +89,13 @@ const SortDropdown: React.FC<SortDropdownProps> = ({
     setMoveCompletedToBottomSetting(newValue);
     // 정렬 변경 알림
     onSelect('moveCompletedToBottom');
+  };
+
+  const handleShowElapsedTimeInListToggle = () => {
+    const newValue = !showElapsedTimeInList;
+    setShowElapsedTimeInList(newValue);
+    setShowElapsedTimeInListSetting(newValue);
+    onSelect('showElapsedTimeInList');
   };
 
   return (
@@ -158,12 +172,25 @@ const SortDropdown: React.FC<SortDropdownProps> = ({
           {/* 구분선 */}
           <View className="border-b border-lightgray -mx-4 my-2" />
 
-          {/* 체크박스 */}
+          {/* 체크박스 - 완성 편물 아래로 */}
           <View className="-ml-3">
             <CheckBox
                 label="완성 편물 아래로"
                 checked={hideCompleted}
                 onToggle={handleHideCompletedToggle}
+                size="xs"
+            />
+          </View>
+
+          {/* 구분선 */}
+          <View className="border-b border-lightgray -mx-4 my-2" />
+
+          {/* 체크박스 - 목록에서 소요 시간 표시 */}
+          <View className="-ml-3">
+            <CheckBox
+                label="소요시간 표시"
+                checked={showElapsedTimeInList}
+                onToggle={handleShowElapsedTimeInListToggle}
                 size="xs"
             />
           </View>

@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { CommonActions, useNavigation } from '@react-navigation/native';
-import { activateKeepAwake, deactivateKeepAwake } from '@sayem314/react-native-keep-awake';
 
 import CheckBox from '@components/common/CheckBox';
 import { ConfirmModal } from '@components/common/modals';
@@ -16,6 +15,8 @@ import {
   setScreenAwakeSetting,
   getTooltipEnabledSetting,
   setTooltipEnabledSetting,
+  getAutoPlayElapsedTimeSetting,
+  setAutoPlayElapsedTimeSetting,
 } from '@storage/settings';
 
 interface SettingsCheckBoxesProps {}
@@ -32,6 +33,7 @@ const SettingsCheckBoxes: React.FC<SettingsCheckBoxesProps> = () => {
   const [vibration, setVibration] = useState(true);
   const [screenAwake, setScreenAwake] = useState(true);
   const [tooltipEnabled, setTooltipEnabled] = useState(true);
+  const [autoPlayElapsedTime, setAutoPlayElapsedTime] = useState(true);
   const [resetConfirm, setResetConfirm] = useState(false);
   const [resetModalVisible, setResetModalVisible] = useState(false);
   const [errorModalVisible, setErrorModalVisible] = useState(false);
@@ -44,6 +46,7 @@ const SettingsCheckBoxes: React.FC<SettingsCheckBoxesProps> = () => {
     const currentSetting = getScreenAwakeSetting();
     setScreenAwake(currentSetting);
     setTooltipEnabled(getTooltipEnabledSetting());
+    setAutoPlayElapsedTime(getAutoPlayElapsedTimeSetting());
   }, []);
 
   /**
@@ -71,12 +74,6 @@ const SettingsCheckBoxes: React.FC<SettingsCheckBoxesProps> = () => {
     const newValue = !screenAwake;
     setScreenAwake(newValue);
     setScreenAwakeSetting(newValue);
-
-    if (newValue) {
-      activateKeepAwake();
-    } else {
-      deactivateKeepAwake();
-    }
   };
 
   /**
@@ -86,6 +83,15 @@ const SettingsCheckBoxes: React.FC<SettingsCheckBoxesProps> = () => {
     const newValue = !tooltipEnabled;
     setTooltipEnabled(newValue);
     setTooltipEnabledSetting(newValue);
+  };
+
+  /**
+   * 타이머 자동 재생 설정 토글 처리
+   */
+  const handleAutoPlayElapsedTimeToggle = () => {
+    const newValue = !autoPlayElapsedTime;
+    setAutoPlayElapsedTime(newValue);
+    setAutoPlayElapsedTimeSetting(newValue);
   };
 
   /**
@@ -148,7 +154,7 @@ const SettingsCheckBoxes: React.FC<SettingsCheckBoxesProps> = () => {
           onToggle={handleVibrationToggle}
         />
         <CheckBox
-          label="카운터 스크린 항상 켜두기"
+          label="스크린 항상 켜두기"
           checked={screenAwake}
           onToggle={handleScreenAwakeToggle}
         />
@@ -156,6 +162,11 @@ const SettingsCheckBoxes: React.FC<SettingsCheckBoxesProps> = () => {
           label="툴팁 표시하기"
           checked={tooltipEnabled}
           onToggle={handleTooltipToggle}
+        />
+        <CheckBox
+          label="타이머 자동 재생"
+          checked={autoPlayElapsedTime}
+          onToggle={handleAutoPlayElapsedTimeToggle}
         />
         <CheckBox
           label="초기화하기"
@@ -173,7 +184,6 @@ const SettingsCheckBoxes: React.FC<SettingsCheckBoxesProps> = () => {
         onConfirm={handleResetConfirm}
         confirmText="삭제"
         cancelText="취소"
-        confirmButtonStyle="danger"
       />
 
       {/* 에러 알림 모달 */}
@@ -185,7 +195,6 @@ const SettingsCheckBoxes: React.FC<SettingsCheckBoxesProps> = () => {
         onConfirm={() => setErrorModalVisible(false)}
         confirmText="확인"
         cancelText=""
-        confirmButtonStyle="primary"
       />
     </>
   );

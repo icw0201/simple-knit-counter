@@ -1,7 +1,7 @@
 // src/components/counter/ProgressBar.tsx
 import React from 'react';
 import { Pressable, Text, View, useWindowDimensions } from 'react-native';
-import { ScreenSize } from '@constants/screenSizeConfig';
+import { ScreenSize, getProgressBarHeightClass } from '@constants/screenSizeConfig';
 
 interface ProgressBarProps {
   count: number;
@@ -29,8 +29,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ count, targetCount, screenSiz
   const minTextWidth = 50;
   const isProgressBarWideEnough = progressWidth >= minTextWidth;
   const isCompact = screenSize === ScreenSize.COMPACT;
-  const isSmall = screenSize === ScreenSize.SMALL;
-  const heightClass = isCompact ? 'h-3' : isSmall ? 'h-5' : 'h-7';
+  const heightClass = getProgressBarHeightClass(screenSize);
 
   const containerClassName = `absolute top-0 left-0 right-0 ${heightClass} bg-red-orange-50`;
 

@@ -22,7 +22,12 @@ const SubCounterTouchArea: React.FC<SubCounterTouchAreaProps> = ({
   const [rightPressed, setRightPressed] = useState(false);
 
   return (
-    <View className="absolute top-0 left-0 right-0 bottom-0 flex-row" style={{ paddingLeft: handleWidth }}>
+    <View
+      className="absolute top-0 left-0 right-0 bottom-0 flex-row"
+      // SlideModal이 children과 핸들이 겹치지 않게 오른쪽에 여유를 두는 만큼,
+      // 터치 영역(배경)의 중앙도 동일하게 맞춰준다.
+      style={{ paddingRight: handleWidth * 0.4 }}
+    >
       {/* 왼쪽 영역 (감소) - 투명 배경 */}
       <Pressable
         className={`flex-1 items-start justify-center ${leftPressed ? 'bg-gray-100' : 'bg-transparent'}`}

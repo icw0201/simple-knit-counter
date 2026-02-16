@@ -14,6 +14,7 @@ const KEY_SORT_ORDER = 'settings.sortOrder';
 const KEY_MOVE_COMPLETED_TO_BOTTOM = 'settings.moveCompletedToBottom';
 const KEY_AUTO_PLAY_ELAPSED_TIME = 'settings.autoPlayElapsedTime';
 const KEY_TOOLTIP_ENABLED = 'settings.tooltipEnabled';
+const KEY_SHOW_ELAPSED_TIME_IN_LIST = 'settings.showElapsedTimeInList';
 
 // 기본값 상수 정의
 const DEFAULT_SOUND = true;
@@ -24,6 +25,7 @@ const DEFAULT_SORT_ORDER: SortOrder = 'desc';
 const DEFAULT_MOVE_COMPLETED_TO_BOTTOM = false;
 const DEFAULT_AUTO_PLAY_ELAPSED_TIME = true;
 const DEFAULT_TOOLTIP_ENABLED = true;
+const DEFAULT_SHOW_ELAPSED_TIME_IN_LIST = false;
 
 /**
  * 사운드 설정을 저장합니다.
@@ -74,6 +76,23 @@ export const setScreenAwakeSetting = (value: boolean) => {
 export const getScreenAwakeSetting = (): boolean => {
   const value = storage.getString(KEY_SCREEN_AWAKE);
   return value ? JSON.parse(value) : DEFAULT_SCREEN_AWAKE;
+};
+
+/**
+ * screenAwake 설정 변경을 구독합니다. (변경 시점만 알려줌)
+ * - 키 문자열/리스너 등록을 이 파일로 숨겨서 사용처를 깔끔하게 유지
+ * @returns unsubscribe 함수
+ */
+export const subscribeScreenAwakeSettingChange = (callback: () => void) => {
+  const listener = storage.addOnValueChangedListener((changedKey) => {
+    if (changedKey === KEY_SCREEN_AWAKE) {
+      callback();
+    }
+  });
+
+  return () => {
+    listener.remove();
+  };
 };
 
 /**
@@ -159,5 +178,22 @@ export const setTooltipEnabledSetting = (value: boolean) => {
 export const getTooltipEnabledSetting = (): boolean => {
   const value = storage.getString(KEY_TOOLTIP_ENABLED);
   return value ? JSON.parse(value) : DEFAULT_TOOLTIP_ENABLED;
+};
+
+/**
+ * 목록에서 소요 시간 표시 설정을 저장합니다.
+ * @param value 소요 시간 표시 여부
+ */
+export const setShowElapsedTimeInListSetting = (value: boolean) => {
+  storage.set(KEY_SHOW_ELAPSED_TIME_IN_LIST, JSON.stringify(value));
+};
+
+/**
+ * 목록에서 소요 시간 표시 설정을 가져옵니다.
+ * @returns 소요 시간 표시 여부 (기본값: false)
+ */
+export const getShowElapsedTimeInListSetting = (): boolean => {
+  const value = storage.getString(KEY_SHOW_ELAPSED_TIME_IN_LIST);
+  return value ? JSON.parse(value) : DEFAULT_SHOW_ELAPSED_TIME_IN_LIST;
 };
 

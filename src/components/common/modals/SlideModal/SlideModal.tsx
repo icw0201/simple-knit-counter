@@ -13,7 +13,7 @@ interface SlideModalProps {
   handleWidth?: number; // 핸들의 가로 길이 (기본값: 40)
   backgroundColor?: string; // 배경색 (기본값: white)
   padding?: number; // 모달 내부 패딩 (기본값: 20)
-  top?: DimensionValue; // 모달의 상단 위치 (기본값: '50%')
+  centerY?: DimensionValue; // 모달 세로 중앙 위치 (기본값: '50%'). SlideModal이 translateY: -height/2 로 보정함.
   onClose?: () => void; // 닫기 콜백 (선택사항)
 }
 
@@ -31,37 +31,40 @@ export const SlideModal: React.FC<SlideModalProps> = ({
   handleWidth = 40,
   backgroundColor = 'white',
   padding = 20,
-  top = '50%',
+  centerY = '50%',
   onClose,
 }) => {
   // ===== 상태 관리 =====
-  const [translateY, setTranslateY] = useState(isOpen ? -width : -handleWidth);
+  // 왼쪽 모달 기준:
+  // - 닫힌 상태: translateX = handleWidth (핸들만 보임)
+  // - 열린 상태: translateX = width (완전히 열림)
+  const [translateX, setTranslateX] = useState(isOpen ? width : handleWidth);
 
   const modalRef = useRef<View>(null);
 
-  // isOpen props가 변경될 때 translateY 업데이트
+  // isOpen props가 변경될 때 translateX 업데이트
   useEffect(() => {
-    setTranslateY(isOpen ? -width : -handleWidth);
+    setTranslateX(isOpen ? width : handleWidth);
   }, [isOpen, width, handleWidth]);
 
   // ===== 핸들러 함수들 =====
 
   // 모달 열기
   const handleOpen = () => {
-    setTranslateY(-width);
+    setTranslateX(width);
     onToggle?.();
   };
 
   // 모달 닫기
   const handleClose = () => {
-    setTranslateY(-handleWidth);
+    setTranslateX(handleWidth);
     onToggle?.();
     onClose?.();
   };
 
   // 드래그 위치 업데이트
-  const handleDragUpdate = (newTranslateY: number) => {
-    setTranslateY(newTranslateY);
+  const handleDragUpdate = (newTranslateX: number) => {
+    setTranslateX(newTranslateX);
   };
 
 
@@ -75,24 +78,24 @@ export const SlideModal: React.FC<SlideModalProps> = ({
       {/* 모달 내용 - 항상 보임, 드래그에 따라 위치 변경 */}
       <View
         ref={modalRef}
-        className="absolute border-t-2 border-l-2 border-white"
+        className="absolute border-t-2 border-r-2 border-white"
         style={{
-          top: top,
-          right: -width,
+          top: centerY,
+          left: -width,
           width: width,
           height: height,
           backgroundColor,
-          borderTopLeftRadius: 16,
-          borderBottomLeftRadius: 16,
+          borderTopRightRadius: 16,
+          borderBottomRightRadius: 16,
           // iOS용 그림자 (위쪽 그림자 제거)
           shadowColor: '#000',
-          shadowOffset: { width: -2, height: 2 },
+          shadowOffset: { width: 2, height: 2 },
           shadowOpacity: 0.25,
           shadowRadius: 3.84,
           // Android용 그림자
           elevation: 3,
           transform: [
-            { translateX: translateY },
+            { translateX: translateX },
             { translateY: -height / 2 },
           ],
         }}
@@ -104,9 +107,14 @@ export const SlideModal: React.FC<SlideModalProps> = ({
           locations={[0, 0.2, 0.6]} // 그라데이션 비율
           className="flex-1"
           style={{
-            padding: padding,
-            borderTopLeftRadius: 16,
-            borderBottomLeftRadius: 16,
+            // 핸들이 모달의 오른쪽(handleWidth) 영역을 덮기 때문에,
+            // children이 겹치지 않도록 해당 영역만큼 여유를 추가로 확보
+            paddingTop: padding,
+            paddingBottom: padding,
+            paddingLeft: padding,
+            paddingRight: padding + (handleWidth * 0.4),
+            borderTopRightRadius: 16,
+            borderBottomRightRadius: 16,
           }}
         >
           {children}
@@ -119,8 +127,8 @@ export const SlideModal: React.FC<SlideModalProps> = ({
         height={height}
         handleWidth={handleWidth}
         modalWidth={width}
-        translateY={translateY}
-        top={top}
+        translateX={translateX}
+        centerY={centerY}
         onOpen={handleOpen}
         onClose={handleClose}
         onToggle={onToggle}

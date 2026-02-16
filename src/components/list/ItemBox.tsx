@@ -3,12 +3,13 @@ import React from 'react';
 import { Text, TouchableOpacity, View, Image } from 'react-native';
 import clsx from 'clsx';
 import { colorStyles } from '@styles/colorStyles';
-import { Images } from '@assets/images';
+import { completeImages } from '@assets/images';
 
 interface ItemBoxProps {
   title: string;
   subtitle?: string;
   number?: number;
+  elapsedTimeText?: string;
   onPress: () => void;
   onLongPress?: () => void;
   progressPercentage?: number;
@@ -18,20 +19,22 @@ interface ItemBoxProps {
 
 /**
  * ItemRow에서 사용하는 박스 컴포넌트
- * 기존 RoundedBox의 레이아웃 스타일 C(제목과 숫자를 좌우로 배치)분리와 프로그레스 바 기능 포함
+ * 제목과 숫자를 좌우로 배치하는 박스 컴포넌트로 프로그레스 바 기능 포함
  */
 const ItemBox: React.FC<ItemBoxProps> = ({
   title,
   subtitle,
   number,
+  elapsedTimeText,
   onPress,
   onLongPress,
   progressPercentage,
   isCompleted = false,
   isEditMode = false,
 }) => {
-  const { container, text, subtext } = colorStyles.A;
+  const { container, text, subtext } = colorStyles.default;
   const hasProgress = progressPercentage !== undefined && progressPercentage !== null;
+  const hasElapsedTime = !!elapsedTimeText;
 
   const boxView = (
     <View className={clsx(
@@ -72,15 +75,26 @@ const ItemBox: React.FC<ItemBoxProps> = ({
             <Text className={clsx('text-lg font-semibold', isEditMode ? 'text-black' : text)}>{title}</Text>
           </View>
           {number !== undefined && (
-            <View className="relative items-center justify-center">
+            <View className="relative items-end justify-center">
               {isCompleted && (
                 <Image
-                  source={isEditMode ? Images.complete_reverse : Images.complete_nomal}
-                  className="absolute h-20 w-20 right-10 top-1/2 -mt-12"
+                  source={isEditMode ? completeImages.reverse : completeImages.normal}
+                  className="absolute h-20 w-20 right-10 top-1/2 -mt-11"
                   resizeMode="cover"
                 />
               )}
-              <Text className={clsx('text-2xl font-bold', text)}>{number}</Text>
+              <View className="items-end justify-center h-10">
+                {hasElapsedTime ? (
+                  <>
+                    <Text className={clsx('text-2xl font-bold', text)}>{number}</Text>
+                    <Text className={clsx('text-xs font-bold', text)}>
+                      {elapsedTimeText}
+                    </Text>
+                  </>
+                ) : (
+                  <Text className={clsx('text-2xl font-bold', text)}>{number}</Text>
+                )}
+              </View>
             </View>
           )}
         </View>

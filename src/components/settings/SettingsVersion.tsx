@@ -14,7 +14,7 @@ const SettingsVersion: React.FC<SettingsVersionProps> = ({
 }) => {
   return (
     <View className="items-center mt-4">
-      <Text className="text-[14px] text-gray-500">Ver {version}</Text>
+      <Text className="text-s text-darkgray">Ver {version}</Text>
     </View>
   );
 };

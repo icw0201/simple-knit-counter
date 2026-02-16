@@ -76,6 +76,7 @@ export const useProjectDetail = () => {
       targetCount: 0,
       elapsedTime: 0,
       timerIsActive: false,
+      timerIsPlaying: false,
       parentProjectId: project?.id ?? '',
       subCount: 0,
       subRule: 0,
@@ -83,11 +84,8 @@ export const useProjectDetail = () => {
       subModalIsOpen: false,
       // 마스코트 반복 규칙 기본값
       mascotIsActive: false,
-      wayIsChange: false,
-      repeatRuleIsActive: false,
-      repeatRuleNumber: 0,
-      repeatRuleStartNumber: 0,
-      repeatRuleEndNumber: 0,
+      wayIsChange: true,
+      repeatRules: [],
       // 구간 기록 기본값
       sectionRecords: [],
       sectionModalIsOpen: false,

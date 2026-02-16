@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text } from 'react-native';
 import BaseModal from '../common/modals/BaseModal/BaseModal';
-import RoundedBox from '@components/common/RoundedBox';
+import RoundedButton from '@components/common/RoundedButton';
 import TextInputBox from '@components/common/TextInputBox';
 import CheckBox from '@components/common/CheckBox';
 
@@ -54,7 +54,7 @@ const SubCounterRuleModal: React.FC<SubCounterRuleModalProps> = ({
                 value={rule}
                 onChangeText={setRule}
                 type="number"
-                className="mb-0"
+                containerClassName="mb-2"
                 placeholder="0"
               />
             </View>
@@ -75,21 +75,15 @@ const SubCounterRuleModal: React.FC<SubCounterRuleModalProps> = ({
 
         {/* 버튼 영역 */}
         <View className="flex-row justify-evenly">
-          <RoundedBox
+          <RoundedButton
             title="취소"
             onPress={onClose}
-            isButton
-            colorStyle="C"
-            rounded="full"
-            containerClassName="mx-1 py-3 px-8"
+            colorStyle="light"
           />
-          <RoundedBox
+          <RoundedButton
             title="확인"
             onPress={handleConfirm}
-            isButton
-            colorStyle="E"
-            rounded="full"
-            containerClassName="mx-1 py-3 px-8"
+            colorStyle="vivid"
           />
         </View>
       </View>
